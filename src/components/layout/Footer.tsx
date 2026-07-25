@@ -1,62 +1,113 @@
 import Link from "next/link";
-import { Twitter, Instagram, Youtube, Mail } from "lucide-react";
+import { NewsletterForm } from "./NewsletterForm";
+
+const EXPLORE = [
+  { href: "/reviews",  label: "Reviews" },
+  { href: "/news",     label: "News" },
+  { href: "/spotlight",label: "Spotlight" },
+  { href: "/lists",    label: "Rankings" },
+];
+
+const COMPANY = [
+  { href: "/about",   label: "About" },
+  { href: "/contact", label: "Contact" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms",   label: "Terms" },
+];
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-1 md:col-span-2">
-            <Link href="/" className="font-serif text-3xl font-bold tracking-tight text-primary mb-6 block">
-              ORANGE<span className="text-foreground">PULP</span>
-            </Link>
-            <p className="text-foreground/70 text-sm max-w-sm leading-relaxed">
-              Your premium destination for cinematic storytelling, editorial reviews, and deep-dive features into the world of entertainment.
-            </p>
-            <div className="flex gap-4 mt-8">
-              <Link href="#" className="text-foreground/60 hover:text-primary transition-colors"><Twitter className="w-5 h-5" /></Link>
-              <Link href="#" className="text-foreground/60 hover:text-primary transition-colors"><Instagram className="w-5 h-5" /></Link>
-              <Link href="#" className="text-foreground/60 hover:text-primary transition-colors"><Youtube className="w-5 h-5" /></Link>
+    <footer className="bg-foreground text-background border-t-[4px] border-foreground">
+
+      {/* Newsletter strip */}
+      <div className="border-b-[3px] border-background/15">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
+          <div className="shrink-0">
+            <div className="font-heading text-3xl font-black uppercase text-background leading-tight">
+              Stay in the Loop
+            </div>
+            <div className="text-sm font-bold text-background/50 mt-1 uppercase tracking-widest">
+              Weekly film takes. No spam.
             </div>
           </div>
-          
-          <div>
-            <h4 className="font-sans font-bold text-xs uppercase tracking-widest text-foreground mb-6">Explore</h4>
-            <ul className="space-y-4 text-sm text-foreground/70">
-              <li><Link href="/reviews" className="hover:text-primary transition-colors">Movie Reviews</Link></li>
-              <li><Link href="/news" className="hover:text-primary transition-colors">Latest News</Link></li>
-              <li><Link href="/spotlight" className="hover:text-primary transition-colors">Spotlights</Link></li>
-              <li><Link href="/recommendations" className="hover:text-primary transition-colors">Recommendations</Link></li>
-              <li><Link href="/lists" className="hover:text-primary transition-colors">Rankings</Link></li>
-            </ul>
-          </div>
+          <NewsletterForm />
+        </div>
+      </div>
 
-          <div>
-            <h4 className="font-sans font-bold text-xs uppercase tracking-widest text-foreground mb-6">Newsletter</h4>
-            <p className="text-sm text-foreground/70 mb-4">
-              Get the best of OrangePulp delivered to your inbox weekly.
-            </p>
-            <form className="flex">
-              <input 
-                type="email" 
-                placeholder="Email Address" 
-                className="bg-transparent border-b border-border py-2 px-0 text-sm w-full focus:outline-none focus:border-primary transition-colors"
-                required
-              />
-              <button type="submit" className="ml-4 text-primary hover:text-foreground transition-colors">
-                <Mail className="w-5 h-5" />
+      {/* Main footer grid */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-14 grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
+
+        {/* Brand column */}
+        <div className="md:col-span-2">
+          <Link href="/" className="inline-flex items-center gap-0 mb-4 group">
+            <span className="font-heading text-2xl font-black uppercase tracking-tighter text-background leading-none">
+              THE ORANGE
+            </span>
+            <span className="font-heading text-2xl font-black uppercase tracking-tighter leading-none ml-2 bg-primary text-foreground px-2 py-0.5 border-[2px] border-background/20 group-hover:bg-secondary transition-colors">
+              PULP
+            </span>
+          </Link>
+          <p className="text-sm font-medium text-background/55 leading-relaxed max-w-xs mt-2">
+            Premium movie reviews, news, and film culture for the modern cinephile.
+          </p>
+
+          {/* Social */}
+          <div className="flex gap-2 mt-6">
+            {["X", "IG", "YT"].map(s => (
+              <button
+                key={s}
+                className="w-9 h-9 border-[2px] border-background/30 text-background/60 text-[10px] font-black uppercase hover:border-primary hover:text-primary hover:bg-primary/10 transition-colors flex items-center justify-center"
+              >
+                {s}
               </button>
-            </form>
+            ))}
           </div>
         </div>
 
-        <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-foreground/50 font-medium">
-          <p>&copy; {new Date().getFullYear()} OrangePulp Media. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
-            <Link href="/about" className="hover:text-foreground transition-colors">About Us</Link>
-          </div>
+        {/* Explore */}
+        <div>
+          <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-background/40 mb-4">Explore</h4>
+          <ul className="space-y-3">
+            {EXPLORE.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="text-sm font-bold text-background/70 uppercase tracking-widest hover:text-primary transition-colors"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Company */}
+        <div>
+          <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-background/40 mb-4">Company</h4>
+          <ul className="space-y-3">
+            {COMPANY.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="text-sm font-bold text-background/70 uppercase tracking-widest hover:text-primary transition-colors"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t-[2px] border-background/10">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-background/35">
+            © {new Date().getFullYear()} The Orange Pulp. All rights reserved.
+          </p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-background/35">
+            Made for film lovers.
+          </p>
         </div>
       </div>
     </footer>

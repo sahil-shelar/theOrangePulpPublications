@@ -1,50 +1,66 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #fbf9f6;
-  --foreground: #2a2725;
-  --card: #ffffff;
-  --card-foreground: #2a2725;
-  --popover: #ffffff;
-  --popover-foreground: #2a2725;
-  --primary: #cf6b34;
-  --primary-foreground: #ffffff;
-  --secondary: #e8e4df;
-  --secondary-foreground: #2a2725;
-  --muted: #f3f0eb;
-  --muted-foreground: #7a7571;
-  --accent: #f3f0eb;
-  --accent-foreground: #2a2725;
-  --destructive: #ef4444;
+  /* Warm cream — between yellowed and white */
+  --background: #F5EFE4;
+  /* Deep forest green — rich, cooler hue to avoid olive/yellow cast */
+  --foreground: #173D2A;
+
+  --card: #F5EFE4;
+  --card-foreground: #173D2A;
+
+  --popover: #F5EFE4;
+  --popover-foreground: #173D2A;
+
+  /* Dusty rose — nakedcoffee pink card */
+  --primary: #E2BFCA;
+  --primary-foreground: #173D2A;
+
+  /* Soft butter yellow — nakedcoffee yellow card */
+  --secondary: #ECEA82;
+  --secondary-foreground: #173D2A;
+
+  /* Slightly warmer than background — subtle contrast without going tan */
+  --muted: #EEE9DF;
+  --muted-foreground: #3E6648;
+
+  /* Dusty slate blue — nakedcoffee blue card */
+  --accent: #99B4C8;
+  --accent-foreground: #173D2A;
+
+  --destructive: #c0392b;
   --destructive-foreground: #ffffff;
-  --border: #e8e4df;
-  --input: #e8e4df;
-  --ring: #cf6b34;
-  --radius: 0.5rem;
+
+  --border: #173D2A;
+  --input: #173D2A;
+  --ring: #E2BFCA;
+
+  --radius: 0px;
 }
 
 .dark {
-  --background: #161413;
-  --foreground: #e8e4df;
-  --card: #1c1a19;
-  --card-foreground: #e8e4df;
-  --popover: #1c1a19;
-  --popover-foreground: #e8e4df;
-  --primary: #cf6b34;
-  --primary-foreground: #ffffff;
-  --secondary: #2a2725;
-  --secondary-foreground: #e8e4df;
-  --muted: #2a2725;
-  --muted-foreground: #9ca3af;
-  --accent: #2a2725;
-  --accent-foreground: #e8e4df;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #2a2725;
-  --input: #2a2725;
-  --ring: #cf6b34;
+  --background: #173D2A;
+  --foreground: #F5EFE4;
+  --card: #1E4630;
+  --card-foreground: #F5EFE4;
+  --popover: #173D2A;
+  --popover-foreground: #F5EFE4;
+  --primary: #E2BFCA;
+  --primary-foreground: #173D2A;
+  --secondary: #ECEA82;
+  --secondary-foreground: #173D2A;
+  --muted: #1C4430;
+  --muted-foreground: #A8C8B0;
+  --accent: #99B4C8;
+  --accent-foreground: #173D2A;
+  --destructive: #c0392b;
+  --destructive-foreground: #F4EDD8;
+  --border: #F4EDD8;
+  --input: #F4EDD8;
+  --ring: #E2BFCA;
 }
 
 @theme inline {
@@ -69,7 +85,38 @@
   --color-ring: var(--ring);
 
   --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
+  --font-heading: var(--font-heading);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Sharp corners — brutalist cards */
+  .brutal-card {
+    @apply border-[3px] border-foreground bg-background;
+    box-shadow: 6px 6px 0px 0px var(--foreground);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .brutal-card:hover {
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0px 0px var(--foreground);
+  }
+
+  /* Sharp corners — brutalist buttons */
+  .brutal-button {
+    @apply border-[3px] border-foreground bg-foreground text-background font-black uppercase tracking-widest;
+    box-shadow: 4px 4px 0px 0px rgba(23, 61, 42, 0.3);
+    transition: box-shadow 0.15s ease, transform 0.15s ease, background-color 0.15s;
+  }
+
+  .brutal-button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px rgba(23, 61, 42, 0.3);
+    @apply bg-primary text-foreground;
+  }
 }
 
 @layer base {
@@ -79,5 +126,8 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading uppercase;
   }
 }
