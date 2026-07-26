@@ -9,6 +9,7 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
     <Link
       href={`/${typeToRoute(article.type)}/${article.slug}`}
       className="block group w-full relative h-[42vh] md:h-[72vh] overflow-hidden outline-none border-0"
+      style={{ boxShadow: '0 8px 28px rgba(23,61,42,0.45)' }}
     >
       {/* Background image */}
       <div className="absolute inset-0">
