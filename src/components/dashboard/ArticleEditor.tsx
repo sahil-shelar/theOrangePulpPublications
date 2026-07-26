@@ -405,7 +405,7 @@ export default function ArticleEditor({ initialData, categories, authors, movies
 
           {formData.type === 'review' && (
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Rating (0–10)</label>
+              <label className="text-[10px] font-black uppercase tracking-widest">Rating (0–5)</label>
               <input
                 type="number"
                 name="rating"
