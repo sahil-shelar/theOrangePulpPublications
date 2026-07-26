@@ -20,7 +20,7 @@ export default function AuthConfirmPage() {
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-          router.replace('/reset-password')
+          router.replace('/auth/setup')
           return
         }
         setStatus('error')
@@ -38,7 +38,7 @@ export default function AuthConfirmPage() {
         if (accessToken && refreshToken) {
           const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
           if (!error) {
-            router.replace('/reset-password')
+            router.replace('/auth/setup')
             return
           }
           setStatus('error')
