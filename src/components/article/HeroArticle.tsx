@@ -23,11 +23,11 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
         )}
       </div>
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/30 to-transparent" />
-
-      {/* Cream strip at bottom edge — prevents gradient-to-background contrast line */}
-      <div className="absolute bottom-0 left-0 right-0 h-[4px] bg-background" />
+      {/* Gradient overlay — fades to transparent at very bottom to avoid hard edge against page background */}
+      <div
+        className="absolute inset-0"
+        style={{ background: 'linear-gradient(to top, transparent 0%, rgba(23,61,42,0.9) 10%, rgba(23,61,42,0.3) 55%, transparent 100%)' }}
+      />
 
       {/* Badges — top-left on mobile, bottom-right on desktop */}
       <div className="absolute top-4 left-4 md:top-auto md:bottom-8 md:left-auto md:right-8 flex items-center gap-2 z-10">
