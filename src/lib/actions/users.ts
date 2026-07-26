@@ -21,8 +21,10 @@ export async function inviteUser(formData: FormData) {
   if (!['admin', 'editor', 'writer'].includes(role)) return { error: 'Invalid role' }
 
   const adminClient = createAdminClient()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
     data: { role },
+    redirectTo: `${siteUrl}/auth/confirm`,
   })
 
   if (error) return { error: error.message }
