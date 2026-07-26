@@ -16,7 +16,11 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.redirect(`${origin}/dashboard`)
     }
+
+    console.error('[auth/confirm] exchangeCodeForSession error:', error?.message, error?.status)
+    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error?.message || 'Invalid or expired link')}`)
   }
 
-  return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent('Invalid or expired link')}`)
+  console.error('[auth/confirm] no code in URL, params:', Object.fromEntries(searchParams))
+  return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent('No code in link — try again')}`)
 }
