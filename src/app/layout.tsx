@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import AutoAds from "@/components/ads/AutoAds";
 import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -59,6 +60,7 @@ export default function RootLayout({
           </main>
           <Footer />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
