@@ -107,6 +107,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
         {/* Back link */}
         <Link
           href={`/${typeToRoute(article.type)}`}
+          prefetch={false}
           className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-[10px] font-black uppercase tracking-widest transition-colors"
         >
           <ArrowLeft size={14} strokeWidth={3} /> {typeToRoute(article.type)}
@@ -158,6 +159,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
             </div>
             <Link
               href={`/author/${article.authors?.slug || ""}`}
+              prefetch={false}
               className="font-black uppercase tracking-widest text-[10px] text-background/80 hover:text-background transition-colors"
             >
               {article.authors?.name || "Editorial Team"}
@@ -190,6 +192,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
                   <Link
                     key={tag.id}
                     href={`/tag/${tag.slug}`}
+                    prefetch={false}
                     className={`border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors ${accent.tag}`}
                   >
                     #{tag.name}
@@ -228,6 +231,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
                     <Link
                       key={art.id}
                       href={`/${typeToRoute(art.type)}/${art.slug}`}
+                      prefetch={false}
                       className="group flex gap-3 py-4 hover:bg-muted/40 transition-colors"
                     >
                       {img ? (

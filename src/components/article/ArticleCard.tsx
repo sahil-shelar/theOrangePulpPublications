@@ -18,7 +18,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
 
   if (variant === 'horizontal') {
     return (
-      <Link href={href} className="group flex gap-0 brutal-card p-0 overflow-hidden hover:-translate-y-0.5 transition-transform">
+      <Link href={href} prefetch={false} className="group flex gap-0 brutal-card p-0 overflow-hidden hover:-translate-y-0.5 transition-transform">
         <div className="w-24 shrink-0 aspect-square border-r-[3px] border-foreground overflow-hidden bg-muted">
           {image ? (
             <img src={image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -43,7 +43,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
 
   if (variant === 'compact') {
     return (
-      <Link href={href} className="group block py-4 border-b-[2px] border-foreground last:border-b-0 hover:bg-muted/30 transition-colors px-2">
+      <Link href={href} prefetch={false} className="group block py-4 border-b-[2px] border-foreground last:border-b-0 hover:bg-muted/30 transition-colors px-2">
         <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50 mb-1">{article.categories?.name || article.type}</div>
         <h3 className="font-heading text-lg font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
           {article.title}
@@ -54,7 +54,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
   }
 
   return (
-    <Link href={href} className={`group flex flex-col brutal-card p-0 overflow-hidden hover:-translate-y-1 transition-transform h-full ${accentColor}`}>
+    <Link href={href} prefetch={false} className={`group flex flex-col brutal-card p-0 overflow-hidden hover:-translate-y-1 transition-transform h-full ${accentColor}`}>
       {/* Image */}
       <div className={`${imageAspect === 'portrait' ? 'aspect-[2/3]' : 'aspect-[4/3]'} relative overflow-hidden border-b-[3px] border-foreground bg-muted shrink-0`}>
         {image ? (
