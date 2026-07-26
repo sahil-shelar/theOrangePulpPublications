@@ -27,7 +27,7 @@ export async function inviteUser(formData: FormData) {
     redirectTo: `${siteUrl}/dashboard`,
   })
 
-  if (error) return { error: error.message }
+  if (error) return { error: error.message || error.code || JSON.stringify(error) }
 
   revalidatePath('/dashboard/users')
   return { success: true, userId: data.user?.id }
