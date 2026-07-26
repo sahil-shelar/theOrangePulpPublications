@@ -24,10 +24,10 @@ export async function inviteUser(formData: FormData) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
     data: { role },
-    redirectTo: `${siteUrl}/dashboard`,
+    redirectTo: `${siteUrl}/auth/confirm`,
   })
 
-  if (error) return { error: error.message || error.code || JSON.stringify(error) }
+  if (error) return { error: error.message || String(error) || 'Invite failed' }
 
   revalidatePath('/dashboard/users')
   return { success: true, userId: data.user?.id }
