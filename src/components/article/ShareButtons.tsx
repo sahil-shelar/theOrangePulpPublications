@@ -170,17 +170,33 @@ async function generateStoryCard(
     ctx.fillText("OP", BCX, BCY + 10);
   }
 
-  // ── Content below card — accumulated positions, tight gaps ──
+  // ── Content below card — vertically centered in available space ──
   ctx.textAlign = "center";
-  let y = CB + 56;
 
-  // Title
+  const hasRating = rating != null && Number(rating) > 0;
   const titleFont = title.length > 22 ? 60 : 72;
   const titleLH = titleFont + 10;
+
+  // Pre-measure title lines to know content height upfront
   ctx.font = `800 ${titleFont}px Arial, sans-serif`;
   const titleLines = wrap(ctx, title, 820).slice(0, 2);
+
+  const titleBlockH  = titleLines.length * titleLH + 20;
+  const excerptBlockH = excerpt ? 34 + 24 : 0;
+  const starsBlockH  = hasRating ? 38 * 2 + 32 : 0;  // R*2 height + gap
+  const ruleBlockH   = 44;
+  const brandBlockH  = 42 + 28;
+  const ctaBlockH    = 40;
+  const totalH = titleBlockH + excerptBlockH + starsBlockH + ruleBlockH + brandBlockH + ctaBlockH;
+
+  // Center block vertically between card bottom and canvas bottom (leave 120px bottom padding)
+  const available = H - CB - 120;
+  let y = CB + Math.max(60, (available - totalH) / 2);
+
+  // Title
   titleLines.forEach((l, i) => {
     ctx.fillStyle = "#FFFFFF";
+    ctx.font = `800 ${titleFont}px Arial, sans-serif`;
     ctx.fillText(l, W / 2, y + titleFont + i * titleLH);
   });
   y += titleLines.length * titleLH + 20;
@@ -190,13 +206,13 @@ async function generateStoryCard(
     ctx.font = "400 italic 34px Arial, sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.36)";
     ctx.fillText((wrap(ctx, excerpt, 800)[0] ?? ""), W / 2, y + 34);
-    y += 34 + 22;
+    y += 34 + 24;
   }
 
-  // Stars — canvas paths, no font/char rendering issues
-  if (rating != null && rating > 0) {
-    drawStars(ctx, Number(rating), W / 2, y + 42);
-    y += 42 + 38 + 28; // R=38, so star height = 76, + gap
+  // Stars — canvas paths
+  if (hasRating) {
+    drawStars(ctx, Number(rating), W / 2, y + 38);
+    y += 38 * 2 + 32;
   }
 
   // Divider rule
