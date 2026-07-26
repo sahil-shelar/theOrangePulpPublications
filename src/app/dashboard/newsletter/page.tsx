@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Mail, Users, Send } from 'lucide-react'
 import Link from 'next/link'
+import { sendCampaign } from '@/lib/actions/newsletter'
 
 export const revalidate = 0
 
@@ -81,9 +82,12 @@ export default async function NewsletterDashboard() {
                   <td className="p-3.5 font-bold text-sm">{campaign.click_rate != null ? `${campaign.click_rate}%` : '—'}</td>
                   <td className="p-3.5">
                     {campaign.status !== 'sent' && (
-                      <button className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1 hover:text-primary transition-colors">
-                        <Send size={13} /> Send
-                      </button>
+                      <form action={sendCampaign}>
+                        <input type="hidden" name="campaignId" value={campaign.id} />
+                        <button type="submit" className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1 hover:text-primary transition-colors">
+                          <Send size={13} /> Send
+                        </button>
+                      </form>
                     )}
                   </td>
                 </tr>

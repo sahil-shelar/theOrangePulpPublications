@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, Send } from 'lucide-react'
 import { createCampaign } from '@/lib/actions/newsletter'
 
+
 export default function NewCampaignPage() {
   return (
     <div className="p-6 md:p-8 max-w-3xl">
@@ -27,7 +28,7 @@ export default function NewCampaignPage() {
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase tracking-widest text-foreground">Body *</label>
           <textarea
-            name="body"
+            name="content"
             rows={12}
             required
             placeholder="Write your newsletter content here…"
