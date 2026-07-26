@@ -1,0 +1,1 @@
+ALTER TABLE comments ADD COLUMN IF NOT EXISTS guest_name VARCHAR(50);

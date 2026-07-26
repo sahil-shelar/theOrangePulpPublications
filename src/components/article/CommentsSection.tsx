@@ -5,14 +5,25 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MessageSquare, ThumbsUp, ThumbsDown, Flag } from 'lucide-react'
 
+function getOrCreateVisitorName(): string {
+  const key = 'op_visitor_name'
+  const stored = localStorage.getItem(key)
+  if (stored) return stored
+  const name = `visitor${Math.floor(1000 + Math.random() * 9000)}`
+  localStorage.setItem(key, name)
+  return name
+}
+
 export default function CommentsSection({ articleId }: { articleId: string }) {
   const [user, setUser] = useState(null)
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [visitorName, setVisitorName] = useState('')
 
   useEffect(() => {
+    setVisitorName(getOrCreateVisitorName())
     const supabase = createClient()
     Promise.all([
       supabase.auth.getUser(),
@@ -26,20 +37,28 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newComment.trim() || !user) return
+    if (!newComment.trim()) return
     setIsSubmitting(true)
     const supabase = createClient()
     const { data, error } = await supabase
       .from('comments')
-      .insert({ article_id: articleId, user_id: user.id, content: newComment, status: 'approved' })
+      .insert({
+        article_id: articleId,
+        user_id: user?.id ?? null,
+        guest_name: user ? null : visitorName,
+        content: newComment,
+        status: 'approved',
+      })
       .select()
       .single()
     if (!error && data) {
-      setComments([data, ...comments])
+      setComments([{ ...data, guest_name: data.guest_name ?? visitorName }, ...comments])
       setNewComment('')
     }
     setIsSubmitting(false)
   }
+
+  const displayName = (comment: any) => comment.guest_name ?? 'Member'
 
   return (
     <div className="mt-16 pt-8 border-t-[6px] border-foreground">
@@ -49,8 +68,13 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
 
       {loading ? (
         <div className="h-10 bg-muted/40 border-[2px] border-foreground/10 mb-12" />
-      ) : user ? (
+      ) : (
         <form onSubmit={handleSubmit} className="mb-12">
+          {!user && visitorName && (
+            <div className="mb-3 text-xs font-black uppercase tracking-widest text-foreground/40">
+              Commenting as <span className="text-primary">{visitorName}</span>
+            </div>
+          )}
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
@@ -67,30 +91,26 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
             {isSubmitting ? 'Posting...' : 'Post Comment'}
           </button>
         </form>
-      ) : (
-        <div className="bg-muted p-6 border-[3px] border-foreground mb-12 font-bold uppercase tracking-widest text-center text-sm">
-          Login to join the discussion
-        </div>
       )}
 
       <div className="space-y-6">
         {comments.map((comment: any) => (
           <div key={comment.id} className="bg-background border-[3px] border-foreground p-6">
             <div className="flex justify-between items-start mb-4">
-              <div className="font-black uppercase tracking-widest text-sm text-primary">User</div>
+              <div className="font-black uppercase tracking-widest text-sm text-primary">{displayName(comment)}</div>
               <div className="text-[10px] font-bold text-foreground/50">{new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</div>
             </div>
             <p className="font-medium text-foreground mb-6 leading-relaxed">{comment.content}</p>
             <div className="flex items-center gap-4 border-t-[2px] border-foreground/10 pt-4">
-               <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/60 hover:text-primary transition-colors">
-                 <ThumbsUp size={14} /> {comment.upvotes || 0}
-               </button>
-               <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/60 hover:text-red-500 transition-colors">
-                 <ThumbsDown size={14} /> {comment.downvotes || 0}
-               </button>
-               <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/40 hover:text-foreground transition-colors ml-auto">
-                 <Flag size={14} /> Report
-               </button>
+              <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/60 hover:text-primary transition-colors">
+                <ThumbsUp size={14} /> {comment.upvotes || 0}
+              </button>
+              <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/60 hover:text-red-500 transition-colors">
+                <ThumbsDown size={14} /> {comment.downvotes || 0}
+              </button>
+              <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/40 hover:text-foreground transition-colors ml-auto">
+                <Flag size={14} /> Report
+              </button>
             </div>
           </div>
         ))}
