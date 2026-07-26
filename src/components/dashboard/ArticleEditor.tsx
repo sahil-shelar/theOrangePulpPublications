@@ -412,9 +412,9 @@ export default function ArticleEditor({ initialData, categories, authors, movies
                 value={formData.rating}
                 onChange={handleChange}
                 min="0"
-                max="10"
+                max="5"
                 step="0.5"
-                placeholder="e.g. 8.5"
+                placeholder="e.g. 4.5"
                 className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold focus:outline-none"
               />
             </div>

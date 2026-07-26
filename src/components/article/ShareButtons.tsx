@@ -68,7 +68,7 @@ function drawStarPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: 
 }
 
 function drawStars(ctx: CanvasRenderingContext2D, rating10: number, cx: number, cy: number) {
-  const s5 = rating10 / 2;
+  const s5 = rating10;
   const full = Math.floor(s5);
   const half = (s5 - full) >= 0.5;
   const total = full + (half ? 1 : 0); // stars to draw
