@@ -56,6 +56,43 @@ function drawCircleClip(ctx: CanvasRenderingContext2D, img: HTMLImageElement, cx
   ctx.restore();
 }
 
+function drawStarPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const radius = i % 2 === 0 ? r : r * 0.4;
+    const angle = (i * Math.PI) / 5 - Math.PI / 2;
+    i === 0 ? ctx.moveTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle))
+             : ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
+  }
+  ctx.closePath();
+}
+
+function drawStars(ctx: CanvasRenderingContext2D, rating10: number, cx: number, cy: number) {
+  const s5 = rating10 / 2;
+  const full = Math.floor(s5);
+  const half = (s5 - full) >= 0.5;
+  const total = full + (half ? 1 : 0); // stars to draw
+  const R = 38, GAP = 18;
+  const totalW = total * R * 2 + (total - 1) * GAP;
+  let x = cx - totalW / 2 + R;
+  ctx.fillStyle = "#4ade80";
+  for (let i = 0; i < full; i++) {
+    drawStarPath(ctx, x, cy, R);
+    ctx.fill();
+    x += R * 2 + GAP;
+  }
+  if (half && x <= cx + totalW / 2) {
+    // half star: clip left half
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x - R, cy - R, R, R * 2);
+    ctx.clip();
+    drawStarPath(ctx, x, cy, R);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
 async function generateStoryCard(
   title: string,
   coverImageUrl: string | undefined,
@@ -156,16 +193,10 @@ async function generateStoryCard(
     y += 34 + 22;
   }
 
-  // Stars — filled only, no outline stars (more reliable rendering)
+  // Stars — canvas paths, no font/char rendering issues
   if (rating != null && rating > 0) {
-    const s5 = rating / 2;
-    const full = Math.floor(s5), half = (s5 - full) >= 0.5;
-    const starStr = "★".repeat(full) + (half ? "½" : "");
-    ctx.font = "600 68px Arial, sans-serif";
-    ctx.fillStyle = "#4ade80";
-    ctx.textAlign = "center";
-    ctx.fillText(starStr, W / 2, y + 68);
-    y += 68 + 32;
+    drawStars(ctx, Number(rating), W / 2, y + 42);
+    y += 42 + 38 + 28; // R=38, so star height = 76, + gap
   }
 
   // Divider rule
