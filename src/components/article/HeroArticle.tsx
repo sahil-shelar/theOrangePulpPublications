@@ -6,10 +6,10 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
   const image = article.cover_image_url || (article as any).movies?.backdrop_url || (article as any).movies?.poster_url
 
   return (
+    <div className="relative">
     <Link
       href={`/${typeToRoute(article.type)}/${article.slug}`}
       className="block group w-full relative h-[42vh] md:h-[72vh] overflow-hidden outline-none border-0"
-      style={{ boxShadow: '0 8px 28px rgba(23,61,42,0.45)' }}
     >
       {/* Background image */}
       <div className="absolute inset-0">
@@ -61,5 +61,8 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
         </div>
       </div>
     </Link>
+    {/* Green fade that continues below the hero into the page — not clipped by overflow-hidden */}
+    <div className="absolute top-full left-0 right-0 h-16 bg-gradient-to-b from-foreground/50 to-transparent pointer-events-none z-10" />
+    </div>
   )
 }
