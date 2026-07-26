@@ -8,7 +8,7 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
   return (
     <Link
       href={`/${typeToRoute(article.type)}/${article.slug}`}
-      className="block group w-full relative h-[58vh] md:h-[72vh] overflow-hidden border-b-[4px] border-foreground"
+      className="block group w-full relative h-[42vh] md:h-[72vh] overflow-hidden"
     >
       {/* Background image */}
       <div className="absolute inset-0">
@@ -26,19 +26,20 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/30 to-transparent" />
 
+      {/* Badges — top-left on mobile, bottom-right on desktop */}
+      <div className="absolute top-4 left-4 md:top-auto md:bottom-8 md:left-auto md:right-8 flex items-center gap-2 z-10">
+        <span className="bg-primary text-foreground text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground">
+          {article.type}
+        </span>
+        {article.categories && (
+          <span className="bg-background/10 text-background text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-background/30">
+            {article.categories.name}
+          </span>
+        )}
+      </div>
+
       {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 max-w-7xl mx-auto">
-        {/* Badges */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="bg-primary text-foreground text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground">
-            {article.type}
-          </span>
-          {article.categories && (
-            <span className="bg-background/10 text-background text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-background/30">
-              {article.categories.name}
-            </span>
-          )}
-        </div>
 
         {/* Title */}
         <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase text-background leading-[0.92] md:w-3/4 group-hover:text-primary transition-colors duration-300">
