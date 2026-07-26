@@ -42,6 +42,7 @@ export default function ArticleEditor({ initialData, categories, authors, movies
     workflow_status: initialData?.workflow_status || 'idea',
     assignee_id: initialData?.assignee_id || '',
     priority: initialData?.priority || 'medium',
+    rating: initialData?.rating != null ? String(initialData.rating) : '',
   })
 
   const [isSaving, setIsSaving] = useState(false)
@@ -109,6 +110,7 @@ export default function ArticleEditor({ initialData, categories, authors, movies
       category_id: formData.category_id === '' ? null : formData.category_id,
       author_id: formData.author_id === '' ? null : formData.author_id,
       assignee_id: formData.assignee_id === '' ? null : formData.assignee_id,
+      rating: formData.rating === '' ? null : Number(formData.rating),
       published_at: (forceStatus === 'published' && !initialData?.published_at) ? new Date().toISOString() : initialData?.published_at
     }
 
@@ -400,6 +402,23 @@ export default function ArticleEditor({ initialData, categories, authors, movies
               <option value="list">List</option>
             </select>
           </div>
+
+          {formData.type === 'review' && (
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Rating (0–10)</label>
+              <input
+                type="number"
+                name="rating"
+                value={formData.rating}
+                onChange={handleChange}
+                min="0"
+                max="10"
+                step="0.5"
+                placeholder="e.g. 8.5"
+                className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold focus:outline-none"
+              />
+            </div>
+          )}
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase tracking-widest">Category</label>
