@@ -1,35 +1,39 @@
 // @ts-nocheck
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MessageSquare, ThumbsUp, ThumbsDown, Flag } from 'lucide-react'
 
-type CommentsSectionProps = {
-  articleId: string
-  initialComments: any[]
-  user: any
-}
-
-export default function CommentsSection({ articleId, initialComments, user }: CommentsSectionProps) {
-  const supabase = createClient()
-  const [comments, setComments] = useState(initialComments)
+export default function CommentsSection({ articleId }: { articleId: string }) {
+  const [user, setUser] = useState(null)
+  const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const supabase = createClient()
+    Promise.all([
+      supabase.auth.getUser(),
+      supabase.from('comments').select('*').eq('article_id', articleId).order('created_at', { ascending: false }),
+    ]).then(([{ data: { user } }, { data: comments }]) => {
+      setUser(user)
+      setComments(comments ?? [])
+      setLoading(false)
+    })
+  }, [articleId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newComment.trim() || !user) return
-
     setIsSubmitting(true)
-    const payload = {
-      article_id: articleId,
-      user_id: user.id,
-      content: newComment,
-      status: 'approved', // Real app would have a moderation step
-    }
-
-    const { data, error } = await supabase.from('comments').insert(payload).select().single()
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('comments')
+      .insert({ article_id: articleId, user_id: user.id, content: newComment, status: 'approved' })
+      .select()
+      .single()
     if (!error && data) {
       setComments([data, ...comments])
       setNewComment('')
@@ -43,7 +47,9 @@ export default function CommentsSection({ articleId, initialComments, user }: Co
         <MessageSquare size={32} /> Comments ({comments.length})
       </h3>
 
-      {user ? (
+      {loading ? (
+        <div className="h-10 bg-muted/40 border-[2px] border-foreground/10 mb-12" />
+      ) : user ? (
         <form onSubmit={handleSubmit} className="mb-12">
           <textarea
             value={newComment}
@@ -68,7 +74,7 @@ export default function CommentsSection({ articleId, initialComments, user }: Co
       )}
 
       <div className="space-y-6">
-        {comments.map((comment) => (
+        {comments.map((comment: any) => (
           <div key={comment.id} className="bg-background border-[3px] border-foreground p-6">
             <div className="flex justify-between items-start mb-4">
               <div className="font-black uppercase tracking-widest text-sm text-primary">User</div>
@@ -88,7 +94,7 @@ export default function CommentsSection({ articleId, initialComments, user }: Co
             </div>
           </div>
         ))}
-        {comments.length === 0 && (
+        {!loading && comments.length === 0 && (
           <div className="text-center font-bold text-foreground/50 py-12 border-[3px] border-dashed border-foreground/20">
             NO COMMENTS YET. BE THE FIRST.
           </div>

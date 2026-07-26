@@ -10,7 +10,6 @@ import CommentsSection from "./CommentsSection";
 import ShareButtons from "./ShareButtons";
 import SidebarNewsletter from "./SidebarNewsletter";
 import { getRecommendedArticles } from "@/lib/services/recommendations";
-import { createClient } from "@/lib/supabase/server";
 import { createPublicClient } from "@/lib/supabase/public";
 import { unstable_cache } from "next/cache";
 import { ArrowLeft } from "lucide-react";
@@ -42,11 +41,7 @@ const TYPE_ACCENT: Record<string, { strip: string; badge: string; tag: string; b
 };
 
 export default async function ArticleDetailView({ article }: { article: ArticleWithRelations }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const [{ data: initialComments }, articleTags, related] = await Promise.all([
-    supabase.from("comments").select("*").eq("article_id", article.id).order("created_at", { ascending: false }),
+  const [articleTags, related] = await Promise.all([
     getCachedArticleTags(article.id),
     getCachedRelated(article.id, article.category_id, article.type, article.movie_id),
   ]);
@@ -210,7 +205,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
           <ShareButtons title={article.title} accentBorder={accent.border} />
 
           {/* Comments */}
-          <CommentsSection articleId={article.id} initialComments={initialComments || []} user={user} />
+          <CommentsSection articleId={article.id} />
         </div>
 
         {/* Sidebar */}
