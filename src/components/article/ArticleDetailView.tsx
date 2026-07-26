@@ -11,8 +11,28 @@ import ShareButtons from "./ShareButtons";
 import SidebarNewsletter from "./SidebarNewsletter";
 import { getRecommendedArticles } from "@/lib/services/recommendations";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { unstable_cache } from "next/cache";
 import { ArrowLeft } from "lucide-react";
 import { typeToRoute } from "@/lib/utils";
+
+const getCachedArticleTags = unstable_cache(
+  async (articleId: string) => {
+    const supabase = createPublicClient()
+    const { data } = await supabase.from("article_tags").select("tags(id, name, slug)").eq("article_id", articleId)
+    return data ?? []
+  },
+  ['article-tags'],
+  { revalidate: 300, tags: ['articles'] }
+)
+
+const getCachedRelated = unstable_cache(
+  async (articleId: string, categoryId: string | null, type: string, movieId: string | null) => {
+    return getRecommendedArticles(articleId, 4, { category_id: categoryId, type, movie_id: movieId })
+  },
+  ['article-related'],
+  { revalidate: 300, tags: ['articles'] }
+)
 
 const TYPE_ACCENT: Record<string, { strip: string; badge: string; tag: string; border: string }> = {
   review:    { strip: "bg-primary",    badge: "bg-primary text-foreground border-foreground",    tag: "bg-primary text-foreground",    border: "border-primary" },
@@ -25,14 +45,10 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const [{ data: initialComments }, { data: articleTags }, related] = await Promise.all([
+  const [{ data: initialComments }, articleTags, related] = await Promise.all([
     supabase.from("comments").select("*").eq("article_id", article.id).order("created_at", { ascending: false }),
-    supabase.from("article_tags").select("tags(id, name, slug)").eq("article_id", article.id),
-    getRecommendedArticles(article.id, 4, {
-      category_id: article.category_id,
-      type: article.type,
-      movie_id: article.movie_id,
-    }),
+    getCachedArticleTags(article.id),
+    getCachedRelated(article.id, article.category_id, article.type, article.movie_id),
   ]);
 
   const coverImage = article.cover_image_url || (article as any).movies?.backdrop_url;
@@ -170,7 +186,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
           {/* Tags */}
           <div className="mt-10 flex flex-wrap gap-2">
             {articleTags && articleTags.length > 0
-              ? articleTags.map((at: any) => at.tags).filter(Boolean).map((tag: any) => (
+              ? (articleTags as any[]).map((at: any) => at.tags).filter(Boolean).map((tag: any) => (
                   <Link
                     key={tag.id}
                     href={`/tag/${tag.slug}`}

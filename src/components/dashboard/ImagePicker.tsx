@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { uploadMediaAction } from '@/lib/actions/media'
+import { createClient } from '@/lib/supabase/client'
+import { registerMediaRecord } from '@/lib/actions/media'
 import { STORAGE_BUCKETS } from '@/lib/api/storage'
 import { Upload, Link as LinkIcon, X, RefreshCw, ImageIcon } from 'lucide-react'
 
@@ -13,6 +14,8 @@ type Props = {
 }
 
 type Tab = 'upload' | 'url'
+
+const ALLOWED = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif']
 
 export default function ImagePicker({ value, onChange, label = 'Cover Image', bucket = STORAGE_BUCKETS.ARTICLES }: Props) {
   const [tab, setTab] = useState<Tab>('upload')
@@ -28,34 +31,46 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
     setUploading(true)
     setProgress(10)
 
-    // Validate
-    const ALLOWED = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif']
     if (!ALLOWED.includes(file.type)) {
       setError('Unsupported format. Use JPG, PNG, WebP or AVIF.')
       setUploading(false)
       return
     }
-    if (file.size > 25 * 1024 * 1024) {
-      setError('File exceeds 25 MB limit.')
+    if (file.size > 50 * 1024 * 1024) {
+      setError('File exceeds 50 MB limit.')
       setUploading(false)
       return
     }
 
-    // Fake progress ticks while awaiting server action
-    const tick = setInterval(() => setProgress(p => Math.min(p + 12, 85)), 400)
+    const safeName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_')
+    const uniqueId = Math.random().toString(36).substring(2, 9)
+    const fileName = `${Date.now()}_${uniqueId}_${safeName}`
 
-    const fd = new FormData()
-    fd.append('file', file)
+    const tick = setInterval(() => setProgress(p => Math.min(p + 8, 85)), 500)
+
     try {
-      const res = await uploadMediaAction(fd, bucket)
+      // Upload directly browser → Supabase Storage (no Vercel body limit)
+      const supabase = createClient()
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(fileName, file, { cacheControl: '3600', upsert: false })
+
       clearInterval(tick)
-      if (res.error) {
-        setError(res.error)
-      } else if (res.url) {
-        setProgress(100)
-        onChange(res.url)
-        setTimeout(() => setProgress(0), 600)
+
+      if (uploadError) {
+        setError(uploadError.message)
+        setUploading(false)
+        return
       }
+
+      const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(fileName)
+      setProgress(100)
+      onChange(publicUrl)
+
+      // Register in media library (tiny metadata call, no file payload)
+      registerMediaRecord(fileName, publicUrl, file.type, file.size).catch(() => {})
+
+      setTimeout(() => setProgress(0), 600)
     } catch (e: any) {
       clearInterval(tick)
       setError(e.message || 'Upload failed.')
@@ -104,7 +119,6 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
         <div className="text-red-500 text-[10px] font-black uppercase tracking-widest border-l-[3px] border-red-500 pl-2">{error}</div>
       )}
 
-      {/* Preview */}
       {value && (
         <div className="relative border-[3px] border-foreground overflow-hidden bg-muted aspect-video">
           <img src={value} alt="Preview" className="w-full h-full object-cover" />
@@ -119,17 +133,12 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
         </div>
       )}
 
-      {/* Upload progress bar */}
       {uploading && (
         <div className="w-full h-[3px] bg-muted border-[1px] border-foreground/20">
-          <div
-            className="h-full bg-primary transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
+          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
       )}
 
-      {/* Tab bar */}
       <div className="flex border-[3px] border-foreground">
         {(['upload', 'url'] as Tab[]).map(t => (
           <button
@@ -146,7 +155,6 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
         ))}
       </div>
 
-      {/* Upload tab */}
       {tab === 'upload' && (
         <div
           onDragOver={e => { e.preventDefault(); setDragging(true) }}
@@ -162,7 +170,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
             <p className="text-xs font-black uppercase tracking-widest text-foreground/70">
               {uploading ? 'Uploading…' : dragging ? 'Drop to upload' : 'Drag & drop or click'}
             </p>
-            <p className="text-[10px] font-bold text-foreground/40 mt-0.5">JPG · PNG · WebP · AVIF · max 25 MB</p>
+            <p className="text-[10px] font-bold text-foreground/40 mt-0.5">JPG · PNG · WebP · AVIF · max 50 MB</p>
           </div>
           <input
             ref={fileRef}
@@ -175,7 +183,6 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
         </div>
       )}
 
-      {/* URL tab */}
       {tab === 'url' && (
         <div className="flex gap-0">
           <input

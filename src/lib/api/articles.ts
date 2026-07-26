@@ -20,6 +20,21 @@ export const getCachedArticleBySlug = cache(
   }
 )
 
+// Cross-request cache (60s) using public client — no cookies needed, safe for force-dynamic pages
+export const getCachedPublicArticleBySlug = unstable_cache(
+  async (slug: string): Promise<ArticleWithRelations | null> => {
+    const supabase = createPublicClient()
+    const { data } = await supabase
+      .from('articles')
+      .select('*, categories(*), authors(*), movies(*)')
+      .eq('slug', slug)
+      .single()
+    return (data ?? null) as ArticleWithRelations | null
+  },
+  ['public-article-by-slug'],
+  { revalidate: 60, tags: ['articles'] }
+)
+
 // Returns published slugs by type — used in generateStaticParams
 export const getPublishedSlugs = unstable_cache(
   async (type: string): Promise<{ slug: string }[]> => {

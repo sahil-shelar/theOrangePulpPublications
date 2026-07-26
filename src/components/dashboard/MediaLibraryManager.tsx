@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { uploadMediaAction, deleteMediaAction } from '@/lib/actions/media'
+import { registerMediaRecord, deleteMediaAction } from '@/lib/actions/media'
 import { STORAGE_BUCKETS } from '@/lib/api/storage'
+import { createClient } from '@/lib/supabase/client'
 import { Trash2, Copy, Grid, List, Search, UploadCloud, X } from 'lucide-react'
 
 type MediaFile = {
@@ -32,17 +33,17 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
 
     let newFiles = [...files]
 
+    const supabase = createClient()
     for (let i = 0; i < selected.length; i++) {
       const file = selected[i]
-      const formData = new FormData()
-      formData.append('file', file)
-      
-      const res = await uploadMediaAction(formData, STORAGE_BUCKETS.ASSETS)
-      if (res.success) {
-        // Optimistic UI update could go here, but we'll rely on refresh or manual unshift
-        // Let's just trigger a router refresh after, or push to state if we returned the full object.
-        // Server action just returns {success, url, path}. 
-        // For simplicity, we just reload the page when done or mutate state locally.
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_')
+      const uniqueId = Math.random().toString(36).substring(2, 9)
+      const fileName = `${Date.now()}_${uniqueId}_${safeName}`
+
+      const { error, data } = await supabase.storage.from(STORAGE_BUCKETS.ASSETS).upload(fileName, file, { cacheControl: '3600', upsert: false })
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage.from(STORAGE_BUCKETS.ASSETS).getPublicUrl(fileName)
+        registerMediaRecord(fileName, publicUrl, file.type, file.size).catch(() => {})
       }
       setUploadProgress({ current: i + 1, total: selected.length })
     }

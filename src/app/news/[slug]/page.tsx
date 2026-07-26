@@ -1,4 +1,4 @@
-import { getCachedArticleBySlug, getPublishedSlugs } from "@/lib/api/articles"
+import { getCachedPublicArticleBySlug, getPublishedSlugs } from "@/lib/api/articles"
 import { notFound } from "next/navigation"
 import ArticleDetailView from "@/components/article/ArticleDetailView"
 
@@ -12,7 +12,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const article = await getCachedArticleBySlug(slug)
+  const article = await getCachedPublicArticleBySlug(slug)
   if (!article || article.status !== 'published') return {}
   const title = article.seo_title || article.title
   const description = article.seo_description || article.excerpt || ''
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const article = await getCachedArticleBySlug(slug)
+  const article = await getCachedPublicArticleBySlug(slug)
 
   if (!article || article.status !== 'published' || article.type !== 'news') {
     notFound()
