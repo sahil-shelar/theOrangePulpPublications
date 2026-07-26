@@ -38,9 +38,9 @@ export default function LetterboxdRow({ post, href }: Props) {
         {post.rating && (
           <div className="flex items-center gap-0.5 mt-1">
             {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={`text-[11px] ${i < Math.round(post.rating / 2) ? 'text-foreground' : 'text-foreground/20'}`}>★</span>
+              <span key={i} className={`text-[11px] ${i < Math.round(post.rating) ? 'text-foreground' : 'text-foreground/20'}`}>★</span>
             ))}
-            <span className="text-[9px] font-black text-foreground/40 ml-1">{post.rating}/10</span>
+            <span className="text-[9px] font-black text-foreground/40 ml-1">{post.rating}/5</span>
           </div>
         )}
 

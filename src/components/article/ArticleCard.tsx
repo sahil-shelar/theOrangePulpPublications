@@ -77,7 +77,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
         {/* Rating */}
         {(article as any).rating && (
           <span className="absolute top-3 right-3 bg-foreground text-background text-xs font-black px-2.5 py-1 border-[2px] border-background">
-            {(article as any).rating}/10
+            {(article as any).rating}/5
           </span>
         )}
       </div>
