@@ -202,7 +202,13 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
           </div>
 
           {/* Share */}
-          <ShareButtons title={article.title} accentBorder={accent.border} />
+          <ShareButtons
+            title={article.title}
+            accentBorder={accent.border}
+            coverImageUrl={article.cover_image_url || (article as any).movies?.backdrop_url || undefined}
+            rating={(article as any).rating ?? undefined}
+            excerpt={article.excerpt ?? undefined}
+          />
 
           {/* Comments */}
           <CommentsSection articleId={article.id} />
