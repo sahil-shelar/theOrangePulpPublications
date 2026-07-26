@@ -2,7 +2,7 @@ import { getCachedArticleBySlug, getPublishedSlugs } from "@/lib/api/articles"
 import { notFound } from "next/navigation"
 import ArticleDetailView from "@/components/article/ArticleDetailView"
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
 export async function generateStaticParams() {
