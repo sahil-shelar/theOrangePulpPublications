@@ -73,22 +73,11 @@ async function generateStoryCard(
     loadImage(`${siteOrigin}/logo.jpg`),
   ]);
 
-  // ── Background: blurred cover (Letterboxd style) ──
-  if (coverImg) {
-    ctx.save();
-    ctx.filter = "blur(48px)";
-    // Overdraw by 80px on each side so blur edges don't go dark
-    const bScale = Math.max((W + 160) / coverImg.naturalWidth, (H + 160) / coverImg.naturalHeight);
-    const bw = coverImg.naturalWidth * bScale, bh = coverImg.naturalHeight * bScale;
-    ctx.drawImage(coverImg, (W - bw) / 2, (H - bh) / 2, bw, bh);
-    ctx.filter = "none";
-    ctx.restore();
-  } else {
-    ctx.fillStyle = "#1c1c1e";
-    ctx.fillRect(0, 0, W, H);
-  }
-  // Dark vignette over blurred bg — keeps text readable, preserves color tint
-  ctx.fillStyle = "rgba(14,14,16,0.80)";
+  // ── Background: light grey → dark grey gradient ──
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, "#3a3a3c");
+  bgGrad.addColorStop(1, "#0f0f11");
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, W, H);
 
   // ── Card: 640×860 — tighter poster, more content room ──
@@ -130,7 +119,7 @@ async function generateStoryCard(
   const BCX = W / 2, BCY = CY;
 
   ctx.beginPath(); ctx.arc(BCX, BCY, BR + 6, 0, Math.PI * 2);
-  ctx.fillStyle = "#1c1c1e"; ctx.fill();
+  ctx.fillStyle = "#2e2e30"; ctx.fill();
 
   ctx.beginPath(); ctx.arc(BCX, BCY, BR + 3, 0, Math.PI * 2);
   ctx.strokeStyle = "#E8A045"; ctx.lineWidth = 3; ctx.stroke();
@@ -167,15 +156,16 @@ async function generateStoryCard(
     y += 34 + 22;
   }
 
-  // Stars
-  if (rating) {
+  // Stars — filled only, no outline stars (more reliable rendering)
+  if (rating != null && rating > 0) {
     const s5 = rating / 2;
     const full = Math.floor(s5), half = (s5 - full) >= 0.5;
-    const starStr = "★".repeat(full) + (half ? "½" : "") + "☆".repeat(5 - full - (half ? 1 : 0));
-    ctx.font = "500 64px Arial, sans-serif";
+    const starStr = "★".repeat(full) + (half ? "½" : "");
+    ctx.font = "600 68px Arial, sans-serif";
     ctx.fillStyle = "#4ade80";
-    ctx.fillText(starStr, W / 2, y + 64);
-    y += 64 + 36;
+    ctx.textAlign = "center";
+    ctx.fillText(starStr, W / 2, y + 68);
+    y += 68 + 32;
   }
 
   // Divider rule
