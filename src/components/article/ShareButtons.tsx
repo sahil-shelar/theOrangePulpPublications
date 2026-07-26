@@ -11,125 +11,153 @@ type Props = {
   excerpt?: string;
 };
 
+function cardRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
+  const words = text.split(" ");
+  let line = "", lines: string[] = [];
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word; }
+    else line = test;
+  }
+  lines.push(line);
+  return lines;
+}
+
 async function generateStoryCard(
   title: string,
   coverImageUrl: string | undefined,
   rating: number | null | undefined,
-  excerpt: string | undefined,
 ): Promise<Blob> {
   const W = 1080, H = 1920;
   const canvas = document.createElement("canvas");
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext("2d")!;
 
-  // Background
-  ctx.fillStyle = "#0d2318";
+  // Dark neutral background — no green
+  ctx.fillStyle = "#111827";
   ctx.fillRect(0, 0, W, H);
 
-  // Try to draw cover image (top 55%)
+  // Subtle top vignette
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, 400);
+  bgGrad.addColorStop(0, "rgba(20,20,40,0.6)");
+  bgGrad.addColorStop(1, "rgba(17,24,39,0)");
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, 400);
+
+  // Card — portrait, centered, like Letterboxd poster
+  const CARD_W = 660, CARD_H = 900, CARD_R = 28;
+  const cardX = (W - CARD_W) / 2;
+  const cardY = 200;
+
+  // Draw image clipped to card
+  ctx.save();
+  cardRoundRect(ctx, cardX, cardY, CARD_W, CARD_H, CARD_R);
+  ctx.clip();
+
   if (coverImageUrl) {
     try {
       const img = new Image();
       img.crossOrigin = "anonymous";
-      await new Promise<void>((resolve) => {
-        img.onload = () => resolve();
-        img.onerror = () => resolve();
-        img.src = coverImageUrl;
-      });
+      await new Promise<void>((resolve) => { img.onload = () => resolve(); img.onerror = () => resolve(); img.src = coverImageUrl; });
       if (img.naturalWidth > 0) {
-        const imgH = H * 0.58;
-        // cover-fit
-        const scale = Math.max(W / img.naturalWidth, imgH / img.naturalHeight);
+        const scale = Math.max(CARD_W / img.naturalWidth, CARD_H / img.naturalHeight);
         const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
-        const dx = (W - dw) / 2, dy = 0;
-        ctx.drawImage(img, dx, dy, dw, dh);
-        // gradient fade from image to bg
-        const grad = ctx.createLinearGradient(0, imgH * 0.5, 0, imgH);
-        grad.addColorStop(0, "rgba(13,35,24,0)");
-        grad.addColorStop(1, "rgba(13,35,24,1)");
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, W, imgH);
+        ctx.drawImage(img, cardX + (CARD_W - dw) / 2, cardY + (CARD_H - dh) / 2, dw, dh);
+      } else {
+        ctx.fillStyle = "#1f2937"; ctx.fillRect(cardX, cardY, CARD_W, CARD_H);
       }
-    } catch (_) {}
+    } catch (_) {
+      ctx.fillStyle = "#1f2937"; ctx.fillRect(cardX, cardY, CARD_W, CARD_H);
+    }
+  } else {
+    ctx.fillStyle = "#1f2937"; ctx.fillRect(cardX, cardY, CARD_W, CARD_H);
   }
+  ctx.restore();
 
-  const textY = H * 0.62;
+  // Card border — subtle white
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
+  ctx.lineWidth = 2;
+  cardRoundRect(ctx, cardX, cardY, CARD_W, CARD_H, CARD_R);
+  ctx.stroke();
 
-  // Type pill
-  ctx.fillStyle = "#E8A045";
-  ctx.beginPath();
-  ctx.roundRect(80, textY, 160, 52, 4);
-  ctx.fill();
-  ctx.fillStyle = "#0d2318";
-  ctx.font = "bold 26px Arial, sans-serif";
+  // Logo badge circle at top-center of card (overlapping top edge)
+  const CX = W / 2, CY = cardY;
+  const CR = 68;
+  ctx.beginPath(); ctx.arc(CX, CY, CR, 0, Math.PI * 2);
+  ctx.fillStyle = "#E8A045"; ctx.fill();
+  ctx.strokeStyle = "#111827"; ctx.lineWidth = 6; ctx.stroke();
+  // "TOP" lettering inside badge
+  ctx.fillStyle = "#111827";
   ctx.textAlign = "center";
-  ctx.fillText("REVIEW", 160, textY + 35);
+  ctx.font = "900 22px Arial, sans-serif";
+  ctx.fillText("THE", CX, CY - 10);
+  ctx.font = "900 26px Arial, sans-serif";
+  ctx.fillText("PULP", CX, CY + 18);
 
-  // Title — wrap text
-  ctx.fillStyle = "#F5F0E8";
-  ctx.textAlign = "left";
-  const titleSize = title.length > 30 ? 72 : 88;
-  ctx.font = `900 ${titleSize}px Arial, sans-serif`;
-  const words = title.toUpperCase().split(" ");
-  let line = "", lines: string[] = [], maxW = W - 160;
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    if (ctx.measureText(test).width > maxW && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  }
-  lines.push(line);
-  lines.slice(0, 3).forEach((l, i) => {
-    ctx.fillText(l, 80, textY + 120 + i * (titleSize + 16));
-  });
+  // ── Below card ──
+  const belowY = cardY + CARD_H + 72;
 
-  const afterTitle = textY + 120 + Math.min(lines.length, 3) * (titleSize + 16) + 40;
+  // Title
+  ctx.fillStyle = "#FFFFFF";
+  ctx.textAlign = "center";
+  ctx.font = "700 66px Arial, sans-serif";
+  const titleLines = wrapText(ctx, title, 860).slice(0, 2);
+  titleLines.forEach((l, i) => ctx.fillText(l, W / 2, belowY + i * 84));
 
-  // Excerpt
-  if (excerpt) {
-    ctx.fillStyle = "rgba(245,240,232,0.55)";
-    ctx.font = "400 38px Arial, sans-serif";
-    const exWords = excerpt.split(" ");
-    let exLine = "", exLines: string[] = [];
-    for (const w of exWords) {
-      const test = exLine ? `${exLine} ${w}` : w;
-      if (ctx.measureText(test).width > maxW && exLine) { exLines.push(exLine); exLine = w; }
-      else exLine = test;
-      if (exLines.length === 2) break;
-    }
-    exLines.push(exLine);
-    exLines.slice(0, 2).forEach((l, i) => ctx.fillText(l, 80, afterTitle + i * 54));
-  }
+  let curY = belowY + titleLines.length * 84 + 36;
 
-  // Rating
+  // Stars rating (convert /10 → /5)
   if (rating) {
-    const ratingY = H * 0.88;
-    ctx.fillStyle = "#E8A045";
-    ctx.font = "900 130px Arial, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText(`${rating}`, 80, ratingY);
-    ctx.fillStyle = "rgba(232,160,69,0.6)";
-    ctx.font = "bold 60px Arial, sans-serif";
-    ctx.fillText(`/10`, 80 + ctx.measureText(`${rating}`).width + 8, ratingY - 10);
-    ctx.fillStyle = "rgba(245,240,232,0.4)";
-    ctx.font = "bold 32px Arial, sans-serif";
-    ctx.fillText("RATING", 80, ratingY + 36);
+    const stars5 = rating / 2;
+    const full = Math.floor(stars5);
+    const half = stars5 - full >= 0.5;
+    const empty = 5 - full - (half ? 1 : 0);
+    const starStr = "★".repeat(full) + (half ? "½" : "") + "☆".repeat(empty);
+    ctx.fillStyle = "#4ade80"; // green stars like Letterboxd
+    ctx.font = "bold 88px Arial, sans-serif";
+    ctx.fillText(starStr, W / 2, curY + 80);
+    curY += 110;
   }
 
-  // Bottom branding bar
-  ctx.fillStyle = "#E8A045";
-  ctx.fillRect(0, H - 140, W, 4);
-  ctx.fillStyle = "#F5F0E8";
-  ctx.font = "900 52px Arial, sans-serif";
+  curY += 40;
+
+  // Divider with "ON" label
+  ctx.strokeStyle = "rgba(255,255,255,0.2)";
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W / 2 - 180, curY); ctx.lineTo(W / 2 + 180, curY); ctx.stroke();
+  ctx.fillStyle = "rgba(255,255,255,0.4)";
+  ctx.font = "500 30px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("ON", W / 2, curY + 44);
+
+  curY += 60;
+
+  // Orange dots + brand name (like Letterboxd's dot + name)
+  const dotY = curY + 56;
+  const dotColors = ["#E8A045", "#d97706", "#f59e0b"];
+  const nameStart = W / 2 - 240;
+  dotColors.forEach((c, i) => {
+    ctx.beginPath(); ctx.arc(nameStart + i * 42, dotY, 18, 0, Math.PI * 2);
+    ctx.fillStyle = c; ctx.fill();
+  });
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "700 54px Arial, sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText("THE ORANGE PULP", 80, H - 68);
-  ctx.fillStyle = "rgba(245,240,232,0.45)";
-  ctx.font = "400 34px Arial, sans-serif";
-  ctx.fillText("theorangepulp.blog", 80, H - 24);
+  ctx.fillText("The Orange Pulp", nameStart + 150, dotY + 18);
 
   return new Promise((resolve) => canvas.toBlob((b) => resolve(b!), "image/png"));
 }
@@ -168,7 +196,7 @@ export default function ShareButtons({ title, accentBorder = "border-foreground"
   async function shareStory() {
     setGeneratingStory(true);
     try {
-      const blob = await generateStoryCard(title, coverImageUrl, rating, excerpt);
+      const blob = await generateStoryCard(title, coverImageUrl, rating);
       const file = new File([blob], "orange-pulp-story.png", { type: "image/png" });
 
       // On mobile with Web Share API file support → opens native sheet (Instagram Stories)
