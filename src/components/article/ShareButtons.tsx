@@ -120,8 +120,8 @@ async function generateStoryCard(
   // ── Card: 640×860 — tighter poster, more content room ──
   const CW = 640, CH = 860, CR = 16;
   const CX = (W - CW) / 2;
-  const CY = 240;
-  const CB = CY + CH; // 1100
+  const CY = 300;
+  const CB = CY + CH; // 1160
 
   // Shadow
   ctx.shadowColor = "rgba(0,0,0,0.75)";
@@ -174,26 +174,16 @@ async function generateStoryCard(
   ctx.textAlign = "center";
 
   const hasRating = rating != null && Number(rating) > 0;
-  const titleFont = title.length > 22 ? 60 : 72;
+  const displayTitle = title.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const titleFont = displayTitle.length > 22 ? 60 : 72;
   const titleLH = titleFont + 10;
 
-  // Pre-measure title lines to know content height upfront
   ctx.font = `800 ${titleFont}px Arial, sans-serif`;
-  const titleLines = wrap(ctx, title, 820).slice(0, 2);
+  const titleLines = wrap(ctx, displayTitle, 820).slice(0, 2);
 
-  const titleBlockH  = titleLines.length * titleLH + 20;
-  const excerptBlockH = excerpt ? 34 + 24 : 0;
-  const starsBlockH  = hasRating ? 38 * 2 + 32 : 0;  // R*2 height + gap
-  const ruleBlockH   = 44;
-  const brandBlockH  = 42 + 28;
-  const ctaBlockH    = 40;
-  const totalH = titleBlockH + excerptBlockH + starsBlockH + ruleBlockH + brandBlockH + ctaBlockH;
+  // Fixed gap after card — no centering, so no large dead space
+  let y = CB + 50;
 
-  // Center block vertically between card bottom and canvas bottom (leave 120px bottom padding)
-  const available = H - CB - 120;
-  let y = CB + Math.max(60, (available - totalH) / 2);
-
-  // Title
   titleLines.forEach((l, i) => {
     ctx.fillStyle = "#FFFFFF";
     ctx.font = `800 ${titleFont}px Arial, sans-serif`;

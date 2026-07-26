@@ -108,14 +108,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
           <ArrowLeft size={14} strokeWidth={3} /> {typeToRoute(article.type)}
         </Link>
 
-        {/* Rating badge (reviews only) */}
-        {article.rating && (
-          <div className="absolute top-6 right-4 sm:right-8 bg-primary border-[3px] border-background text-foreground font-black text-2xl md:text-4xl px-4 md:px-6 py-2 md:py-3 leading-none">
-            {article.rating}<span className="text-sm md:text-lg">/5</span>
-          </div>
-        )}
-
-        {/* Title + excerpt + author — all overlaid on image */}
+{/* Title + excerpt + author — all overlaid on image */}
         <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
           {/* Type + category badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
