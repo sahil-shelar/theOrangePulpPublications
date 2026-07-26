@@ -25,8 +25,9 @@ export default function AdSlot({ slotKey, className = '' }: AdSlotProps) {
     }
   }, [config, slotKey]);
 
-  // If slot doesn't exist or is disabled, collapse completely (returns null)
-  if (!config || !config.enabled) {
+  // If slot doesn't exist, disabled, or no real AdSense publisher ID, collapse
+  const hasRealPublisherId = adsConfig.publisherId && !adsConfig.publisherId.includes('ca-pub-0000000000');
+  if (!config || !config.enabled || !hasRealPublisherId) {
     return null;
   }
 
