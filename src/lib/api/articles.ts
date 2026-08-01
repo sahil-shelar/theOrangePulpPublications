@@ -6,13 +6,18 @@ import { ArticleWithRelations } from '@/types/models'
 import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
 
+const ARTICLE_DETAIL_SELECT =
+  '*, categories(*), authors(*), movies(*), list_items(*, movies(*)), spotlight_works(*, movies(*))'
+
 // Deduplicates within a single render (generateMetadata + page both call this — only 1 DB hit)
 export const getCachedArticleBySlug = cache(
   async (slug: string): Promise<ArticleWithRelations | null> => {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('articles')
-      .select('*, categories(*), authors(*), movies(*)')
+      .select(ARTICLE_DETAIL_SELECT)
+      .order('rank', { referencedTable: 'list_items', ascending: true })
+      .order('rank', { referencedTable: 'spotlight_works', ascending: true })
       .eq('slug', slug)
       .single()
     if (error && error.code !== 'PGRST116') return null
@@ -26,7 +31,9 @@ export const getCachedPublicArticleBySlug = unstable_cache(
     const supabase = createPublicClient()
     const { data } = await supabase
       .from('articles')
-      .select('*, categories(*), authors(*), movies(*)')
+      .select(ARTICLE_DETAIL_SELECT)
+      .order('rank', { referencedTable: 'list_items', ascending: true })
+      .order('rank', { referencedTable: 'spotlight_works', ascending: true })
       .eq('slug', slug)
       .single()
     return (data ?? null) as ArticleWithRelations | null
@@ -257,7 +264,9 @@ export async function getArticleById(id: string): Promise<ArticleWithRelations |
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('articles')
-    .select('*, categories(*), authors(*), movies(*)')
+    .select(ARTICLE_DETAIL_SELECT)
+    .order('rank', { referencedTable: 'list_items', ascending: true })
+    .order('rank', { referencedTable: 'spotlight_works', ascending: true })
     .eq('id', id)
     .single()
 

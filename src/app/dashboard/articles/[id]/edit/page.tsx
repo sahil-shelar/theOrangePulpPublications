@@ -28,6 +28,7 @@ export default async function EditArticlePage({ params }: { params: Promise<{ id
         </Link>
       </div>
       <ArticleEditor
+        type={article.type}
         initialData={article}
         categories={categories}
         authors={authors}

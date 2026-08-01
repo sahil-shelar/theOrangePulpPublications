@@ -1,6 +1,6 @@
 import { getCachedPublicArticleBySlug, getPublishedSlugs } from "@/lib/api/articles"
 import { notFound } from "next/navigation"
-import ArticleDetailView from "@/components/article/ArticleDetailView"
+import SpotlightDetailView from "@/components/article/SpotlightDetailView"
 
 export const revalidate = 60
 export const dynamicParams = true
@@ -61,7 +61,7 @@ export default async function SpotlightDetailPage({ params }: { params: Promise<
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <ArticleDetailView article={article} />
+      <SpotlightDetailView article={article} />
     </>
   )
 }

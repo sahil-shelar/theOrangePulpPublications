@@ -1,0 +1,15 @@
+{
+  "title": "10 Best Horror Films of 2024",
+  "slug": "10-best-horror-films-2024",
+  "excerpt": "From folk horror to body horror — the ten films that defined the genre this year.",
+  "content": "2024 was horror's best year in a decade. Here's the definitive ranking — one entry per day until we run out of nightmares.",
+  "seo_title": "10 Best Horror Movies of 2024, Ranked",
+  "seo_description": "From folk horror to body horror, our definitive ranking of the 10 best horror films released in 2024 — with ratings and full breakdowns for each.",
+  "items": [
+    { "movie_id": null, "custom_title": "Heretic", "blurb": "Hugh Grant's most unsettling performance in decades — a two-hander that never lets up.", "item_rating": "4.5" },
+    { "movie_id": null, "custom_title": "The Substance", "blurb": "Body horror as feminist rage. Demi Moore hasn't been this good since the '90s.", "item_rating": "4.9" },
+    { "movie_id": null, "custom_title": "Longlegs", "blurb": "Nicolas Cage disappears into a role that will haunt you long after the credits roll.", "item_rating": "4.0" },
+    { "movie_id": null, "custom_title": "Late Night with the Devil", "blurb": "Found-footage done right — dread that builds in real time.", "item_rating": "4.2" },
+    { "movie_id": null, "custom_title": "In a Violent Nature", "blurb": "An experimental slasher told entirely from the killer's POV.", "item_rating": "3.5" }
+  ]
+}

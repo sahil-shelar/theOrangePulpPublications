@@ -12,7 +12,7 @@ import SidebarNewsletter from "./SidebarNewsletter";
 import { getRecommendedArticles } from "@/lib/services/recommendations";
 import { createPublicClient } from "@/lib/supabase/public";
 import { unstable_cache } from "next/cache";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Play } from "lucide-react";
 import { typeToRoute } from "@/lib/utils";
 
 const getCachedArticleTags = unstable_cache(
@@ -33,25 +33,27 @@ const getCachedRelated = unstable_cache(
   { revalidate: 300, tags: ['articles'] }
 )
 
-const TYPE_ACCENT: Record<string, { strip: string; badge: string; tag: string; border: string }> = {
-  review:    { strip: "bg-primary",    badge: "bg-primary text-foreground border-foreground",    tag: "bg-primary text-foreground",    border: "border-primary" },
-  news:      { strip: "bg-secondary",  badge: "bg-secondary text-foreground border-foreground",  tag: "bg-secondary text-foreground",  border: "border-secondary" },
-  spotlight: { strip: "bg-accent",     badge: "bg-accent text-foreground border-foreground",     tag: "bg-accent text-foreground",     border: "border-accent" },
-  list:      { strip: "bg-foreground text-background", badge: "bg-primary text-foreground border-background/30", tag: "bg-foreground text-background", border: "border-foreground" },
-};
+const VERDICT_LABEL: Record<string, string> = {
+  must_watch: 'Must Watch',
+  recommended: 'Recommended',
+  mixed: 'Mixed',
+  skip: 'Skip',
+}
 
-export default async function ArticleDetailView({ article }: { article: ArticleWithRelations }) {
+export default async function ReviewDetailView({ article }: { article: ArticleWithRelations }) {
   const [articleTags, related] = await Promise.all([
     getCachedArticleTags(article.id),
     getCachedRelated(article.id, article.category_id, article.type, article.movie_id),
   ]);
 
-  const coverImage = article.cover_image_url || (article as any).movies?.backdrop_url;
-  const accent = TYPE_ACCENT[article.type] ?? TYPE_ACCENT.review;
+  const movie = (article as any).movies;
+  const coverImage = article.cover_image_url || movie?.backdrop_url;
+  const verdict = (article as any).verdict as string | null;
+  const streamingPlatforms: string[] = Array.isArray(movie?.streaming_platforms) ? movie.streaming_platforms : [];
 
   const schema = {
     "@context": "https://schema.org",
-    "@type": "NewsArticle",
+    "@type": "Review",
     "headline": article.seo_title || article.title,
     "description": article.seo_description || article.excerpt,
     "image": [article.og_image_url || article.cover_image_url || ""],
@@ -62,6 +64,12 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
       "name": article.authors?.name || "Editorial Team",
       "url": `https://theorangepulp.com/author/${article.authors?.slug || ""}`,
     }],
+    ...(article.rating != null && {
+      "reviewRating": { "@type": "Rating", "ratingValue": article.rating, "bestRating": 5 },
+    }),
+    ...(movie && {
+      "itemReviewed": { "@type": "Movie", "name": movie.title, "image": movie.poster_url || movie.backdrop_url },
+    }),
   };
 
   const breadcrumbs = {
@@ -69,7 +77,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://theorangepulp.com/" },
-      { "@type": "ListItem", "position": 2, "name": article.type.toUpperCase(), "item": `https://theorangepulp.com/${typeToRoute(article.type)}` },
+      { "@type": "ListItem", "position": 2, "name": "REVIEW", "item": `https://theorangepulp.com/${typeToRoute(article.type)}` },
       { "@type": "ListItem", "position": 3, "name": article.title },
     ],
   };
@@ -85,21 +93,13 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
 
       {/* ── Cinematic Hero ── */}
       <div className="relative w-full h-[55vh] md:h-[75vh] overflow-hidden border-b-[4px] border-foreground">
-        {/* Image */}
         {coverImage ? (
-          <img
-            src={coverImage}
-            alt={article.title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <img src={coverImage} alt={article.title} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
-          <div className={`absolute inset-0 ${accent.strip}`} />
+          <div className="absolute inset-0 bg-primary" />
         )}
-
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/40 to-foreground/10" />
 
-        {/* Back link */}
         <Link
           href={`/${typeToRoute(article.type)}`}
           prefetch={false}
@@ -108,12 +108,10 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
           <ArrowLeft size={14} strokeWidth={3} /> {typeToRoute(article.type)}
         </Link>
 
-{/* Title + excerpt + author — all overlaid on image */}
         <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
-          {/* Type + category badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] ${accent.badge}`}>
-              {article.type}
+            <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
+              Review
             </span>
             {article.categories && (
               <span className="text-[9px] font-black uppercase tracking-widest text-background/60 px-3 py-1.5 border-[2px] border-background/20">
@@ -122,26 +120,16 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
             )}
           </div>
 
-          {/* Title */}
           <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-background leading-[0.95] max-w-4xl">
             {article.title}
           </h1>
 
-          {/* Subheadline (news) — bold, not italic, sits above the byline */}
-          {(article as any).subheadline && (
-            <p className="mt-3 text-sm sm:text-lg font-bold text-background/85 leading-snug max-w-2xl">
-              {(article as any).subheadline}
-            </p>
-          )}
-
-          {/* Excerpt — small, italic, dimmed */}
           {article.excerpt && (
             <p className="mt-3 text-sm sm:text-base font-medium text-background/65 leading-snug max-w-2xl italic">
               {article.excerpt}
             </p>
           )}
 
-          {/* Author + meta row */}
           <div className="flex items-center gap-2.5 mt-4 pt-4 border-t-[1px] border-background/20">
             <div className="w-7 h-7 shrink-0 border-[2px] border-background/40 overflow-hidden">
               {article.authors?.avatar_url ? (
@@ -152,11 +140,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
                 </div>
               )}
             </div>
-            <Link
-              href={`/author/${article.authors?.slug || ""}`}
-              prefetch={false}
-              className="font-black uppercase tracking-widest text-[10px] text-background/80 hover:text-background transition-colors"
-            >
+            <Link href={`/author/${article.authors?.slug || ""}`} prefetch={false} className="font-black uppercase tracking-widest text-[10px] text-background/80 hover:text-background transition-colors">
               {article.authors?.name || "Editorial Team"}
             </Link>
             <span className="text-background/30 text-[10px]">·</span>
@@ -165,74 +149,89 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
             </span>
             <span className="text-background/30 text-[10px]">·</span>
             <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">{article.reading_time || 5} min read</span>
-            <span className="hidden sm:inline text-background/30 text-[10px]">·</span>
-            <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-widest text-background/55">{article.views_count ?? 0} views</span>
-            {(article as any).source_name && (
-              <>
-                <span className="text-background/30 text-[10px]">·</span>
-                {(article as any).source_url ? (
-                  <a href={(article as any).source_url} target="_blank" rel="noopener noreferrer nofollow"
-                     className="text-[10px] font-black uppercase tracking-widest text-background/70 hover:text-background underline underline-offset-2">
-                    Source: {(article as any).source_name}
-                  </a>
-                ) : (
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">Source: {(article as any).source_name}</span>
-                )}
-              </>
-            )}
           </div>
+        </div>
+      </div>
+
+      {/* ── Score strip ── */}
+      <div className="bg-muted border-b-[3px] border-foreground">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center gap-x-8 gap-y-3">
+          {verdict && (
+            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-2 border-[2px] border-foreground bg-secondary text-foreground">
+              {VERDICT_LABEL[verdict] || verdict}
+            </span>
+          )}
+          {article.rating != null && (
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">OP Score</span>
+              <span className="font-heading text-xl font-black text-foreground tabular-nums">{article.rating}<span className="text-xs text-foreground/40">/5</span></span>
+            </div>
+          )}
+          {(article as any).imdb_score != null && (
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">IMDb</span>
+              <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).imdb_score}<span className="text-xs text-foreground/40">/10</span></span>
+            </div>
+          )}
+          {(article as any).rt_score != null && (
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">Rotten Tomatoes</span>
+              <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).rt_score}<span className="text-xs text-foreground/40">%</span></span>
+            </div>
+          )}
+          {streamingPlatforms.length > 0 && (
+            <div className="flex items-center gap-1.5 ml-auto">
+              <Play size={12} className="text-foreground/50" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70">
+                {streamingPlatforms.slice(0, 3).join(' · ')}
+              </span>
+            </div>
+          )}
+          {movie?.trailer_url && (
+            <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest border-[2px] border-foreground px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors">
+              Watch Trailer
+            </a>
+          )}
         </div>
       </div>
 
       {/* ── Main content + sidebar ── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-12 md:py-16">
 
-        {/* Article body */}
         <div className="lg:col-span-8">
           <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
             <ReactMarkdown>{article.content || ""}</ReactMarkdown>
           </article>
 
-          {/* Tags */}
           <div className="mt-10 flex flex-wrap gap-2">
             {articleTags && articleTags.length > 0
               ? (articleTags as any[]).map((at: any) => at.tags).filter(Boolean).map((tag: any) => (
-                  <Link
-                    key={tag.id}
-                    href={`/tag/${tag.slug}`}
-                    prefetch={false}
-                    className={`border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors ${accent.tag}`}
-                  >
+                  <Link key={tag.id} href={`/tag/${tag.slug}`} prefetch={false}
+                    className="border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-primary text-foreground">
                     #{tag.name}
                   </Link>
                 ))
               : (
-                <span className={`border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest ${accent.tag}`}>
-                  #{article.type}
-                </span>
+                <span className="border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-primary text-foreground">#review</span>
               )
             }
           </div>
 
-          {/* Share */}
           <ShareButtons
             title={article.title}
-            accentBorder={accent.border}
-            coverImageUrl={article.cover_image_url || (article as any).movies?.backdrop_url || undefined}
-            rating={(article as any).rating ?? undefined}
+            accentBorder="border-primary"
+            coverImageUrl={article.cover_image_url || movie?.backdrop_url || undefined}
+            rating={article.rating ?? undefined}
             excerpt={article.excerpt ?? undefined}
           />
 
-          {/* Comments */}
           <CommentsSection articleId={article.id} />
         </div>
 
-        {/* Sidebar */}
         <aside className="lg:col-span-4 space-y-0 bg-muted p-6 md:p-8 self-start">
 
           <AdSlot slotKey="sidebar-top" className="w-full mb-8" />
 
-          {/* Related */}
           {related.length > 0 && (
             <div className="border-t-[3px] border-foreground pt-8">
               <h3 className="font-heading text-lg font-black uppercase text-foreground border-b-[3px] border-foreground pb-2 mb-0">
@@ -242,12 +241,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
                 {related.map((art: any) => {
                   const img = art.cover_image_url || art.movies?.poster_url;
                   return (
-                    <Link
-                      key={art.id}
-                      href={`/${typeToRoute(art.type)}/${art.slug}`}
-                      prefetch={false}
-                      className="group flex gap-3 py-4 hover:bg-muted/40 transition-colors"
-                    >
+                    <Link key={art.id} href={`/${typeToRoute(art.type)}/${art.slug}`} prefetch={false} className="group flex gap-3 py-4 hover:bg-muted/40 transition-colors">
                       {img ? (
                         <div className="w-16 h-12 shrink-0 border-[2px] border-foreground overflow-hidden">
                           <img src={img} alt={art.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -268,14 +262,12 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
             </div>
           )}
 
-          {/* Newsletter */}
           <div className="mt-8">
             <SidebarNewsletter />
           </div>
         </aside>
       </div>
 
-      {/* Bottom ad */}
       <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-16">
         <AdSlot slotKey="article-bottom-leaderboard" className="mx-auto" />
       </div>

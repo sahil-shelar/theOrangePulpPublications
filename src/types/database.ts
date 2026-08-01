@@ -217,6 +217,22 @@ export interface Database {
           published_at: string | null
           created_at: string
           updated_at: string
+          workflow_status: string | null
+          assignee_id: string | null
+          reviewer_id: string | null
+          due_date: string | null
+          priority: string | null
+          seo_score: number | null
+          subheadline: string | null
+          source_name: string | null
+          source_url: string | null
+          imdb_score: number | null
+          rt_score: number | null
+          verdict: string | null
+          subject_name: string | null
+          subject_role: string | null
+          subject_photo_url: string | null
+          pull_quote: string | null
         }
         Insert: {
           id?: string
@@ -244,6 +260,22 @@ export interface Database {
           published_at?: string | null
           created_at?: string
           updated_at?: string
+          workflow_status?: string | null
+          assignee_id?: string | null
+          reviewer_id?: string | null
+          due_date?: string | null
+          priority?: string | null
+          seo_score?: number | null
+          subheadline?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          imdb_score?: number | null
+          rt_score?: number | null
+          verdict?: string | null
+          subject_name?: string | null
+          subject_role?: string | null
+          subject_photo_url?: string | null
+          pull_quote?: string | null
         }
         Update: {
           id?: string
@@ -271,6 +303,83 @@ export interface Database {
           published_at?: string | null
           created_at?: string
           updated_at?: string
+          workflow_status?: string | null
+          assignee_id?: string | null
+          reviewer_id?: string | null
+          due_date?: string | null
+          priority?: string | null
+          seo_score?: number | null
+          subheadline?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          imdb_score?: number | null
+          rt_score?: number | null
+          verdict?: string | null
+          subject_name?: string | null
+          subject_role?: string | null
+          subject_photo_url?: string | null
+          pull_quote?: string | null
+        }
+      }
+      list_items: {
+        Row: {
+          id: string
+          article_id: string
+          rank: number
+          movie_id: string | null
+          custom_title: string | null
+          blurb: string | null
+          item_rating: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          article_id: string
+          rank: number
+          movie_id?: string | null
+          custom_title?: string | null
+          blurb?: string | null
+          item_rating?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          article_id?: string
+          rank?: number
+          movie_id?: string | null
+          custom_title?: string | null
+          blurb?: string | null
+          item_rating?: number | null
+          created_at?: string
+        }
+      }
+      spotlight_works: {
+        Row: {
+          id: string
+          article_id: string
+          rank: number
+          movie_id: string | null
+          custom_title: string | null
+          note: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          article_id: string
+          rank: number
+          movie_id?: string | null
+          custom_title?: string | null
+          note?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          article_id?: string
+          rank?: number
+          movie_id?: string | null
+          custom_title?: string | null
+          note?: string | null
+          created_at?: string
         }
       }
       article_tags: {

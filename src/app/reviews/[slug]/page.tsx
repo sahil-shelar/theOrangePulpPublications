@@ -1,6 +1,6 @@
 import { getCachedPublicArticleBySlug, getPublishedSlugs } from "@/lib/api/articles"
 import { notFound } from "next/navigation"
-import ArticleDetailView from "@/components/article/ArticleDetailView"
+import ReviewDetailView from "@/components/article/ReviewDetailView"
 
 export const revalidate = 60
 export const dynamicParams = true
@@ -67,7 +67,7 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ s
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <ArticleDetailView article={article} />
+      <ReviewDetailView article={article} />
     </>
   )
 }

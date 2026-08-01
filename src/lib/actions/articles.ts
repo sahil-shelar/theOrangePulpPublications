@@ -78,6 +78,59 @@ export async function deleteArticle(id: string) {
   return { success: true }
 }
 
+type ListItemInput = {
+  rank: number
+  movie_id?: string | null
+  custom_title?: string | null
+  blurb?: string | null
+  item_rating?: number | null
+}
+
+export async function replaceListItems(articleId: string, items: ListItemInput[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const { error: delErr } = await supabase.from('list_items').delete().eq('article_id', articleId)
+  if (delErr) return handleSupabaseError(delErr)
+
+  if (items.length > 0) {
+    const { error: insErr } = await supabase.from('list_items').insert(
+      items.map(item => ({ ...item, article_id: articleId }))
+    )
+    if (insErr) return handleSupabaseError(insErr)
+  }
+
+  revalidateTag('articles')
+  return { success: true }
+}
+
+type SpotlightWorkInput = {
+  rank: number
+  movie_id?: string | null
+  custom_title?: string | null
+  note?: string | null
+}
+
+export async function replaceSpotlightWorks(articleId: string, works: SpotlightWorkInput[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const { error: delErr } = await supabase.from('spotlight_works').delete().eq('article_id', articleId)
+  if (delErr) return handleSupabaseError(delErr)
+
+  if (works.length > 0) {
+    const { error: insErr } = await supabase.from('spotlight_works').insert(
+      works.map(work => ({ ...work, article_id: articleId }))
+    )
+    if (insErr) return handleSupabaseError(insErr)
+  }
+
+  revalidateTag('articles')
+  return { success: true }
+}
+
 export async function incrementViewCount(id: string) {
   const supabase = await createClient()
   const { error } = await supabase.rpc('increment_view_count', { article_id: id })
