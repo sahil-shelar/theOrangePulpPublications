@@ -89,7 +89,7 @@ export default function MovieDetail({
             {genres.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {genres.map(g => (
-                  <span key={g} className="text-label font-black uppercase tracking-widest bg-primary text-foreground px-2 py-0.5 border-[2px] border-foreground">
+                  <span key={g} className="text-label font-black uppercase tracking-widest bg-primary text-primary-foreground px-2 py-0.5 border-[2px] border-foreground">
                     {g}
                   </span>
                 ))}

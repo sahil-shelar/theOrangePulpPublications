@@ -73,7 +73,7 @@ export default function UserRow({ u, isYou }: { u: User; isYou: boolean }) {
       </td>
       <td className="p-3.5 hidden sm:table-cell">
         <span className={`text-label font-black uppercase tracking-widest px-2 py-0.5 border-[2px] ${
-          isBanned ? 'bg-primary text-foreground border-foreground' :
+          isBanned ? 'bg-primary text-primary-foreground border-foreground' :
           pending ? 'bg-muted text-muted-foreground border-foreground/30' :
           'bg-background text-muted-foreground border-foreground/20'
         }`}>

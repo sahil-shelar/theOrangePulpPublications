@@ -309,7 +309,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
         )}
 
         {sample && (
-          <div className="border-[3px] border-foreground bg-secondary text-foreground p-4 text-xs font-black uppercase tracking-widest">
+          <div className="border-[3px] border-foreground bg-secondary text-secondary-foreground p-4 text-xs font-black uppercase tracking-widest">
             Reference sample data loaded for the {TYPE_LABEL[type]} template — replace every field with your own before publishing.
           </div>
         )}
@@ -522,7 +522,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
              type="submit"
              id="save-btn"
              disabled={isSaving}
-             className="w-full bg-primary text-foreground border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-hard transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+             className="w-full bg-primary text-primary-foreground border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-hard transition-all flex items-center justify-center gap-2 disabled:opacity-50"
            >
              <Save size={16} /> {isSaving ? 'Saving...' : 'Save Draft'}
            </button>
@@ -578,7 +578,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
           <div className="flex flex-col gap-2">
             <label className="text-label font-black uppercase tracking-widest">Workflow State</label>
-            <select name="workflow_status" value={formData.workflow_status} onChange={handleChange} className="w-full bg-primary text-foreground border-[3px] border-foreground p-3 text-xs font-black uppercase">
+            <select name="workflow_status" value={formData.workflow_status} onChange={handleChange} className="w-full bg-primary text-primary-foreground border-[3px] border-foreground p-3 text-xs font-black uppercase">
               <option value="idea">Idea</option>
               <option value="research">Research</option>
               <option value="draft">Draft</option>

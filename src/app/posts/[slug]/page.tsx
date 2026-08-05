@@ -78,7 +78,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </div>
         </div>
 
-        <div className="prose prose-lg dark:prose-invert prose-headings:font-serif prose-headings:font-bold prose-p:text-foreground/80 prose-a:text-primary hover:prose-a:text-primary/80 max-w-none">
+        {/* Colours come from the .prose token block in globals.css, which is
+            already theme-aware — dark:prose-invert would override it with
+            Tailwind's own greys. */}
+        <div className="prose prose-lg prose-headings:font-heading prose-headings:font-black max-w-none">
           <Post />
         </div>
 

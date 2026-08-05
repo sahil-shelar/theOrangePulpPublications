@@ -42,17 +42,17 @@ export default async function SpotlightPage({ searchParams }: { searchParams: Pr
                         ) : <div className="w-full h-full bg-primary" />
                       })()}
                     </div>
-                    <div className="bg-accent p-8 md:p-12 flex flex-col justify-center gap-4">
+                    <div className="bg-accent on-pastel p-8 md:p-12 flex flex-col justify-center gap-4">
                       <span className="text-label font-black uppercase tracking-widest bg-foreground text-background px-2 py-1 self-start">
                         Spotlight
                       </span>
-                      <h2 className="font-heading text-3xl md:text-5xl font-black uppercase leading-tight group-hover:text-primary transition-colors line-clamp-3">
+                      <h2 className="font-heading text-3xl md:text-5xl font-black uppercase leading-tight group-hover:underline decoration-[3px] underline-offset-4 line-clamp-3">
                         {(featured as any).title}
                       </h2>
                       {(featured as any).excerpt && (
-                        <p className="text-sm font-medium text-foreground/70 leading-relaxed line-clamp-3">{(featured as any).excerpt}</p>
+                        <p className="dim text-base font-medium leading-relaxed line-clamp-3">{(featured as any).excerpt}</p>
                       )}
-                      <div className="text-label font-black uppercase tracking-widest text-muted-foreground pt-4 border-t-[1px] border-foreground/20">
+                      <div className="dim text-label font-black uppercase tracking-widest pt-4 border-t-[1px] border-foreground/20">
                         {(featured as any).authors?.name || 'Editorial'} · {new Date((featured as any).published_at || (featured as any).created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                       </div>
                     </div>

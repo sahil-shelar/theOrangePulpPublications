@@ -52,6 +52,12 @@
   --input: var(--foreground);
   --ring: #E2BFCA;
 
+  /* Text sitting on top of imagery. Fixed in BOTH themes, because a scrim
+     over a photo is always dark — so this must not flip with the theme the
+     way --background does. Using text-background here made hero titles
+     invisible in dark mode. */
+  --on-media: #F5EFE4;
+
   /* Sharp corners are the identity — this is intentionally 0, not unset. */
   --radius: 0px;
 
@@ -126,6 +132,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-on-media: var(--on-media);
 
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
@@ -188,7 +195,7 @@
   .brutal-button:hover {
     transform: translate(2px, 2px);
     box-shadow: var(--shadow-pressed);
-    @apply bg-primary text-foreground;
+    @apply bg-primary text-primary-foreground;
   }
 
   .brutal-button:active {
@@ -201,6 +208,17 @@
     box-shadow: none;
     transform: none;
     opacity: 1;
+  }
+
+  /* ── Pastel-filled panel ──
+     The pink/yellow/blue fills are light in BOTH themes, so text inside them
+     must stay dark green. Using text-foreground here rendered cream-on-yellow
+     at 1.10:1 in dark mode. Descendants inherit; `.dim` is the subdued step. */
+  .on-pastel {
+    color: var(--primary-foreground);
+  }
+  .on-pastel .dim {
+    color: color-mix(in srgb, var(--primary-foreground) 70%, transparent);
   }
 
   /* ── Image scrim ──
@@ -230,6 +248,20 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading uppercase;
   }
+
+  /* Anything filled with a brand pastel defaults its text to dark green,
+     because the pastels are light in BOTH themes while --foreground flips to
+     cream. Without this, ~30 pastel panels rendered cream-on-pastel in dark
+     mode at 1.10-1.89:1.
+
+     This sits in @layer base deliberately: Tailwind utilities come later in
+     the cascade, so any explicit text-* on the element still wins. */
+  .bg-primary,
+  .bg-secondary,
+  .bg-accent {
+    color: var(--primary-foreground);
+  }
+
 
   /* Keyboard focus is visible everywhere; pointer clicks stay clean because
      :focus-visible only matches keyboard/AT interaction. Uses --ring. */
@@ -268,4 +300,47 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ARTICLE PROSE
+
+   Deliberately UNLAYERED. Tailwind Typography sets --tw-prose-* on its own
+   `.prose` class inside a Tailwind layer, so an override in @layer base loses
+   to it — headings kept rendering the plugin's near-black #101828, which is
+   invisible on the dark background. Unlayered CSS wins over every @layer, so
+   this is the one place these can be redirected at the theme tokens.
+   ═══════════════════════════════════════════════════════════════════════ */
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--muted-foreground);
+  --tw-prose-hr: var(--foreground);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--primary);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--card);
+  --tw-prose-pre-bg: var(--foreground);
+  --tw-prose-th-borders: var(--foreground);
+  --tw-prose-td-borders: var(--muted-foreground);
+  /* Links stay --foreground because pink on cream is only 1.46:1. The
+     affordance is a thick primary underline, not a colour swap. */
+  --tw-prose-links: var(--foreground);
+}
+
+.prose :where(a):not(:where(.not-prose *, .not-prose)) {
+  font-weight: 800;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--primary);
+  transition: text-decoration-color var(--dur) var(--ease);
+}
+
+.prose :where(a):hover:not(:where(.not-prose *, .not-prose)) {
+  text-decoration-color: var(--foreground);
 }

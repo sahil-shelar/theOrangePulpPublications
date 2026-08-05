@@ -16,7 +16,7 @@ export default function ErrorBoundary({
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6">
-      <h2 className="font-heading text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 border-[4px] border-foreground p-4 bg-primary text-foreground shadow-hard-lg">
+      <h2 className="font-heading text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 border-[4px] border-foreground p-4 bg-primary text-primary-foreground shadow-hard-lg">
         SYSTEM ERROR 500
       </h2>
       <p className="text-xl font-bold mb-8 max-w-lg text-foreground/80">

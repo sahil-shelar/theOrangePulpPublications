@@ -76,30 +76,30 @@ export default async function SpotlightDetailView({ article }: { article: Articl
         )}
         <div className="absolute inset-0 img-scrim" />
 
-        <Link href="/spotlight" prefetch={false} className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors">
+        <Link href="/spotlight" prefetch={false} className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-on-media/70 hover:text-on-media text-label font-black uppercase tracking-widest transition-colors">
           <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
         </Link>
 
         <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-10 max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-foreground border-foreground">
+            <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-foreground">
               Spotlight
             </span>
             {subjectRole && (
-              <span className="text-label font-black uppercase tracking-widest text-background/80 px-3 py-1.5 border-[2px] border-background/20">
+              <span className="text-label font-black uppercase tracking-widest text-on-media/80 px-3 py-1.5 border-[2px] border-on-media/20">
                 {subjectRole}
               </span>
             )}
           </div>
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-background leading-[0.95] max-w-4xl">
+          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-on-media leading-[0.95] max-w-4xl">
             {subjectName}
           </h1>
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-background/20">
-            <span className="font-black uppercase tracking-widest text-label text-background/80">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-on-media/20">
+            <span className="font-black uppercase tracking-widest text-label text-on-media/80">
               {article.authors?.name || "Editorial Team"}
             </span>
-            <span className="text-background/30 text-label">·</span>
-            <span className="text-label font-bold uppercase tracking-widest text-background/80">
+            <span className="text-on-media/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-on-media/80">
               {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
             </span>
           </div>
@@ -119,7 +119,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
       <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 pb-12 md:pb-16">
         <div className="lg:col-span-8">
           {article.content && (
-            <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
+            <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
               <ReactMarkdown>{article.content}</ReactMarkdown>
             </article>
           )}
@@ -162,12 +162,12 @@ export default async function SpotlightDetailView({ article }: { article: Articl
             {articleTags && articleTags.length > 0
               ? (articleTags as any[]).map((at: any) => at.tags).filter(Boolean).map((tag: any) => (
                   <Link key={tag.id} href={`/tag/${tag.slug}`} prefetch={false}
-                    className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-accent text-foreground">
+                    className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-accent text-accent-foreground">
                     #{tag.name}
                   </Link>
                 ))
               : (
-                <span className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest bg-accent text-foreground">#spotlight</span>
+                <span className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest bg-accent text-accent-foreground">#spotlight</span>
               )
             }
           </div>

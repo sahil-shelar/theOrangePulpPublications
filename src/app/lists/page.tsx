@@ -45,12 +45,12 @@ export default async function ListsPage({ searchParams }: { searchParams: Promis
                         List / Ranking
                       </span>
                     </div>
-                    <div className="md:col-span-2 bg-primary p-8 md:p-12 flex flex-col justify-center gap-4">
-                      <h2 className="font-heading text-3xl md:text-4xl font-black uppercase text-foreground leading-tight group-hover:underline line-clamp-3">
+                    <div className="md:col-span-2 bg-primary on-pastel p-8 md:p-12 flex flex-col justify-center gap-4">
+                      <h2 className="font-heading text-3xl md:text-4xl font-black uppercase leading-tight group-hover:underline decoration-[3px] underline-offset-4 line-clamp-3">
                         {(featured as any).title}
                       </h2>
                       {(featured as any).excerpt && (
-                        <p className="text-sm font-medium text-foreground/70 leading-relaxed line-clamp-4">{(featured as any).excerpt}</p>
+                        <p className="dim text-base font-medium leading-relaxed line-clamp-4">{(featured as any).excerpt}</p>
                       )}
                       <span className="self-start bg-foreground text-background text-label font-black uppercase tracking-widest px-4 py-2 mt-2 border-[2px] border-foreground hover:-translate-y-0.5 transition-transform">
                         View List →

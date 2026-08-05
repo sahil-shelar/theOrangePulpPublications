@@ -50,7 +50,7 @@ export default async function ArticlesPage({
             defaultValue={q}
             className="flex-1 bg-background border-[3px] border-foreground px-3 py-2 font-bold text-sm"
           />
-          <button type="submit" className="bg-foreground text-background px-4 py-2 font-black uppercase text-label border-[3px] border-foreground hover:bg-primary hover:text-foreground transition-colors">
+          <button type="submit" className="bg-foreground text-background px-4 py-2 font-black uppercase text-label border-[3px] border-foreground hover:bg-primary hover:text-primary-foreground transition-colors">
             Search
           </button>
         </form>

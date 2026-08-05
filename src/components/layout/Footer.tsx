@@ -43,7 +43,7 @@ export function Footer() {
             <span className="font-heading text-2xl font-black uppercase tracking-tighter text-background leading-none">
               THE ORANGE
             </span>
-            <span className="font-heading text-2xl font-black uppercase tracking-tighter leading-none ml-2 bg-primary text-foreground px-2 py-0.5 border-[2px] border-background/20 group-hover:bg-secondary transition-colors">
+            <span className="font-heading text-2xl font-black uppercase tracking-tighter leading-none ml-2 bg-primary text-primary-foreground px-2 py-0.5 border-[2px] border-background/20 group-hover:bg-secondary transition-colors">
               PULP
             </span>
           </Link>

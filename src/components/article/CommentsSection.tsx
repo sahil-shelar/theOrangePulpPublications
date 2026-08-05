@@ -86,7 +86,7 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-primary text-foreground border-[3px] border-foreground font-black uppercase tracking-widest px-8 py-3 hover:-translate-y-1 hover:shadow-hard transition-all disabled:opacity-50"
+            className="bg-primary text-primary-foreground border-[3px] border-foreground font-black uppercase tracking-widest px-8 py-3 hover:-translate-y-1 hover:shadow-hard transition-all disabled:opacity-50"
           >
             {isSubmitting ? 'Posting...' : 'Post Comment'}
           </button>

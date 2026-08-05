@@ -28,7 +28,7 @@ export function Navbar() {
           <span className="font-heading text-xl sm:text-2xl md:text-3xl font-black tracking-tighter text-foreground uppercase leading-none">
             THE ORANGE
           </span>
-          <span className="font-heading text-xl sm:text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none ml-1.5 bg-primary text-foreground px-1.5 py-0.5 border-[2px] border-foreground group-hover:bg-foreground group-hover:text-primary transition-colors">
+          <span className="font-heading text-xl sm:text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none ml-1.5 bg-primary text-primary-foreground px-1.5 py-0.5 border-[2px] border-foreground group-hover:bg-foreground group-hover:text-background transition-colors">
             PULP
           </span>
         </Link>
@@ -58,7 +58,7 @@ export function Navbar() {
           <ThemeToggle />
           <Link
             href="/subscribe"
-            className="bg-foreground text-background border-[3px] border-foreground px-5 py-2 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors"
+            className="bg-foreground text-background border-[3px] border-foreground px-5 py-2 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-colors"
           >
             Subscribe
           </Link>
@@ -102,7 +102,7 @@ export function Navbar() {
               <Link
                 href="/subscribe"
                 onClick={() => setIsOpen(false)}
-                className="block w-full bg-foreground text-background border-[3px] border-foreground px-4 py-3 text-center text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors"
+                className="block w-full bg-foreground text-background border-[3px] border-foreground px-4 py-3 text-center text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 Subscribe to Newsletter
               </Link>

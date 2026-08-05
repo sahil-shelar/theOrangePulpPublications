@@ -40,7 +40,7 @@ export default function SubscribeForm() {
       <div className="border-[3px] border-foreground p-4">
         <button
           type="submit"
-          className="w-full bg-foreground text-background border-[3px] border-foreground px-6 py-4 text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors"
+          className="w-full bg-foreground text-background border-[3px] border-foreground px-6 py-4 text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           Subscribe Now
         </button>

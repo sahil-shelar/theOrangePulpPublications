@@ -104,35 +104,35 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
         <Link
           href={`/${typeToRoute(article.type)}`}
           prefetch={false}
-          className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors"
+          className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-on-media/70 hover:text-on-media text-label font-black uppercase tracking-widest transition-colors"
         >
           <ArrowLeft size={14} strokeWidth={2.5} /> {typeToRoute(article.type)}
         </Link>
 
         <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-12 max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
+            <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-primary-foreground border-foreground">
               Review
             </span>
             {article.categories && (
-              <span className="text-label font-black uppercase tracking-widest text-background/80 px-3 py-1.5 border-[2px] border-background/20">
+              <span className="text-label font-black uppercase tracking-widest text-on-media/80 px-3 py-1.5 border-[2px] border-on-media/20">
                 {article.categories.name}
               </span>
             )}
           </div>
 
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-background leading-[0.95] max-w-4xl">
+          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-on-media leading-[0.95] max-w-4xl">
             {article.title}
           </h1>
 
           {article.excerpt && (
-            <p className="mt-3 text-sm sm:text-base font-medium text-background/80 leading-snug max-w-2xl italic">
+            <p className="mt-3 text-sm sm:text-base font-medium text-on-media/80 leading-snug max-w-2xl italic">
               {article.excerpt}
             </p>
           )}
 
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-background/20">
-            <div className="w-7 h-7 shrink-0 border-[2px] border-background/40 overflow-hidden">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-on-media/20">
+            <div className="w-7 h-7 shrink-0 border-[2px] border-on-media/40 overflow-hidden">
               {article.authors?.avatar_url ? (
                 <img src={article.authors.avatar_url} alt={article.authors.name} className="w-full h-full object-cover" />
               ) : (
@@ -141,15 +141,15 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
                 </div>
               )}
             </div>
-            <Link href={`/author/${article.authors?.slug || ""}`} prefetch={false} className="font-black uppercase tracking-widest text-label text-background/80 hover:text-background transition-colors">
+            <Link href={`/author/${article.authors?.slug || ""}`} prefetch={false} className="font-black uppercase tracking-widest text-label text-on-media/80 hover:text-on-media transition-colors">
               {article.authors?.name || "Editorial Team"}
             </Link>
-            <span className="text-background/30 text-label">·</span>
-            <span className="text-label font-bold uppercase tracking-widest text-background/80">
+            <span className="text-on-media/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-on-media/80">
               {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
             </span>
-            <span className="text-background/30 text-label">·</span>
-            <span className="text-label font-bold uppercase tracking-widest text-background/80">{article.reading_time || 5} min read</span>
+            <span className="text-on-media/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-on-media/80">{article.reading_time || 5} min read</span>
           </div>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
       <div className="bg-muted border-b-[3px] border-foreground">
         <div className="max-w-6xl mx-auto px-6 md:px-10 py-4 flex flex-wrap items-center gap-x-8 gap-y-3">
           {verdict && (
-            <span className="text-label font-black uppercase tracking-widest px-3 py-2 border-[2px] border-foreground bg-secondary text-foreground">
+            <span className="text-label font-black uppercase tracking-widest px-3 py-2 border-[2px] border-foreground bg-secondary text-secondary-foreground">
               {VERDICT_LABEL[verdict] || verdict}
             </span>
           )}
@@ -200,7 +200,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
       <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-12 md:py-16">
 
         <div className="lg:col-span-8">
-          <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
+          <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
             <ReactMarkdown>{article.content || ""}</ReactMarkdown>
           </article>
 
@@ -208,12 +208,12 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
             {articleTags && articleTags.length > 0
               ? (articleTags as any[]).map((at: any) => at.tags).filter(Boolean).map((tag: any) => (
                   <Link key={tag.id} href={`/tag/${tag.slug}`} prefetch={false}
-                    className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-primary text-foreground">
+                    className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-primary text-primary-foreground">
                     #{tag.name}
                   </Link>
                 ))
               : (
-                <span className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest bg-primary text-foreground">#review</span>
+                <span className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest bg-primary text-primary-foreground">#review</span>
               )
             }
           </div>

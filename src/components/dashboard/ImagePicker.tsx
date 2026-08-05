@@ -196,7 +196,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
           <button
             type="button"
             onClick={handleUrlSubmit}
-            className="bg-foreground text-background border-[3px] border-foreground px-4 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors shrink-0"
+            className="bg-foreground text-background border-[3px] border-foreground px-4 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-colors shrink-0"
           >
             Set
           </button>

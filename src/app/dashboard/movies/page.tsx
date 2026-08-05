@@ -45,7 +45,7 @@ export default async function MoviesDashboardPage() {
                 <div className="absolute inset-0 bg-background/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
                   <Link
                     href={`/dashboard/movies/${movie.id}/edit`}
-                    className="w-full bg-primary text-foreground font-black text-label uppercase tracking-widest px-3 py-2 border-[2px] border-foreground text-center hover:-translate-y-0.5 transition-transform"
+                    className="w-full bg-primary text-primary-foreground font-black text-label uppercase tracking-widest px-3 py-2 border-[2px] border-foreground text-center hover:-translate-y-0.5 transition-transform"
                   >
                     <Edit size={14} className="inline mr-1" /> Edit
                   </Link>

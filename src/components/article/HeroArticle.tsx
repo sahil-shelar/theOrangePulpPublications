@@ -32,11 +32,11 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
 
       {/* Badges — top-left on mobile, bottom-right on desktop */}
       <div className="absolute top-4 left-4 md:top-auto md:bottom-8 md:left-auto md:right-8 flex items-center gap-2 z-10">
-        <span className="bg-primary text-foreground text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground">
+        <span className="bg-primary text-primary-foreground text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground">
           {article.type}
         </span>
         {article.categories && (
-          <span className="bg-background/10 text-background text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-background/30">
+          <span className="bg-background/10 text-on-media text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-on-media/30">
             {article.categories.name}
           </span>
         )}
@@ -46,18 +46,18 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
       <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 max-w-7xl mx-auto">
 
         {/* Title */}
-        <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase text-background leading-[0.92] md:w-3/4 group-hover:text-primary transition-colors duration-300">
+        <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase text-on-media leading-[0.92] md:w-3/4 group-hover:text-primary transition-colors duration-300">
           {article.title}
         </h1>
 
         {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 mt-5 text-label font-black uppercase tracking-widest text-background/80">
+        <div className="flex flex-wrap items-center gap-3 mt-5 text-label font-black uppercase tracking-widest text-on-media/80">
           <span>{article.authors?.name || 'Editorial Team'}</span>
-          <span className="text-background/30">·</span>
+          <span className="text-on-media/30">·</span>
           <span>{new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</span>
           {article.reading_time && (
             <>
-              <span className="text-background/30">·</span>
+              <span className="text-on-media/30">·</span>
               <span>{article.reading_time} min read</span>
             </>
           )}

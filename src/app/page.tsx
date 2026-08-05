@@ -167,7 +167,7 @@ export default async function Homepage() {
                         <div className="absolute inset-0 img-scrim" />
                       </div>
                       <div className="relative p-7 min-h-[280px] flex flex-col justify-between">
-                        <span className="text-label font-black uppercase tracking-widest bg-primary text-foreground px-2 py-1 border-[2px] border-background/30 self-start">
+                        <span className="text-label font-black uppercase tracking-widest bg-primary text-primary-foreground px-2 py-1 border-[2px] border-background/30 self-start">
                           {article.type}
                         </span>
                         <div>

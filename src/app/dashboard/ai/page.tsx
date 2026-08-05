@@ -93,7 +93,7 @@ export default async function AIOperationsCenter() {
               <h2 className="font-heading text-lg font-black uppercase tracking-widest flex items-center gap-2">
                 <Check size={16} /> Pending Approvals
               </h2>
-              <span className="bg-primary text-foreground text-label font-black px-2 py-1">{suggestions?.length ?? 0}</span>
+              <span className="bg-primary text-primary-foreground text-label font-black px-2 py-1">{suggestions?.length ?? 0}</span>
             </div>
             <div className="max-h-[440px] overflow-y-auto">
               {suggestions && suggestions.length > 0 ? suggestions.map((s: any) => (

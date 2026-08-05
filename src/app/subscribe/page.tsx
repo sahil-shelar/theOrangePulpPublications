@@ -11,7 +11,7 @@ export default function SubscribePage() {
     <div className="w-full bg-secondary min-h-screen py-16 px-4 sm:px-6 flex items-center justify-center">
       <div className="max-w-xl w-full brutal-card p-8 sm:p-12 text-center">
 
-        <span className="bg-primary text-foreground border-[3px] border-foreground px-4 py-1.5 text-label font-black uppercase tracking-widest inline-block mb-6">
+        <span className="bg-primary text-primary-foreground border-[3px] border-foreground px-4 py-1.5 text-label font-black uppercase tracking-widest inline-block mb-6">
           Newsletter
         </span>
 

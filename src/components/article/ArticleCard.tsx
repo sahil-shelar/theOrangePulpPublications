@@ -74,7 +74,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
           </div>
         )}
         {/* Type badge */}
-        <span className="absolute top-3 left-3 bg-primary text-foreground text-label font-black uppercase tracking-widest px-2 py-1 border-[2px] border-foreground">
+        <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-label font-black uppercase tracking-widest px-2 py-1 border-[2px] border-foreground">
           {article.type}
         </span>
         {/* Rating */}

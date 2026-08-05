@@ -70,11 +70,11 @@ export default function SearchModal({ onClose }: Props) {
   }
 
   const TYPE_COLOR: Record<string, string> = {
-    review:   "bg-primary text-foreground",
-    news:     "bg-secondary text-foreground",
+    review:   "bg-primary text-primary-foreground",
+    news:     "bg-secondary text-secondary-foreground",
     spotlight:"bg-muted text-foreground",
     list:     "bg-foreground text-background",
-    movie:    "bg-accent text-foreground",
+    movie:    "bg-accent text-accent-foreground",
   };
 
   function resultHref(r: Result) {
