@@ -9,7 +9,7 @@ export default async function SettingsPage() {
   return (
     <div className="p-6 md:p-8 max-w-4xl">
       <div className="mb-8">
-        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Admin</p>
+        <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Admin</p>
         <h1 className="font-heading text-4xl font-black uppercase text-foreground">Settings</h1>
       </div>
 

@@ -40,7 +40,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </form>
 
         <div className="mt-6 text-center">
-          <Link href="/forgot-password" className="text-[10px] font-black uppercase tracking-widest text-foreground hover:underline">
+          <Link href="/forgot-password" className="text-label font-black uppercase tracking-widest text-foreground hover:underline">
             Forgot Password?
           </Link>
         </div>

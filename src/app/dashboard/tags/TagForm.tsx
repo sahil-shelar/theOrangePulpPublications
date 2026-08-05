@@ -46,7 +46,7 @@ export default function TagForm({ initialData }: { initialData?: TagData }) {
       {error && <div className="bg-red-500 text-white p-4 font-bold border-[3px] border-foreground uppercase">{error}</div>}
       
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-foreground">Name</label>
+        <label className="text-label font-black uppercase tracking-widest text-foreground">Name</label>
         <input 
           type="text" 
           value={formData.name}
@@ -57,7 +57,7 @@ export default function TagForm({ initialData }: { initialData?: TagData }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-foreground">Slug</label>
+        <label className="text-label font-black uppercase tracking-widest text-foreground">Slug</label>
         <input 
           type="text" 
           value={formData.slug}
@@ -68,7 +68,7 @@ export default function TagForm({ initialData }: { initialData?: TagData }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-foreground">Description</label>
+        <label className="text-label font-black uppercase tracking-widest text-foreground">Description</label>
         <textarea 
           value={formData.description}
           onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}

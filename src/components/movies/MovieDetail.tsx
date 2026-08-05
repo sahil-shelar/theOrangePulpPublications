@@ -79,7 +79,7 @@ export default function MovieDetail({
             <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-black uppercase text-foreground leading-[0.9] tracking-tight">
               {title}
             </h1>
-            <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] font-black uppercase tracking-widest text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 mt-3 text-label font-black uppercase tracking-widest text-muted-foreground">
               {year && <span>{year}</span>}
               {runtime && <><span className="text-muted-foreground">·</span><span>{runtime} min</span></>}
               {director && <><span className="text-muted-foreground">·</span><span>Dir. {director}</span></>}
@@ -88,7 +88,7 @@ export default function MovieDetail({
             {genres.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {genres.map(g => (
-                  <span key={g} className="text-[9px] font-black uppercase tracking-widest bg-primary text-foreground px-2 py-0.5 border-[2px] border-foreground">
+                  <span key={g} className="text-label font-black uppercase tracking-widest bg-primary text-foreground px-2 py-0.5 border-[2px] border-foreground">
                     {g}
                   </span>
                 ))}
@@ -148,9 +148,9 @@ export default function MovieDetail({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-black text-[11px] uppercase tracking-wide leading-tight truncate">{c.name}</div>
+                      <div className="font-black text-label uppercase tracking-wide leading-tight truncate">{c.name}</div>
                       {c.character && (
-                        <div className="font-bold text-[10px] text-muted-foreground truncate">{c.character}</div>
+                        <div className="font-bold text-label text-muted-foreground truncate">{c.character}</div>
                       )}
                     </div>
                   </div>
@@ -170,11 +170,11 @@ export default function MovieDetail({
             {streaming_providers.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {streaming_providers.map(p => (
-                  <span key={p} className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-foreground text-background">{p}</span>
+                  <span key={p} className="text-label font-black uppercase tracking-widest px-3 py-1 bg-foreground text-background">{p}</span>
                 ))}
               </div>
             ) : (
-              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Not currently streaming</p>
+              <p className="text-label font-bold text-muted-foreground uppercase tracking-widest">Not currently streaming</p>
             )}
           </div>
 
@@ -186,13 +186,13 @@ export default function MovieDetail({
               <div className="space-y-3">
                 {budget ? (
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Budget</span>
+                    <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Budget</span>
                     <span className="font-black text-sm">${(budget / 1_000_000).toFixed(0)}M</span>
                   </div>
                 ) : null}
                 {revenue ? (
                   <div className="flex justify-between items-center border-t-[2px] border-foreground/10 pt-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Worldwide</span>
+                    <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Worldwide</span>
                     <span className="font-black text-sm">${(revenue / 1_000_000).toFixed(0)}M</span>
                   </div>
                 ) : null}
@@ -213,7 +213,7 @@ export default function MovieDetail({
                     className="block p-3 bg-background border-[3px] border-foreground hover:-translate-y-0.5 transition-transform"
                     style={{boxShadow:'4px 4px 0px 0px var(--foreground)'}}
                   >
-                    <span className="text-[9px] font-black uppercase tracking-widest bg-primary px-2 py-0.5 mb-1.5 inline-block border-[2px] border-foreground">
+                    <span className="text-label font-black uppercase tracking-widest bg-primary px-2 py-0.5 mb-1.5 inline-block border-[2px] border-foreground">
                       {art.type}
                     </span>
                     <h4 className="font-black text-xs uppercase leading-tight line-clamp-2">{art.title}</h4>

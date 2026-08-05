@@ -77,7 +77,7 @@ export default function SpotlightWorksEditor({ movies, works, onChange }: Props)
                     />
                   )}
                   {selectedMovie && (
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                    <div className="text-label font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                       {selectedMovie.poster_url && <img src={selectedMovie.poster_url} alt="" className="w-5 h-7 object-cover border border-foreground" />}
                       Linked to movie database
                     </div>

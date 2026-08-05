@@ -44,7 +44,7 @@ export default function ContactForm() {
         { id: "subject", label: "Subject",       type: "text",  required: true },
       ].map(({ id, label, type, required }) => (
         <div key={id} className="border-[3px] border-foreground border-b-0">
-          <label htmlFor={id} className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-5 pt-4 pb-1">
+          <label htmlFor={id} className="block text-label font-black uppercase tracking-[0.2em] text-muted-foreground px-5 pt-4 pb-1">
             {label}
           </label>
           <input
@@ -59,7 +59,7 @@ export default function ContactForm() {
       ))}
 
       <div className="border-[3px] border-foreground border-b-0">
-        <label htmlFor="message" className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-5 pt-4 pb-1">
+        <label htmlFor="message" className="block text-label font-black uppercase tracking-[0.2em] text-muted-foreground px-5 pt-4 pb-1">
           Message
         </label>
         <textarea

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArticleWithRelations } from '@/types/models'
 import { typeToRoute } from '@/lib/utils'
 
@@ -10,13 +11,16 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
       href={`/${typeToRoute(article.type)}/${article.slug}`}
       className="block group w-full relative h-[42vh] md:h-[72vh] overflow-hidden"
     >
-      {/* Background image */}
+      {/* Background image — LCP element on the homepage, so eager + priority */}
       <div className="absolute inset-0">
         {image ? (
-          <img
+          <Image
             src={image}
             alt={article.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
           />
         ) : (
           <div className="w-full h-full bg-secondary" />
@@ -24,15 +28,15 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
       </div>
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/65 to-foreground/20" />
 
       {/* Badges — top-left on mobile, bottom-right on desktop */}
       <div className="absolute top-4 left-4 md:top-auto md:bottom-8 md:left-auto md:right-8 flex items-center gap-2 z-10">
-        <span className="bg-primary text-foreground text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground">
+        <span className="bg-primary text-foreground text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground">
           {article.type}
         </span>
         {article.categories && (
-          <span className="bg-background/10 text-background text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-background/30">
+          <span className="bg-background/10 text-background text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-background/30">
             {article.categories.name}
           </span>
         )}
@@ -47,7 +51,7 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
         </h1>
 
         {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 mt-5 text-[10px] font-black uppercase tracking-widest text-background/60">
+        <div className="flex flex-wrap items-center gap-3 mt-5 text-label font-black uppercase tracking-widest text-background/80">
           <span>{article.authors?.name || 'Editorial Team'}</span>
           <span className="text-background/30">·</span>
           <span>{new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</span>

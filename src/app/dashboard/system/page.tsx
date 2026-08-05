@@ -24,7 +24,7 @@ export default async function SystemDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between border-b-[3px] border-foreground pb-6">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Admin</p>
+          <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Admin</p>
           <h1 className="font-heading text-5xl font-black uppercase tracking-tighter text-foreground">System</h1>
         </div>
         <div className="flex items-center gap-2 bg-primary/20 text-foreground px-4 py-2 font-bold uppercase tracking-widest text-xs border-[2px] border-primary">
@@ -37,28 +37,28 @@ export default async function SystemDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         <div className="brutal-card bg-background p-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Articles</span>
+            <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Articles</span>
             <Database size={16} className="text-primary" />
           </div>
           <div className="font-heading text-5xl font-black">{totalArticles ?? 0}</div>
         </div>
         <div className="brutal-card bg-background p-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Authors</span>
+            <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Authors</span>
             <Server size={16} className="text-primary" />
           </div>
           <div className="font-heading text-5xl font-black">{totalAuthors ?? 0}</div>
         </div>
         <div className="brutal-card bg-background p-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Active Jobs</span>
+            <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Active Jobs</span>
             <Activity size={16} className="text-primary" />
           </div>
           <div className="font-heading text-5xl font-black">{activeJobs ?? 0}</div>
         </div>
         <div className={`brutal-card p-6 ${(failedJobs ?? 0) > 0 ? 'bg-red-50 border-red-400' : 'bg-background'}`}>
           <div className="flex items-center justify-between mb-3">
-            <span className={`text-[9px] font-black uppercase tracking-widest ${(failedJobs ?? 0) > 0 ? 'text-red-500' : 'text-muted-foreground'}`}>Failed Jobs</span>
+            <span className={`text-label font-black uppercase tracking-widest ${(failedJobs ?? 0) > 0 ? 'text-red-500' : 'text-muted-foreground'}`}>Failed Jobs</span>
             <AlertTriangle size={16} className={(failedJobs ?? 0) > 0 ? 'text-red-500' : 'text-muted-foreground'} />
           </div>
           <div className={`font-heading text-5xl font-black ${(failedJobs ?? 0) > 0 ? 'text-red-500' : ''}`}>{failedJobs ?? 0}</div>

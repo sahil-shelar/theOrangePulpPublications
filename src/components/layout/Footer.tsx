@@ -56,7 +56,7 @@ export function Footer() {
             {["X", "IG", "YT"].map(s => (
               <button
                 key={s}
-                className="w-9 h-9 border-[2px] border-background/30 text-background/60 text-[10px] font-black uppercase hover:border-primary hover:text-primary hover:bg-primary/10 transition-colors flex items-center justify-center"
+                className="w-9 h-9 border-[2px] border-background/30 text-background/60 text-label font-black uppercase hover:border-primary hover:text-primary hover:bg-primary/10 transition-colors flex items-center justify-center"
               >
                 {s}
               </button>
@@ -66,7 +66,7 @@ export function Footer() {
 
         {/* Explore */}
         <div>
-          <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-background/40 mb-4">Explore</h4>
+          <h4 className="text-label font-black uppercase tracking-[0.2em] text-background/40 mb-4">Explore</h4>
           <ul className="space-y-3">
             {EXPLORE.map(({ href, label }) => (
               <li key={href}>
@@ -83,7 +83,7 @@ export function Footer() {
 
         {/* Company */}
         <div>
-          <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-background/40 mb-4">Company</h4>
+          <h4 className="text-label font-black uppercase tracking-[0.2em] text-background/40 mb-4">Company</h4>
           <ul className="space-y-3">
             {COMPANY.map(({ href, label }) => (
               <li key={href}>
@@ -102,10 +102,10 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="border-t-[2px] border-background/10">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-background/35">
+          <p className="text-label font-bold uppercase tracking-widest text-background/35">
             © {new Date().getFullYear()} The Orange Pulp. All rights reserved.
           </p>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-background/35">
+          <p className="text-label font-bold uppercase tracking-widest text-background/35">
             Made for film lovers.
           </p>
         </div>

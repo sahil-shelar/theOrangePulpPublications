@@ -37,7 +37,7 @@ export default async function NewsPage() {
                           <img src={img} alt={(featured as any).title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : <div className="w-full h-full bg-secondary" />
                       })()}
-                      <span className="absolute top-4 left-4 bg-foreground text-background text-[9px] font-black uppercase tracking-widest px-3 py-1.5">
+                      <span className="absolute top-4 left-4 bg-foreground text-background text-label font-black uppercase tracking-widest px-3 py-1.5">
                         News
                       </span>
                     </div>
@@ -48,7 +48,7 @@ export default async function NewsPage() {
                       {(featured as any).excerpt && (
                         <p className="text-sm font-medium text-foreground/70 leading-relaxed line-clamp-3">{(featured as any).excerpt}</p>
                       )}
-                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground pt-4 border-t-[1px] border-foreground/20">
+                      <div className="text-label font-black uppercase tracking-widest text-muted-foreground pt-4 border-t-[1px] border-foreground/20">
                         {(featured as any).authors?.name || 'Editorial'} · {new Date((featured as any).published_at || (featured as any).created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                       </div>
                     </div>

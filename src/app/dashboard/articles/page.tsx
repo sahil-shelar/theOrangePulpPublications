@@ -27,7 +27,7 @@ export default async function ArticlesPage({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Content</p>
+          <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Content</p>
           <h1 className="font-heading text-4xl font-black uppercase tracking-tighter text-foreground">Articles</h1>
         </div>
         <Link href="/dashboard/articles/new" className="brutal-button px-5 py-3 text-xs flex items-center gap-2 bg-primary">
@@ -46,7 +46,7 @@ export default async function ArticlesPage({
             defaultValue={q}
             className="flex-1 bg-background border-[3px] border-foreground px-3 py-2 font-bold text-sm"
           />
-          <button type="submit" className="bg-foreground text-background px-4 py-2 font-black uppercase text-[10px] border-[3px] border-foreground hover:bg-primary hover:text-foreground transition-colors">
+          <button type="submit" className="bg-foreground text-background px-4 py-2 font-black uppercase text-label border-[3px] border-foreground hover:bg-primary hover:text-foreground transition-colors">
             Search
           </button>
         </form>
@@ -59,7 +59,7 @@ export default async function ArticlesPage({
             <Link
               key={value}
               href={value ? `/dashboard/articles?status=${value}${q ? `&q=${q}` : ''}` : '/dashboard/articles'}
-              className={`px-3 py-2 border-[3px] border-foreground font-black uppercase text-[10px] transition-colors ${
+              className={`px-3 py-2 border-[3px] border-foreground font-black uppercase text-label transition-colors ${
                 (status || '') === value ? 'bg-primary' : 'bg-background hover:bg-muted'
               }`}
             >
@@ -73,7 +73,7 @@ export default async function ArticlesPage({
       <div className="brutal-card bg-background overflow-hidden overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
-            <tr className="bg-foreground text-background text-[9px] font-black uppercase tracking-widest">
+            <tr className="bg-foreground text-background text-label font-black uppercase tracking-widest">
               <th className="p-3.5">Title</th>
               <th className="p-3.5">Type</th>
               <th className="p-3.5">Category</th>
@@ -92,10 +92,10 @@ export default async function ArticlesPage({
             ) : articles.map((article: any) => (
               <tr key={article.id} className="border-t-[3px] border-foreground hover:bg-muted transition-colors">
                 <td className="p-3.5 font-bold text-sm max-w-[280px] truncate">{article.title}</td>
-                <td className="p-3.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">{article.type}</td>
-                <td className="p-3.5 text-[10px] font-bold uppercase tracking-wider text-foreground/70">{article.categories?.name || '—'}</td>
+                <td className="p-3.5 text-label font-black uppercase tracking-widest text-muted-foreground">{article.type}</td>
+                <td className="p-3.5 text-label font-bold uppercase tracking-wider text-foreground/70">{article.categories?.name || '—'}</td>
                 <td className="p-3.5">
-                  <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 border-[2px] border-foreground ${article.status === 'published' ? 'bg-primary' : 'bg-muted'}`}>
+                  <span className={`text-label font-black uppercase tracking-widest px-2 py-1 border-[2px] border-foreground ${article.status === 'published' ? 'bg-primary' : 'bg-muted'}`}>
                     {article.status}
                   </span>
                 </td>

@@ -9,6 +9,13 @@ const nextConfig = {
     },
     proxyClientMaxBodySize: '26mb',
   },
+  images: {
+    // TMDb artwork and Supabase Storage uploads are the only remote image sources.
+    remotePatterns: [
+      { protocol: 'https', hostname: 'image.tmdb.org', pathname: '/t/p/**' },
+      { protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' },
+    ],
+  },
 }
 
 const withMDX = createMDX({})

@@ -122,15 +122,15 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
                 <img src={file.file_url} alt={file.file_name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
                 
                 <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                  <button onClick={() => handleCopy(file.file_url)} className="bg-primary text-foreground font-black text-[10px] uppercase tracking-widest px-3 py-2 border-[3px] border-foreground hover:-translate-y-1 transition-transform flex items-center gap-2">
+                  <button onClick={() => handleCopy(file.file_url)} className="bg-primary text-foreground font-black text-label uppercase tracking-widest px-3 py-2 border-[3px] border-foreground hover:-translate-y-1 transition-transform flex items-center gap-2">
                     <Copy size={12} /> Copy URL
                   </button>
-                  <button onClick={() => handleDelete(file.id, file.file_name)} className="bg-red-500 text-white font-black text-[10px] uppercase tracking-widest px-3 py-2 border-[3px] border-foreground hover:-translate-y-1 transition-transform flex items-center gap-2">
+                  <button onClick={() => handleDelete(file.id, file.file_name)} className="bg-red-500 text-white font-black text-label uppercase tracking-widest px-3 py-2 border-[3px] border-foreground hover:-translate-y-1 transition-transform flex items-center gap-2">
                     <Trash2 size={12} /> Delete
                   </button>
                 </div>
               </div>
-              <div className="p-2 text-[10px] font-black uppercase tracking-widest truncate">
+              <div className="p-2 text-label font-black uppercase tracking-widest truncate">
                 {file.file_name.split('_').pop()}
               </div>
             </div>

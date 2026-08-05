@@ -61,7 +61,7 @@ export default function CommandPalette() {
         <div className="p-2 max-h-96 overflow-y-auto">
           {filteredActions.length > 0 ? (
             <div className="space-y-1">
-              <div className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Actions</div>
+              <div className="px-3 py-2 text-label font-black uppercase tracking-widest text-muted-foreground">Actions</div>
               {filteredActions.map((action, i) => (
                 <button
                   key={i}
@@ -79,7 +79,7 @@ export default function CommandPalette() {
             </div>
           )}
         </div>
-        <div className="border-t-[4px] border-foreground bg-muted p-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground flex justify-between">
+        <div className="border-t-[4px] border-foreground bg-muted p-3 text-label font-black uppercase tracking-widest text-muted-foreground flex justify-between">
           <span>Use arrows to navigate</span>
           <span>Esc to close</span>
         </div>

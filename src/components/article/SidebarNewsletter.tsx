@@ -32,7 +32,7 @@ export default function SidebarNewsletter() {
         />
         <button
           type="submit"
-          className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-background hover:text-foreground transition-colors"
+          className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-3 text-label font-black uppercase tracking-widest hover:bg-background hover:text-foreground transition-colors"
         >
           Subscribe
         </button>

@@ -98,7 +98,7 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
           <div key={comment.id} className="bg-background border-[3px] border-foreground p-6">
             <div className="flex justify-between items-start mb-4">
               <div className="font-black uppercase tracking-widest text-sm text-primary">{displayName(comment)}</div>
-              <div className="text-[10px] font-bold text-muted-foreground">{new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</div>
+              <div className="text-label font-bold text-muted-foreground">{new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</div>
             </div>
             <p className="font-medium text-foreground mb-6 leading-relaxed">{comment.content}</p>
             <div className="flex items-center gap-4 border-t-[2px] border-foreground/10 pt-4">

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { ArticleWithRelations } from "@/types/models";
 import Link from "next/link";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import AdSlot from "@/components/ads/AdSlot";
 import ViewCounter from "./ViewCounter";
@@ -94,27 +95,27 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
       {/* ── Cinematic Hero ── */}
       <div className="relative w-full h-[55vh] md:h-[75vh] overflow-hidden border-b-[4px] border-foreground">
         {coverImage ? (
-          <img src={coverImage} alt={article.title} className="absolute inset-0 w-full h-full object-cover" />
+          <Image src={coverImage} alt={article.title} fill priority sizes="100vw" className="object-cover" />
         ) : (
           <div className="absolute inset-0 bg-primary" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/40 to-foreground/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25" />
 
         <Link
           href={`/${typeToRoute(article.type)}`}
           prefetch={false}
-          className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-[10px] font-black uppercase tracking-widest transition-colors"
+          className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors"
         >
           <ArrowLeft size={14} strokeWidth={3} /> {typeToRoute(article.type)}
         </Link>
 
         <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
+            <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
               Review
             </span>
             {article.categories && (
-              <span className="text-[9px] font-black uppercase tracking-widest text-background/60 px-3 py-1.5 border-[2px] border-background/20">
+              <span className="text-label font-black uppercase tracking-widest text-background/80 px-3 py-1.5 border-[2px] border-background/20">
                 {article.categories.name}
               </span>
             )}
@@ -125,12 +126,12 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
           </h1>
 
           {article.excerpt && (
-            <p className="mt-3 text-sm sm:text-base font-medium text-background/65 leading-snug max-w-2xl italic">
+            <p className="mt-3 text-sm sm:text-base font-medium text-background/80 leading-snug max-w-2xl italic">
               {article.excerpt}
             </p>
           )}
 
-          <div className="flex items-center gap-2.5 mt-4 pt-4 border-t-[1px] border-background/20">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-background/20">
             <div className="w-7 h-7 shrink-0 border-[2px] border-background/40 overflow-hidden">
               {article.authors?.avatar_url ? (
                 <img src={article.authors.avatar_url} alt={article.authors.name} className="w-full h-full object-cover" />
@@ -140,15 +141,15 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
                 </div>
               )}
             </div>
-            <Link href={`/author/${article.authors?.slug || ""}`} prefetch={false} className="font-black uppercase tracking-widest text-[10px] text-background/80 hover:text-background transition-colors">
+            <Link href={`/author/${article.authors?.slug || ""}`} prefetch={false} className="font-black uppercase tracking-widest text-label text-background/80 hover:text-background transition-colors">
               {article.authors?.name || "Editorial Team"}
             </Link>
-            <span className="text-background/30 text-[10px]">·</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">
+            <span className="text-background/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-background/80">
               {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
             </span>
-            <span className="text-background/30 text-[10px]">·</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">{article.reading_time || 5} min read</span>
+            <span className="text-background/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-background/80">{article.reading_time || 5} min read</span>
           </div>
         </div>
       </div>
@@ -157,38 +158,38 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
       <div className="bg-muted border-b-[3px] border-foreground">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center gap-x-8 gap-y-3">
           {verdict && (
-            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-2 border-[2px] border-foreground bg-secondary text-foreground">
+            <span className="text-label font-black uppercase tracking-widest px-3 py-2 border-[2px] border-foreground bg-secondary text-foreground">
               {VERDICT_LABEL[verdict] || verdict}
             </span>
           )}
           {article.rating != null && (
             <div className="flex items-baseline gap-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">OP Score</span>
+              <span className="text-label font-black uppercase tracking-widest text-muted-foreground">OP Score</span>
               <span className="font-heading text-xl font-black text-foreground tabular-nums">{article.rating}<span className="text-xs text-muted-foreground">/5</span></span>
             </div>
           )}
           {(article as any).imdb_score != null && (
             <div className="flex items-baseline gap-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">IMDb</span>
+              <span className="text-label font-black uppercase tracking-widest text-muted-foreground">IMDb</span>
               <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).imdb_score}<span className="text-xs text-muted-foreground">/10</span></span>
             </div>
           )}
           {(article as any).rt_score != null && (
             <div className="flex items-baseline gap-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Rotten Tomatoes</span>
+              <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Rotten Tomatoes</span>
               <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).rt_score}<span className="text-xs text-muted-foreground">%</span></span>
             </div>
           )}
           {streamingPlatforms.length > 0 && (
             <div className="flex items-center gap-1.5 ml-auto">
               <Play size={12} className="text-muted-foreground" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70">
+              <span className="text-label font-black uppercase tracking-widest text-foreground/70">
                 {streamingPlatforms.slice(0, 3).join(' · ')}
               </span>
             </div>
           )}
           {movie?.trailer_url && (
-            <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest border-[2px] border-foreground px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors">
+            <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="text-label font-black uppercase tracking-widest border-[2px] border-foreground px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors">
               Watch Trailer
             </a>
           )}
@@ -207,12 +208,12 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
             {articleTags && articleTags.length > 0
               ? (articleTags as any[]).map((at: any) => at.tags).filter(Boolean).map((tag: any) => (
                   <Link key={tag.id} href={`/tag/${tag.slug}`} prefetch={false}
-                    className="border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-primary text-foreground">
+                    className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-primary text-foreground">
                     #{tag.name}
                   </Link>
                 ))
               : (
-                <span className="border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-primary text-foreground">#review</span>
+                <span className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest bg-primary text-foreground">#review</span>
               )
             }
           </div>
@@ -250,7 +251,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
                         <div className="w-16 h-12 shrink-0 border-[2px] border-foreground bg-muted" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
+                        <div className="text-label font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
                         <h4 className="font-heading text-sm font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
                           {art.title}
                         </h4>

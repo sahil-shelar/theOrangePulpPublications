@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { ArticleWithRelations } from "@/types/models";
 import Link from "next/link";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import AdSlot from "@/components/ads/AdSlot";
 import ViewCounter from "./ViewCounter";
@@ -87,23 +88,26 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
       <div className="relative w-full h-[55vh] md:h-[75vh] overflow-hidden border-b-[4px] border-foreground">
         {/* Image */}
         {coverImage ? (
-          <img
+          <Image
             src={coverImage}
             alt={article.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
         ) : (
           <div className={`absolute inset-0 ${accent.strip}`} />
         )}
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/40 to-foreground/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25" />
 
         {/* Back link */}
         <Link
           href={`/${typeToRoute(article.type)}`}
           prefetch={false}
-          className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-[10px] font-black uppercase tracking-widest transition-colors"
+          className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors"
         >
           <ArrowLeft size={14} strokeWidth={3} /> {typeToRoute(article.type)}
         </Link>
@@ -112,11 +116,11 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
         <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
           {/* Type + category badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] ${accent.badge}`}>
+            <span className={`text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] ${accent.badge}`}>
               {article.type}
             </span>
             {article.categories && (
-              <span className="text-[9px] font-black uppercase tracking-widest text-background/60 px-3 py-1.5 border-[2px] border-background/20">
+              <span className="text-label font-black uppercase tracking-widest text-background/80 px-3 py-1.5 border-[2px] border-background/20">
                 {article.categories.name}
               </span>
             )}
@@ -136,13 +140,13 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
 
           {/* Excerpt — small, italic, dimmed */}
           {article.excerpt && (
-            <p className="mt-3 text-sm sm:text-base font-medium text-background/65 leading-snug max-w-2xl italic">
+            <p className="mt-3 text-sm sm:text-base font-medium text-background/80 leading-snug max-w-2xl italic">
               {article.excerpt}
             </p>
           )}
 
           {/* Author + meta row */}
-          <div className="flex items-center gap-2.5 mt-4 pt-4 border-t-[1px] border-background/20">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-background/20">
             <div className="w-7 h-7 shrink-0 border-[2px] border-background/40 overflow-hidden">
               {article.authors?.avatar_url ? (
                 <img src={article.authors.avatar_url} alt={article.authors.name} className="w-full h-full object-cover" />
@@ -155,28 +159,28 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
             <Link
               href={`/author/${article.authors?.slug || ""}`}
               prefetch={false}
-              className="font-black uppercase tracking-widest text-[10px] text-background/80 hover:text-background transition-colors"
+              className="font-black uppercase tracking-widest text-label text-background/80 hover:text-background transition-colors"
             >
               {article.authors?.name || "Editorial Team"}
             </Link>
-            <span className="text-background/30 text-[10px]">·</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">
+            <span className="text-background/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-background/80">
               {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
             </span>
-            <span className="text-background/30 text-[10px]">·</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">{article.reading_time || 5} min read</span>
-            <span className="hidden sm:inline text-background/30 text-[10px]">·</span>
-            <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-widest text-background/55">{article.views_count ?? 0} views</span>
+            <span className="text-background/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-background/80">{article.reading_time || 5} min read</span>
+            <span className="hidden sm:inline text-background/30 text-label">·</span>
+            <span className="hidden sm:inline text-label font-bold uppercase tracking-widest text-background/80">{article.views_count ?? 0} views</span>
             {(article as any).source_name && (
               <>
-                <span className="text-background/30 text-[10px]">·</span>
+                <span className="text-background/30 text-label">·</span>
                 {(article as any).source_url ? (
                   <a href={(article as any).source_url} target="_blank" rel="noopener noreferrer nofollow"
-                     className="text-[10px] font-black uppercase tracking-widest text-background/70 hover:text-background underline underline-offset-2">
+                     className="text-label font-black uppercase tracking-widest text-background/70 hover:text-background underline underline-offset-2">
                     Source: {(article as any).source_name}
                   </a>
                 ) : (
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">Source: {(article as any).source_name}</span>
+                  <span className="text-label font-bold uppercase tracking-widest text-background/80">Source: {(article as any).source_name}</span>
                 )}
               </>
             )}
@@ -201,13 +205,13 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
                     key={tag.id}
                     href={`/tag/${tag.slug}`}
                     prefetch={false}
-                    className={`border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors ${accent.tag}`}
+                    className={`border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors ${accent.tag}`}
                   >
                     #{tag.name}
                   </Link>
                 ))
               : (
-                <span className={`border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest ${accent.tag}`}>
+                <span className={`border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest ${accent.tag}`}>
                   #{article.type}
                 </span>
               )
@@ -256,7 +260,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
                         <div className="w-16 h-12 shrink-0 border-[2px] border-foreground bg-muted" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
+                        <div className="text-label font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
                         <h4 className="font-heading text-sm font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
                           {art.title}
                         </h4>

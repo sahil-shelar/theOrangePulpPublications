@@ -10,7 +10,7 @@ export default async function MoviesDashboardPage() {
     <div className="p-6 md:p-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Content</p>
+          <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Content</p>
           <h1 className="font-heading text-4xl font-black uppercase text-foreground">Movies</h1>
         </div>
         <Link href="/dashboard/movies/new" className="brutal-button px-5 py-3 flex items-center justify-center gap-2 text-xs">
@@ -37,7 +37,7 @@ export default async function MoviesDashboardPage() {
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <Film size={28} />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-center px-2">{movie.title}</span>
+                    <span className="text-label font-black uppercase tracking-widest text-center px-2">{movie.title}</span>
                   </div>
                 )}
 
@@ -45,7 +45,7 @@ export default async function MoviesDashboardPage() {
                 <div className="absolute inset-0 bg-background/95 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
                   <Link
                     href={`/dashboard/movies/${movie.id}/edit`}
-                    className="w-full bg-primary text-foreground font-black text-[9px] uppercase tracking-widest px-3 py-2 border-[2px] border-foreground text-center hover:-translate-y-0.5 transition-transform"
+                    className="w-full bg-primary text-foreground font-black text-label uppercase tracking-widest px-3 py-2 border-[2px] border-foreground text-center hover:-translate-y-0.5 transition-transform"
                   >
                     <Edit size={12} className="inline mr-1" /> Edit
                   </Link>
@@ -58,7 +58,7 @@ export default async function MoviesDashboardPage() {
                 <h3 className="font-heading text-sm font-black uppercase text-foreground truncate leading-tight">
                   {movie.title}
                 </h3>
-                <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5 truncate">
+                <p className="text-label font-bold text-muted-foreground uppercase tracking-widest mt-0.5 truncate">
                   {movie.release_year || movie.director || '—'}
                 </p>
               </div>

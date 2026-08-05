@@ -27,7 +27,7 @@ export default async function AIOperationsCenter() {
       {/* Header */}
       <div className="flex items-end justify-between border-b-[3px] border-foreground pb-6">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Intelligence</p>
+          <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Intelligence</p>
           <h1 className="font-heading text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-3">
             <Sparkles size={36} className="text-primary" />
             AI Center
@@ -64,21 +64,21 @@ export default async function AIOperationsCenter() {
         <div className="brutal-card bg-background p-6">
           <div className="flex items-center gap-3 mb-3">
             <FileText size={18} className="text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Articles</span>
+            <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Total Articles</span>
           </div>
           <div className="font-heading text-5xl font-black">{articleCount ?? 0}</div>
         </div>
         <div className="brutal-card bg-primary p-6">
           <div className="flex items-center gap-3 mb-3">
             <TrendingUp size={18} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Trend Signals</span>
+            <span className="text-label font-black uppercase tracking-widest">Trend Signals</span>
           </div>
           <div className="font-heading text-5xl font-black">{trends?.length ?? '—'}</div>
         </div>
         <div className="brutal-card bg-secondary p-6">
           <div className="flex items-center gap-3 mb-3">
             <AlertTriangle size={18} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Coverage Gaps</span>
+            <span className="text-label font-black uppercase tracking-widest">Coverage Gaps</span>
           </div>
           <div className="font-heading text-5xl font-black">{coverage?.length ?? '—'}</div>
         </div>
@@ -93,13 +93,13 @@ export default async function AIOperationsCenter() {
               <h2 className="font-heading text-lg font-black uppercase tracking-widest flex items-center gap-2">
                 <Check size={18} /> Pending Approvals
               </h2>
-              <span className="bg-primary text-foreground text-[10px] font-black px-2 py-1">{suggestions?.length ?? 0}</span>
+              <span className="bg-primary text-foreground text-label font-black px-2 py-1">{suggestions?.length ?? 0}</span>
             </div>
             <div className="max-h-[440px] overflow-y-auto">
               {suggestions && suggestions.length > 0 ? suggestions.map((s: any) => (
                 <div key={s.id} className="p-4 border-b-[2px] border-foreground/10 hover:bg-muted transition-colors">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest bg-secondary px-2 py-1 border-[2px] border-foreground">
+                    <span className="text-label font-black uppercase tracking-widest bg-secondary px-2 py-1 border-[2px] border-foreground">
                       {s.suggestion_type}
                     </span>
                     <div className="flex gap-1.5">
@@ -137,7 +137,7 @@ export default async function AIOperationsCenter() {
                 <div key={t.id} className="p-4 border-b-[2px] border-foreground/10 flex justify-between items-center hover:bg-muted transition-colors">
                   <div>
                     <div className="font-bold text-sm uppercase tracking-wider">{t.topic}</div>
-                    <div className="text-[9px] font-black text-muted-foreground mt-0.5 uppercase tracking-widest">Source: {t.source}</div>
+                    <div className="text-label font-black text-muted-foreground mt-0.5 uppercase tracking-widest">Source: {t.source}</div>
                   </div>
                   <div className="font-heading text-2xl font-black text-primary shrink-0">{t.opportunity_score}</div>
                 </div>
@@ -159,9 +159,9 @@ export default async function AIOperationsCenter() {
                 <div key={c.movie_id} className="p-4 border-b-[2px] border-foreground/10 hover:bg-muted transition-colors">
                   <div className="font-black uppercase tracking-wider text-sm mb-2">{c.movies?.title || 'Unknown Movie'}</div>
                   <div className="flex flex-wrap gap-1.5">
-                    {!c.has_review && <span className="text-[9px] font-bold uppercase bg-red-100 text-red-800 px-2 py-1 border border-red-300">No Review</span>}
-                    {!c.has_streaming_guide && <span className="text-[9px] font-bold uppercase bg-red-100 text-red-800 px-2 py-1 border border-red-300">No Streaming Guide</span>}
-                    {!c.has_ending_explained && <span className="text-[9px] font-bold uppercase bg-red-100 text-red-800 px-2 py-1 border border-red-300">No Ending Explained</span>}
+                    {!c.has_review && <span className="text-label font-bold uppercase bg-red-100 text-red-800 px-2 py-1 border border-red-300">No Review</span>}
+                    {!c.has_streaming_guide && <span className="text-label font-bold uppercase bg-red-100 text-red-800 px-2 py-1 border border-red-300">No Streaming Guide</span>}
+                    {!c.has_ending_explained && <span className="text-label font-bold uppercase bg-red-100 text-red-800 px-2 py-1 border border-red-300">No Ending Explained</span>}
                   </div>
                 </div>
               )) : (

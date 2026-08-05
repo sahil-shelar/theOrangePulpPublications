@@ -63,28 +63,28 @@ export default function AIAssistantPanel({ content, onApplyContent, onApplySeo }
             <button 
               type="button" 
               onClick={() => handleAIRequest('rewrite', 'Rewrite')}
-              className="p-2 border-[2px] border-foreground text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
+              className="p-2 border-[2px] border-foreground text-label font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
             >
               <RefreshCcw size={16} /> Rewrite / Improve
             </button>
             <button 
               type="button" 
               onClick={() => handleAIRequest('grammar', 'Grammar')}
-              className="p-2 border-[2px] border-foreground text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
+              className="p-2 border-[2px] border-foreground text-label font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
             >
               <Type size={16} /> Fix Grammar
             </button>
             <button 
               type="button" 
               onClick={() => handleAIRequest('seo', 'SEO')}
-              className="p-2 border-[2px] border-foreground text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
+              className="p-2 border-[2px] border-foreground text-label font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
             >
               <Wand2 size={16} /> Generate SEO
             </button>
             <button 
               type="button" 
               onClick={() => handleAIRequest('links', 'Internal Links')}
-              className="p-2 border-[2px] border-foreground text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
+              className="p-2 border-[2px] border-foreground text-label font-black uppercase tracking-widest hover:bg-primary transition-colors flex flex-col items-center gap-1"
             >
               <LinkIcon size={16} /> Suggest Links
             </button>
@@ -98,7 +98,7 @@ export default function AIAssistantPanel({ content, onApplyContent, onApplySeo }
 
           {suggestion && !isProcessing && (
             <div className="mt-4 border-[3px] border-foreground bg-muted p-4">
-              <div className="text-[10px] font-black uppercase tracking-widest mb-2 border-b-[2px] border-foreground pb-1">
+              <div className="text-label font-black uppercase tracking-widest mb-2 border-b-[2px] border-foreground pb-1">
                 AI Suggestion
               </div>
               {suggestionType === 'seo' ? (
@@ -113,10 +113,10 @@ export default function AIAssistantPanel({ content, onApplyContent, onApplySeo }
               )}
               
               <div className="flex gap-2 mt-4">
-                <button type="button" onClick={applySuggestion} className="flex-1 bg-primary border-[2px] border-foreground font-black uppercase text-[10px] py-2 flex justify-center items-center gap-1 hover:-translate-y-1 transition-transform">
+                <button type="button" onClick={applySuggestion} className="flex-1 bg-primary border-[2px] border-foreground font-black uppercase text-label py-2 flex justify-center items-center gap-1 hover:-translate-y-1 transition-transform">
                   <Check size={14} /> Apply
                 </button>
-                <button type="button" onClick={() => setSuggestion(null)} className="flex-1 bg-background border-[2px] border-foreground font-black uppercase text-[10px] py-2 flex justify-center items-center gap-1 hover:bg-red-500 hover:text-white transition-colors">
+                <button type="button" onClick={() => setSuggestion(null)} className="flex-1 bg-background border-[2px] border-foreground font-black uppercase text-label py-2 flex justify-center items-center gap-1 hover:bg-red-500 hover:text-white transition-colors">
                   <X size={14} /> Discard
                 </button>
               </div>

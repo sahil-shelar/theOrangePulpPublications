@@ -13,7 +13,7 @@ export default function ContactPage() {
       {/* Header */}
       <div className="border-b-[4px] border-foreground bg-secondary">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-3">Reach Out</p>
+          <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-3">Reach Out</p>
           <h1 className="font-heading text-6xl md:text-8xl font-black uppercase text-foreground leading-none">
             Contact
           </h1>
@@ -33,7 +33,7 @@ export default function ContactPage() {
             { label: "Advertising", value: "ads@theorangepulp.com" },
           ].map(({ label, value }) => (
             <div key={label} className="border-[3px] border-foreground border-b-0 last:border-b-[3px] px-6 py-5">
-              <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground mb-1">{label}</p>
+              <p className="text-label font-black uppercase tracking-[0.15em] text-muted-foreground mb-1">{label}</p>
               <p className="text-sm font-bold text-foreground">{value}</p>
             </div>
           ))}

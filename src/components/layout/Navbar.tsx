@@ -39,7 +39,7 @@ export function Navbar() {
             <Link
               key={href}
               href={href}
-              className="relative px-4 py-2 text-[11px] font-black tracking-[0.18em] uppercase text-foreground/70 hover:text-foreground hover:bg-muted transition-colors border-[2px] border-transparent hover:border-foreground"
+              className="relative px-4 py-2 text-label font-black tracking-[0.18em] uppercase text-foreground/70 hover:text-foreground hover:bg-muted transition-colors border-[2px] border-transparent hover:border-foreground"
             >
               {label}
             </Link>
@@ -51,14 +51,14 @@ export function Navbar() {
           <button
             aria-label="Search"
             onClick={() => setSearchOpen(true)}
-            className="p-2 border-[2px] border-foreground/20 hover:border-foreground hover:bg-muted transition-colors"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center border-[2px] border-foreground/20 hover:border-foreground hover:bg-muted transition-colors"
           >
             <Search className="w-4 h-4" strokeWidth={2.5} />
           </button>
           <ThemeToggle />
           <Link
             href="/subscribe"
-            className="bg-foreground text-background border-[3px] border-foreground px-5 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors"
+            className="bg-foreground text-background border-[3px] border-foreground px-5 py-2 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors"
           >
             Subscribe
           </Link>
@@ -68,9 +68,10 @@ export function Navbar() {
         <div className="md:hidden flex items-center gap-2">
           <ThemeToggle />
           <button
-            className="p-1.5 border-[2px] border-foreground hover:bg-muted transition-colors"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center border-[2px] border-foreground hover:bg-muted transition-colors"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Menu"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
             {isOpen ? <X className="w-5 h-5" strokeWidth={2.5} /> : <Menu className="w-5 h-5" strokeWidth={2.5} />}
           </button>

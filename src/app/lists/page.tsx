@@ -37,7 +37,7 @@ export default async function ListsPage() {
                           <img src={img} alt={(featured as any).title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : <div className="w-full h-full bg-primary" />
                       })()}
-                      <span className="absolute top-4 left-4 bg-foreground text-background text-[9px] font-black uppercase tracking-widest px-3 py-1.5">
+                      <span className="absolute top-4 left-4 bg-foreground text-background text-label font-black uppercase tracking-widest px-3 py-1.5">
                         List / Ranking
                       </span>
                     </div>
@@ -48,7 +48,7 @@ export default async function ListsPage() {
                       {(featured as any).excerpt && (
                         <p className="text-sm font-medium text-foreground/70 leading-relaxed line-clamp-4">{(featured as any).excerpt}</p>
                       )}
-                      <span className="self-start bg-foreground text-background text-[10px] font-black uppercase tracking-widest px-4 py-2 mt-2 border-[2px] border-foreground hover:-translate-y-0.5 transition-transform">
+                      <span className="self-start bg-foreground text-background text-label font-black uppercase tracking-widest px-4 py-2 mt-2 border-[2px] border-foreground hover:-translate-y-0.5 transition-transform">
                         View List →
                       </span>
                     </div>

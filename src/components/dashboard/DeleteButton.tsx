@@ -49,7 +49,7 @@ export default function DeleteButton({ id, label = 'Delete', onDelete, className
     <button
       onClick={handleClick}
       disabled={loading}
-      className={`flex items-center justify-center gap-2 brutal-button py-2 px-0 text-[10px] disabled:opacity-50 ${confirming ? 'bg-red-600 text-white' : 'bg-red-500 text-white'} ${className}`}
+      className={`flex items-center justify-center gap-2 brutal-button py-2 px-0 text-label disabled:opacity-50 ${confirming ? 'bg-red-600 text-white' : 'bg-red-500 text-white'} ${className}`}
     >
       <Trash2 size={12} />
       {loading ? 'Deleting...' : confirming ? 'Confirm?' : label}

@@ -107,16 +107,16 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{label}</span>
+        <span className="text-label font-black uppercase tracking-widest text-foreground">{label}</span>
         {value && (
-          <button type="button" onClick={() => onChange('')} className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1">
+          <button type="button" onClick={() => onChange('')} className="text-label font-black uppercase tracking-widest text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1">
             <X size={11} /> Remove
           </button>
         )}
       </div>
 
       {error && (
-        <div className="text-red-500 text-[10px] font-black uppercase tracking-widest border-l-[3px] border-red-500 pl-2">{error}</div>
+        <div className="text-red-500 text-label font-black uppercase tracking-widest border-l-[3px] border-red-500 pl-2">{error}</div>
       )}
 
       {value && (
@@ -145,7 +145,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
             key={t}
             type="button"
             onClick={() => { setTab(t); setError('') }}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-label font-black uppercase tracking-widest transition-colors ${
               tab === t ? 'bg-foreground text-background' : 'bg-background text-foreground hover:bg-muted'
             } ${t === 'url' ? 'border-l-[3px] border-foreground' : ''}`}
           >
@@ -170,7 +170,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
             <p className="text-xs font-black uppercase tracking-widest text-foreground/70">
               {uploading ? 'Uploading…' : dragging ? 'Drop to upload' : 'Drag & drop or click'}
             </p>
-            <p className="text-[10px] font-bold text-muted-foreground mt-0.5">JPG · PNG · WebP · AVIF · max 50 MB</p>
+            <p className="text-label font-bold text-muted-foreground mt-0.5">JPG · PNG · WebP · AVIF · max 50 MB</p>
           </div>
           <input
             ref={fileRef}
@@ -196,7 +196,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
           <button
             type="button"
             onClick={handleUrlSubmit}
-            className="bg-foreground text-background border-[3px] border-foreground px-4 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors shrink-0"
+            className="bg-foreground text-background border-[3px] border-foreground px-4 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-foreground transition-colors shrink-0"
           >
             Set
           </button>

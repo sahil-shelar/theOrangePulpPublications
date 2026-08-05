@@ -49,7 +49,7 @@ export default function AuthorForm({ initialData }: { initialData?: AuthorData }
       {error && <div className="bg-red-500 text-white p-4 font-bold border-[3px] border-foreground uppercase">{error}</div>}
       
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-foreground">Name</label>
+        <label className="text-label font-black uppercase tracking-widest text-foreground">Name</label>
         <input 
           type="text" 
           value={formData.name}
@@ -60,7 +60,7 @@ export default function AuthorForm({ initialData }: { initialData?: AuthorData }
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-foreground">Slug</label>
+        <label className="text-label font-black uppercase tracking-widest text-foreground">Slug</label>
         <input 
           type="text" 
           value={formData.slug}
@@ -71,7 +71,7 @@ export default function AuthorForm({ initialData }: { initialData?: AuthorData }
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-foreground">Bio</label>
+        <label className="text-label font-black uppercase tracking-widest text-foreground">Bio</label>
         <textarea 
           value={formData.bio}
           onChange={(e) => setFormData(p => ({ ...p, bio: e.target.value }))}

@@ -63,7 +63,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
             <div className="space-y-4">
               {person.articles.map(a => (
                 <Link key={a.id} href={`/${typeToRoute(a.type)}/${a.slug}`} className="block brutal-card p-6 bg-secondary hover:-translate-y-1 transition-transform">
-                   <span className="text-[10px] font-black uppercase tracking-widest bg-foreground text-background px-2 py-1 mb-2 inline-block">{a.type}</span>
+                   <span className="text-label font-black uppercase tracking-widest bg-foreground text-background px-2 py-1 mb-2 inline-block">{a.type}</span>
                    <h3 className="font-heading text-xl font-black uppercase leading-tight">{a.title}</h3>
                 </Link>
               ))}

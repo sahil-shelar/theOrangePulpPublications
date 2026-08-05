@@ -106,7 +106,7 @@ export default function SearchModal({ onClose }: Props) {
               className="flex-1 bg-transparent text-foreground text-base font-bold placeholder:text-muted-foreground"
             />
             {loading && (
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">
+              <span className="text-label font-black uppercase tracking-widest text-muted-foreground animate-pulse">
                 Searching…
               </span>
             )}
@@ -139,11 +139,11 @@ export default function SearchModal({ onClose }: Props) {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 ${TYPE_COLOR[r.type] ?? "bg-muted text-foreground"}`}>
+                      <span className={`text-label font-black uppercase tracking-widest px-1.5 py-0.5 ${TYPE_COLOR[r.type] ?? "bg-muted text-foreground"}`}>
                         {r.type}
                       </span>
                       {r.categories && (
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                        <span className="text-label font-bold uppercase tracking-widest text-muted-foreground">
                           {r.categories.name}
                         </span>
                       )}
@@ -152,7 +152,7 @@ export default function SearchModal({ onClose }: Props) {
                       {r.title}
                     </p>
                     {r.authors && (
-                      <p className="text-[10px] font-bold text-muted-foreground mt-0.5">{r.authors.name}</p>
+                      <p className="text-label font-bold text-muted-foreground mt-0.5">{r.authors.name}</p>
                     )}
                   </div>
                   <ArrowRight size={14} className="shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -173,7 +173,7 @@ export default function SearchModal({ onClose }: Props) {
           {/* Hint */}
           {query.length === 0 && (
             <div className="px-4 py-3 flex items-center gap-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <span className="text-label font-bold uppercase tracking-widest text-muted-foreground">
                 Type to search · ESC to close · ↑↓ navigate · Enter to open
               </span>
             </div>

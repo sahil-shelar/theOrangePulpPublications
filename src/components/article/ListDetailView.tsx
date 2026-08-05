@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { ArticleWithRelations } from "@/types/models";
 import Link from "next/link";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import AdSlot from "@/components/ads/AdSlot";
 import ViewCounter from "./ViewCounter";
@@ -39,23 +40,23 @@ export default async function ListDetailView({ article }: { article: ArticleWith
       {/* Cinematic hero */}
       <div className="relative w-full h-[55vh] md:h-[70vh] overflow-hidden border-b-[4px] border-foreground">
         {article.cover_image_url ? (
-          <img src={article.cover_image_url} alt={article.title} className="absolute inset-0 w-full h-full object-cover" />
+          <Image src={article.cover_image_url} alt={article.title} fill priority sizes="100vw" className="object-cover" />
         ) : (
           <div className="absolute inset-0 bg-foreground" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/40 to-foreground/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25" />
 
-        <Link href="/lists" className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-[10px] font-black uppercase tracking-widest transition-colors">
+        <Link href="/lists" className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors">
           <ArrowLeft size={14} strokeWidth={3} /> Lists
         </Link>
 
         <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
+            <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
               List
             </span>
             {article.categories && (
-              <span className="text-[9px] font-black uppercase tracking-widest text-background/60 px-3 py-1.5 border-[2px] border-background/20">
+              <span className="text-label font-black uppercase tracking-widest text-background/80 px-3 py-1.5 border-[2px] border-background/20">
                 {article.categories.name}
               </span>
             )}
@@ -66,12 +67,12 @@ export default async function ListDetailView({ article }: { article: ArticleWith
           </h1>
 
           {article.excerpt && (
-            <p className="mt-3 text-sm sm:text-base font-medium text-background/65 leading-snug max-w-2xl italic">
+            <p className="mt-3 text-sm sm:text-base font-medium text-background/80 leading-snug max-w-2xl italic">
               {article.excerpt}
             </p>
           )}
 
-          <div className="flex items-center gap-2.5 mt-4 pt-4 border-t-[1px] border-background/20">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-background/20">
             <div className="w-7 h-7 shrink-0 border-[2px] border-background/40 overflow-hidden">
               {article.authors?.avatar_url ? (
                 <img src={article.authors.avatar_url} alt={article.authors.name} className="w-full h-full object-cover" />
@@ -81,15 +82,15 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                 </div>
               )}
             </div>
-            <Link href={`/author/${article.authors?.slug || ""}`} className="font-black uppercase tracking-widest text-[10px] text-background/80 hover:text-background transition-colors">
+            <Link href={`/author/${article.authors?.slug || ""}`} className="font-black uppercase tracking-widest text-label text-background/80 hover:text-background transition-colors">
               {article.authors?.name || "Editorial Team"}
             </Link>
-            <span className="text-background/30 text-[10px]">·</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">
+            <span className="text-background/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-background/80">
               {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
             </span>
-            <span className="text-background/30 text-[10px]">·</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-background/55">{article.reading_time || 5} min read</span>
+            <span className="text-background/30 text-label">·</span>
+            <span className="text-label font-bold uppercase tracking-widest text-background/80">{article.reading_time || 5} min read</span>
           </div>
         </div>
       </div>
@@ -123,12 +124,12 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                     {String(item.rank).padStart(2, "0")}
                   </span>
 
-                  <div className="w-16 sm:w-20 shrink-0 aspect-[2/3] border-[3px] border-foreground overflow-hidden bg-muted">
+                  <div className="relative w-16 sm:w-20 shrink-0 aspect-[2/3] border-[3px] border-foreground overflow-hidden bg-muted">
                     {poster ? (
-                      <img src={poster} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <Image src={poster} alt={title} fill sizes="80px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
                       <div className="w-full h-full bg-primary flex items-center justify-center p-1">
-                        <span className="font-heading text-[9px] font-black uppercase text-center text-muted-foreground leading-tight">{title}</span>
+                        <span className="font-heading text-label font-black uppercase text-center text-muted-foreground leading-tight">{title}</span>
                       </div>
                     )}
                   </div>
@@ -138,7 +139,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                       <h3 className="font-heading text-lg sm:text-xl font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors">
                         {title}
                       </h3>
-                      {year && <span className="text-[10px] font-bold text-muted-foreground">{year}</span>}
+                      {year && <span className="text-label font-bold text-muted-foreground">{year}</span>}
                     </div>
 
                     {rating != null && (
@@ -146,12 +147,12 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                         {Array.from({ length: 5 }).map((_, i) => (
                           <span key={i} className={`text-sm ${i < Math.round(rating) ? 'text-foreground' : 'text-muted-foreground'}`}>★</span>
                         ))}
-                        <span className="text-[10px] font-black text-muted-foreground ml-1">{rating}/5</span>
+                        <span className="text-label font-black text-muted-foreground ml-1">{rating}/5</span>
                       </div>
                     )}
 
                     {item.blurb && (
-                      <p className="text-sm font-medium text-foreground/70 mt-2 leading-snug max-w-xl">{item.blurb}</p>
+                      <p className="text-base font-medium text-foreground/80 mt-2 leading-relaxed max-w-[60ch]">{item.blurb}</p>
                     )}
                   </div>
                 </Wrapper>
@@ -168,12 +169,12 @@ export default async function ListDetailView({ article }: { article: ArticleWith
             {articleTags && articleTags.length > 0
               ? articleTags.map((at: any) => at.tags).filter(Boolean).map((tag: any) => (
                   <Link key={tag.id} href={`/tag/${tag.slug}`}
-                    className="border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-primary text-foreground">
+                    className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors bg-primary text-foreground">
                     #{tag.name}
                   </Link>
                 ))
               : (
-                <span className="border-[3px] border-foreground px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-primary text-foreground">#list</span>
+                <span className="border-[3px] border-foreground px-4 py-2 text-label font-black uppercase tracking-widest bg-primary text-foreground">#list</span>
               )
             }
           </div>
@@ -203,7 +204,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                         <div className="w-16 h-12 shrink-0 border-[2px] border-foreground bg-muted" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
+                        <div className="text-label font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
                         <h4 className="font-heading text-sm font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">{art.title}</h4>
                       </div>
                     </Link>

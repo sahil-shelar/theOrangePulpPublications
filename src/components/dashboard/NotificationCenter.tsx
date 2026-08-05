@@ -27,7 +27,7 @@ export default function NotificationCenter() {
         <div className="absolute top-12 right-0 w-80 bg-background border-[4px] border-foreground shadow-[8px_8px_0_0_#173D2A] z-50 flex flex-col">
           <div className="flex justify-between items-center p-3 border-b-[4px] border-foreground bg-secondary">
             <span className="font-black uppercase tracking-widest text-xs">Notifications</span>
-            <span className="text-[10px] font-bold bg-background px-2 py-1 border-[2px] border-foreground cursor-pointer hover:bg-foreground hover:text-background">Mark All Read</span>
+            <span className="text-label font-bold bg-background px-2 py-1 border-[2px] border-foreground cursor-pointer hover:bg-foreground hover:text-background">Mark All Read</span>
           </div>
           
           <div className="max-h-80 overflow-y-auto">
@@ -35,14 +35,14 @@ export default function NotificationCenter() {
               <div key={n.id} className="p-3 border-b-[2px] border-foreground/10 hover:bg-muted transition-colors cursor-pointer flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-black uppercase tracking-widest text-xs">{n.title}</span>
-                  <span className="text-[9px] font-bold text-muted-foreground">{n.time}</span>
+                  <span className="text-label font-bold text-muted-foreground">{n.time}</span>
                 </div>
                 <p className="text-xs font-medium text-foreground/80">{n.message}</p>
               </div>
             ))}
           </div>
           
-          <Link href="/dashboard/system" onClick={() => setIsOpen(false)} className="p-3 text-center bg-muted text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors border-t-[3px] border-foreground">
+          <Link href="/dashboard/system" onClick={() => setIsOpen(false)} className="p-3 text-center bg-muted text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors border-t-[3px] border-foreground">
             View System Logs
           </Link>
         </div>

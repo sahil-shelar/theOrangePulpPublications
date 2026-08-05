@@ -35,7 +35,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       {/* Header */}
       <div className="border-b-[4px] border-foreground bg-primary">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-16">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">Category</p>
+          <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">Category</p>
           <h1 className="font-heading text-6xl md:text-8xl font-black uppercase text-foreground leading-none mb-4">
             {category.name}
           </h1>
@@ -73,14 +73,14 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                         ) : <div className="w-full h-full bg-primary" />}
                       </div>
                       <div className="bg-primary p-7 flex flex-col justify-center gap-3">
-                        <span className="text-[9px] font-black uppercase tracking-widest bg-foreground text-background px-2 py-1 self-start">{featured.type}</span>
+                        <span className="text-label font-black uppercase tracking-widest bg-foreground text-background px-2 py-1 self-start">{featured.type}</span>
                         <h2 className="font-heading text-2xl md:text-3xl font-black uppercase text-foreground leading-tight group-hover:underline line-clamp-3">
                           {featured.title}
                         </h2>
                         {featured.excerpt && (
                           <p className="text-sm font-medium text-foreground/70 line-clamp-2">{featured.excerpt}</p>
                         )}
-                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                        <div className="text-label font-black uppercase tracking-widest text-muted-foreground">
                           {new Date(featured.published_at || featured.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                         </div>
                       </div>
@@ -112,7 +112,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                 <Link
                   key={c.id}
                   href={`/category/${c.slug}`}
-                  className="bg-background text-foreground border-[3px] border-foreground px-3 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors"
+                  className="bg-background text-foreground border-[3px] border-foreground px-3 py-2 text-label font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors"
                 >
                   {c.name}
                 </Link>

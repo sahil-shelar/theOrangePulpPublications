@@ -60,7 +60,7 @@ export default function MovieForm({ initialData }: { initialData?: MovieData }) 
   }
 
   const inputClass = 'w-full bg-background border-[3px] border-foreground p-3 font-bold text-sm'
-  const labelClass = 'text-[10px] font-black uppercase tracking-widest text-foreground'
+  const labelClass = 'text-label font-black uppercase tracking-widest text-foreground'
 
   return (
     <form onSubmit={handleSubmit} className="brutal-card p-6 md:p-8 bg-background flex flex-col gap-6 max-w-3xl">

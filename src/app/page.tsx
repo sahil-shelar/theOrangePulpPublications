@@ -9,7 +9,9 @@ import Link from 'next/link'
 import { ArrowRight, Star, Newspaper, Sparkles, Trophy } from 'lucide-react'
 import { typeToRoute } from '@/lib/utils'
 
-export const revalidate = 3600
+// Matches the listing pages — the homepage is the main entry point, so it
+// should not be an hour staler than /reviews.
+export const revalidate = 60
 
 export default async function Homepage() {
   const [latestArticles, trendingArticles, editorialMovies, editorsPicks, tmdbTrending] = await Promise.all([
@@ -92,7 +94,7 @@ export default async function Homepage() {
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                      <div className="text-label font-black uppercase tracking-widest text-muted-foreground mb-0.5">
                         {art.categories?.name || art.type}
                       </div>
                       <h4 className="font-heading text-lg font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
@@ -131,11 +133,11 @@ export default async function Homepage() {
                         <div className="w-full h-full bg-primary" />
                       )}
                     </div>
-                    <h4 className="font-heading text-[11px] font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                    <h4 className="font-heading text-label font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
                       {m.title}
                     </h4>
                     {m.release_date && (
-                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground -mt-0.5">
+                      <div className="text-label font-black uppercase tracking-widest text-muted-foreground -mt-0.5">
                         {new Date(m.release_date).getFullYear()}
                       </div>
                     )}
@@ -165,14 +167,14 @@ export default async function Homepage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/60 to-transparent" />
                       </div>
                       <div className="relative p-7 min-h-[280px] flex flex-col justify-between">
-                        <span className="text-[9px] font-black uppercase tracking-widest bg-primary text-foreground px-2 py-1 border-[2px] border-background/30 self-start">
+                        <span className="text-label font-black uppercase tracking-widest bg-primary text-foreground px-2 py-1 border-[2px] border-background/30 self-start">
                           {article.type}
                         </span>
                         <div>
                           <h3 className="font-heading text-2xl font-black uppercase text-background leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-3">
                             {article.title}
                           </h3>
-                          <div className="text-[9px] font-black uppercase tracking-widest text-background/50">
+                          <div className="text-label font-black uppercase tracking-widest text-background/50">
                             {article.authors?.name || 'Editorial'}
                           </div>
                         </div>
@@ -197,7 +199,7 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
         {title}
       </h2>
       {href && (
-        <Link href={href} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+        <Link href={href} className="flex items-center gap-1 text-label font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
           View All <ArrowRight size={13} />
         </Link>
       )}
@@ -217,7 +219,7 @@ function SectionPromo({ href, color, icon, label, desc, inverted }: {
       <div className="opacity-80 group-hover:opacity-100 transition-opacity">{icon}</div>
       <div>
         <div className="font-heading text-lg md:text-2xl font-black uppercase tracking-tight leading-tight break-words">{label}</div>
-        <div className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-1">{desc}</div>
+        <div className="text-label font-bold uppercase tracking-widest opacity-60 mt-1">{desc}</div>
       </div>
       <ArrowRight size={14} className="mt-auto opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
     </Link>

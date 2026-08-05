@@ -34,7 +34,7 @@ export default function NewCampaignPage() {
             placeholder="Write your newsletter content here…"
             className="w-full bg-background border-[3px] border-foreground p-3 font-bold resize-y font-mono text-sm"
           />
-          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Saved as draft. Use the Send button in the campaign list to send.</p>
+          <p className="text-label font-bold uppercase tracking-widest text-muted-foreground">Saved as draft. Use the Send button in the campaign list to send.</p>
         </div>
 
         <div className="pt-4 border-t-[3px] border-foreground">
