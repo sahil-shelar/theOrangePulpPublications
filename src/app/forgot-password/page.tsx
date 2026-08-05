@@ -30,7 +30,7 @@ export default function ForgotPasswordPage({ searchParams }: { searchParams: { e
             <input type="email" name="email" required className="bg-background border-[3px] border-foreground p-3 font-bold text-sm focus:ring-0 text-foreground" />
           </div>
           
-          <button type="submit" className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#E2BFCA] transition-all">
+          <button type="submit" className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-hard transition-all">
             Send Reset Link
           </button>
         </form>

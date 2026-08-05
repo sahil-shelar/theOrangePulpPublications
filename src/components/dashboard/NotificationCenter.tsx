@@ -24,7 +24,7 @@ export default function NotificationCenter() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-12 right-0 w-80 bg-background border-[4px] border-foreground shadow-[8px_8px_0_0_#173D2A] z-50 flex flex-col">
+        <div className="absolute top-12 right-0 w-80 bg-background border-[4px] border-foreground shadow-hard-lg z-50 flex flex-col">
           <div className="flex justify-between items-center p-3 border-b-[4px] border-foreground bg-secondary">
             <span className="font-black uppercase tracking-widest text-xs">Notifications</span>
             <span className="text-label font-bold bg-background px-2 py-1 border-[2px] border-foreground cursor-pointer hover:bg-foreground hover:text-background">Mark All Read</span>

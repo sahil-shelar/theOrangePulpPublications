@@ -89,7 +89,7 @@ export default function DashboardSidebar({ userEmail, userRole, onNavigate }: Pr
                     onClick={onNavigate}
                     className={`flex items-center gap-3 px-3 py-2.5 text-sm font-bold uppercase tracking-wider transition-all border-l-[3px] ${
                       active
-                        ? 'bg-primary text-foreground border-foreground shadow-[2px_2px_0_0_rgba(0,0,0,0.15)]'
+                        ? 'bg-primary text-foreground border-foreground shadow-hard-sm'
                         : 'text-foreground/70 border-transparent hover:bg-background hover:text-foreground hover:border-foreground/30'
                     }`}
                   >

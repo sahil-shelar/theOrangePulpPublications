@@ -58,7 +58,7 @@ function QuickAction({ href, icon, label }: { href: string; icon: React.ReactNod
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-2 bg-foreground text-background border-[3px] border-foreground px-4 py-2.5 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-foreground hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#173D2A] transition-all"
+      className="inline-flex items-center gap-2 bg-foreground text-background border-[3px] border-foreground px-4 py-2.5 text-label font-black uppercase tracking-widest hover:bg-primary hover:text-foreground hover:-translate-y-0.5 hover:shadow-hard transition-all"
     >
       {icon} {label}
     </Link>

@@ -34,7 +34,7 @@ export default function ReaderControls() {
   ];
 
   return (
-    <div className="hidden sm:flex fixed bottom-6 left-6 z-40 flex-col gap-1 bg-background border-[3px] border-foreground shadow-[4px_4px_0_0_var(--foreground)]">
+    <div className="hidden sm:flex fixed bottom-6 left-6 z-40 flex-col gap-1 bg-background border-[3px] border-foreground shadow-hard">
       {buttons.map(({ Icon, fn, title }) => (
         <button
           key={title}

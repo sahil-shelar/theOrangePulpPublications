@@ -92,7 +92,7 @@ export default function SearchModal({ onClose }: Props) {
 
       {/* Modal */}
       <div className="fixed top-[10vh] left-1/2 -translate-x-1/2 z-[70] w-full max-w-2xl px-4">
-        <div className="bg-background border-[3px] border-foreground shadow-[8px_8px_0_0_var(--foreground)]">
+        <div className="bg-background border-[3px] border-foreground shadow-hard-lg">
 
           {/* Input row */}
           <div className="flex items-center gap-3 px-4 py-4 border-b-[3px] border-foreground">

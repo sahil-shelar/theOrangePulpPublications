@@ -80,13 +80,13 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="LEAVE A BRUTAL REVIEW..."
             rows={4}
-            className="w-full bg-background border-[4px] border-foreground p-4 font-bold text-foreground focus:ring-0 resize-none shadow-[8px_8px_0_0_#173D2A] mb-4 uppercase"
+            className="w-full bg-background border-[4px] border-foreground p-4 font-bold text-foreground focus:ring-0 resize-none shadow-hard-lg mb-4 uppercase"
             required
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-primary text-foreground border-[3px] border-foreground font-black uppercase tracking-widest px-8 py-3 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#000000] transition-all disabled:opacity-50"
+            className="bg-primary text-foreground border-[3px] border-foreground font-black uppercase tracking-widest px-8 py-3 hover:-translate-y-1 hover:shadow-hard transition-all disabled:opacity-50"
           >
             {isSubmitting ? 'Posting...' : 'Post Comment'}
           </button>

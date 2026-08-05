@@ -34,7 +34,7 @@ export default async function FranchisePage({ params }: { params: Promise<{ slug
         <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-foreground">
            {franchise.movies.map((m, i) => (
              <div key={m.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border-[4px] border-foreground bg-background text-foreground shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[2px_2px_0_0_#E2BFCA] z-10 font-black text-xs">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full border-[4px] border-foreground bg-background text-foreground shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-hard-sm z-10 font-black text-xs">
                   {i + 1}
                 </div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] brutal-card p-4 bg-background group-hover:-translate-y-1 transition-transform">

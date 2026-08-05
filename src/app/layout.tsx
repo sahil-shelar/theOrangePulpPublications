@@ -46,6 +46,9 @@ export default function RootLayout({
       >
         <a href="#main-content" className="skip-link">Skip to content</a>
         <ThemeProvider>
+          {/* #E2BFCA is --primary. Hardcoded because the library takes a plain
+              colour string, not a CSS var — safe here since --primary is the
+              same value in both themes. */}
           <NextTopLoader
             color="#E2BFCA"
             shadow="0 0 10px #E2BFCA, 0 0 5px #E2BFCA"

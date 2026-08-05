@@ -3,63 +3,106 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ═══════════════════════════════════════════════════════════════════════
+   THE ORANGE PULP — DESIGN TOKENS
+
+   Brand hues are fixed and must not change:
+     cream  #F5EFE4   green #173D2A
+     pink   #E2BFCA   yellow #ECEA82   blue #99B4C8
+
+   Surfaces form a deliberate 3-step ramp in both themes: `background`
+   is the page, `card` sits above it, `muted` is recessed (sidebars,
+   table headers, inset panels). Every step was validated to stay above
+   4.5:1 for both --foreground and --muted-foreground.
+   ═══════════════════════════════════════════════════════════════════════ */
+
 :root {
-  /* Warm cream — between yellowed and white */
+  /* Warm cream — the brand base */
   --background: #F5EFE4;
   /* Deep forest green — rich, cooler hue to avoid olive/yellow cast */
   --foreground: #173D2A;
 
-  --card: #F5EFE4;
+  /* Cards lift off the cream base. fg 12.09 · muted-fg 6.56 */
+  --card: #FFFFFF;
   --card-foreground: #173D2A;
 
-  --popover: #F5EFE4;
+  --popover: #FFFFFF;
   --popover-foreground: #173D2A;
 
-  /* Dusty rose — nakedcoffee pink card */
+  /* Dusty rose */
   --primary: #E2BFCA;
   --primary-foreground: #173D2A;
 
-  /* Soft butter yellow — nakedcoffee yellow card */
+  /* Soft butter yellow */
   --secondary: #ECEA82;
   --secondary-foreground: #173D2A;
 
-  /* Slightly warmer than background — subtle contrast without going tan */
-  --muted: #EEE9DF;
+  /* Recessed surface — deep enough to read as inset. fg 8.88 · muted-fg 4.82 */
+  --muted: #E5DCCA;
   --muted-foreground: #3E6648;
 
-  /* Dusty slate blue — nakedcoffee blue card */
+  /* Dusty slate blue */
   --accent: #99B4C8;
   --accent-foreground: #173D2A;
 
-  --destructive: #c0392b;
-  --destructive-foreground: #ffffff;
+  --destructive: #A8322A;
+  --destructive-foreground: #FFFFFF;
 
-  --border: #173D2A;
-  --input: #173D2A;
+  --border: var(--foreground);
+  --input: var(--foreground);
   --ring: #E2BFCA;
 
+  /* Sharp corners are the identity — this is intentionally 0, not unset. */
   --radius: 0px;
+
+  /* Hard offset shadows. One colour, three sizes, no blur. */
+  --shadow-color: var(--foreground);
+  --shadow-sm: 2px 2px 0 0 var(--shadow-color);
+  --shadow-md: 4px 4px 0 0 var(--shadow-color);
+  --shadow-lg: 6px 6px 0 0 var(--shadow-color);
+  /* Pressed state — offset collapses toward the surface. */
+  --shadow-pressed: 2px 2px 0 0 var(--shadow-color);
+
+  /* Motion. Anything longer than `slow` feels sluggish here. */
+  --ease: cubic-bezier(0.2, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 180ms;
+  --dur-slow: 320ms;
 }
 
 .dark {
-  --background: #173D2A;
+  /* Base darkens so the brand green can become the card surface.
+     Previously background/card/muted were 1.14 / 1.03 apart — three
+     tokens rendering as one flat surface with no hierarchy. */
+  --background: #0E2419;
   --foreground: #F5EFE4;
-  --card: #1E4630;
+
+  /* Brand green, now doing the work it is best at. fg 10.56 · muted-fg 6.65 */
+  --card: #173D2A;
   --card-foreground: #F5EFE4;
+
   --popover: #173D2A;
   --popover-foreground: #F5EFE4;
+
   --primary: #E2BFCA;
   --primary-foreground: #173D2A;
+
   --secondary: #ECEA82;
   --secondary-foreground: #173D2A;
-  --muted: #1C4430;
+
+  /* Raised/recessed panels. fg 8.79 · muted-fg 5.54 */
+  --muted: #1F4A34;
   --muted-foreground: #A8C8B0;
+
   --accent: #99B4C8;
   --accent-foreground: #173D2A;
-  --destructive: #c0392b;
-  --destructive-foreground: #F4EDD8;
-  --border: #F4EDD8;
-  --input: #F4EDD8;
+
+  --destructive: #E4736A;
+  --destructive-foreground: #0E2419;
+
+  /* Was #F4EDD8 — a second cream one shade off --foreground for no reason. */
+  --border: var(--foreground);
+  --input: var(--foreground);
   --ring: #E2BFCA;
 }
 
@@ -95,6 +138,12 @@
   --text-label--line-height: 1.25;
   --text-meta: 0.8125rem;             /* 13px — bylines, dates, counts */
   --text-meta--line-height: 1.4;
+
+  /* Hard-shadow utilities: shadow-hard-sm / -hard / -hard-lg.
+     Named distinctly so Tailwind's blurred shadow-* stay available. */
+  --shadow-hard-sm: var(--shadow-sm);
+  --shadow-hard: var(--shadow-md);
+  --shadow-hard-lg: var(--shadow-lg);
 }
 
 @layer utilities {
@@ -102,29 +151,71 @@
     text-wrap: balance;
   }
 
-  /* Sharp corners — brutalist cards */
+  /* ── Card: interactive surface. Lifts off the page, presses on hover. ──
+     Uses --card (not --background) so cards read as a distinct layer in
+     both themes. Pass an explicit bg-* utility to override the fill. */
   .brutal-card {
-    @apply border-[3px] border-foreground bg-background;
-    box-shadow: 6px 6px 0px 0px var(--foreground);
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    @apply border-[3px] border-foreground bg-card;
+    box-shadow: var(--shadow-lg);
+    transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
 
   .brutal-card:hover {
-    transform: translate(3px, 3px);
-    box-shadow: 3px 3px 0px 0px var(--foreground);
+    transform: translate(2px, 2px);
+    box-shadow: var(--shadow-md);
   }
 
-  /* Sharp corners — brutalist buttons */
+  .brutal-card:active {
+    transform: translate(4px, 4px);
+    box-shadow: var(--shadow-pressed);
+  }
+
+  /* ── Panel: static surface. Same language, no lift, no hover. ──
+     For sidebars, inset blocks and anything not clickable — so those stop
+     hand-rolling `border-[3px] border-foreground` with ad-hoc fills. */
+  .brutal-panel {
+    @apply border-[3px] border-foreground bg-card;
+  }
+
+  /* ── Button ── */
   .brutal-button {
     @apply border-[3px] border-foreground bg-foreground text-background font-black uppercase tracking-widest;
-    box-shadow: 4px 4px 0px 0px rgba(23, 61, 42, 0.3);
-    transition: box-shadow 0.15s ease, transform 0.15s ease, background-color 0.15s;
+    box-shadow: var(--shadow-md);
+    transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease),
+                background-color var(--dur) var(--ease), color var(--dur) var(--ease);
   }
 
   .brutal-button:hover {
     transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px 0px rgba(23, 61, 42, 0.3);
+    box-shadow: var(--shadow-pressed);
     @apply bg-primary text-foreground;
+  }
+
+  .brutal-button:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
+
+  .brutal-button:disabled {
+    @apply bg-muted text-muted-foreground cursor-not-allowed;
+    box-shadow: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  /* ── Image scrim ──
+     One recipe for text-over-image everywhere. Strong at the bottom where
+     copy sits, never fully clear at the top so badges stay legible on a
+     light photo. Contrast over arbitrary imagery cannot be computed, so
+     the scrim is the guarantee. */
+  .img-scrim {
+    background-image: linear-gradient(
+      to top,
+      color-mix(in srgb, #0E2419 95%, transparent) 0%,
+      color-mix(in srgb, #0E2419 78%, transparent) 38%,
+      color-mix(in srgb, #0E2419 45%, transparent) 72%,
+      color-mix(in srgb, #0E2419 28%, transparent) 100%
+    );
   }
 }
 

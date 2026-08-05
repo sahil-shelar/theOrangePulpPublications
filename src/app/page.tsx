@@ -73,7 +73,7 @@ export default async function Homepage() {
             <SectionPromo href="/reviews"   color="bg-primary"    label="Reviews"  desc="Critical Takes"  icon={<Star size={22}/>} />
             <SectionPromo href="/news"      color="bg-secondary"  label="News"     desc="Latest Stories"  icon={<Newspaper size={22}/>} />
             <SectionPromo href="/spotlight" color="bg-accent"     label="Spotlight" desc="Deep Dives"     icon={<Sparkles size={22}/>} />
-            <SectionPromo href="/lists"     color="bg-[#D9D0C0]"  label="Rankings" desc="Best Of Lists"   icon={<Trophy size={22}/>} />
+            <SectionPromo href="/lists"     color="bg-muted"      label="Rankings" desc="Best Of Lists"   icon={<Trophy size={22}/>} />
           </div>
         </section>
 

@@ -70,7 +70,7 @@ function FeaturedCard({ post, href, accentColor }: { post: any; href: string; ac
             <div className="w-full h-full bg-secondary" />
           )}
           {post.rating && (
-            <span className="absolute top-4 right-4 bg-foreground text-background font-black text-xl px-4 py-2 border-[3px] border-background shadow-[3px_3px_0_0_#E2BFCA]">
+            <span className="absolute top-4 right-4 bg-foreground text-background font-black text-xl px-4 py-2 border-[3px] border-background shadow-hard">
               {post.rating}/5
             </span>
           )}

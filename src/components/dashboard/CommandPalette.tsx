@@ -43,7 +43,7 @@ export default function CommandPalette() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-foreground/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-2xl bg-background border-[4px] border-foreground shadow-[8px_8px_0_0_#173D2A] flex flex-col">
+      <div className="w-full max-w-2xl bg-background border-[4px] border-foreground shadow-hard-lg flex flex-col">
         <div className="flex items-center border-b-[4px] border-foreground p-4">
           <Search className="text-muted-foreground mr-3" />
           <input

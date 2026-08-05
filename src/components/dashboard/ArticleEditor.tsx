@@ -522,7 +522,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
              type="submit"
              id="save-btn"
              disabled={isSaving}
-             className="w-full bg-primary text-foreground border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#E2BFCA] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+             className="w-full bg-primary text-foreground border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-hard transition-all flex items-center justify-center gap-2 disabled:opacity-50"
            >
              <Save size={18} /> {isSaving ? 'Saving...' : 'Save Draft'}
            </button>
@@ -531,7 +531,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
              type="button"
              onClick={(e) => handleSave(e, 'published')}
              disabled={isSaving || formData.status === 'published'}
-             className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#173D2A] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-muted disabled:text-foreground"
+             className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-hard transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-muted disabled:text-foreground"
            >
              <Send size={18} /> {formData.status === 'published' ? 'Published' : 'Publish Now'}
            </button>
