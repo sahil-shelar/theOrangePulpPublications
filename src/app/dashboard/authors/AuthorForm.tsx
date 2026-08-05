@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 import { createAuthor, updateAuthor } from '@/lib/actions/authors'
 import ImagePicker from '@/components/dashboard/ImagePicker'
 
+// Nullable fields match the schema — authors.slug, bio and avatar_url are all
+// nullable in Postgres, and the form already coalesces them to ''.
 type AuthorData = {
   id?: string
   name: string
-  slug: string
-  bio?: string
-  avatar_url?: string
+  slug?: string | null
+  bio?: string | null
+  avatar_url?: string | null
 }
 
 export default function AuthorForm({ initialData }: { initialData?: AuthorData }) {

@@ -1,7 +1,7 @@
-// @ts-nocheck
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
+import { JOB_PRIORITY } from '@/lib/jobs/types'
 
 export async function submitContact(formData: FormData) {
   const name = (formData.get('name') as string)?.trim()
@@ -18,7 +18,7 @@ export async function submitContact(formData: FormData) {
     job_type: 'contact_form',
     payload: { name, email, subject, message },
     status: 'pending',
-    priority: 'low',
+    priority: JOB_PRIORITY.low,
     attempts: 0,
     scheduled_at: new Date().toISOString(),
   })

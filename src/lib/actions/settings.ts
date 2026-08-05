@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
@@ -11,14 +10,19 @@ export async function updateSiteSettings(formData: FormData) {
     throw new Error("Forbidden: Only Admins can update settings")
   }
 
-  const payload = {
-    site_name: formData.get('site_name') as string,
-    site_description: formData.get('site_description') as string,
-    maintenance_mode: formData.get('maintenance_mode') === 'on'
-  }
+  // One row per setting — site_settings is keyed on `key`, with the value in a
+  // JSONB column. The previous version upserted { id: 1, site_name, ... },
+  // which matched neither the column set nor the uuid primary key, so saving
+  // settings always failed.
+  const rows = [
+    { key: 'site_name', value: (formData.get('site_name') as string) ?? '' },
+    { key: 'site_description', value: (formData.get('site_description') as string) ?? '' },
+    { key: 'maintenance_mode', value: formData.get('maintenance_mode') === 'on' },
+  ]
 
-  // Upsert settings (assuming id 1 is the canonical row)
-  const { error } = await supabase.from('site_settings').upsert({ id: 1, ...payload })
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert(rows, { onConflict: 'key' })
   if (error) throw new Error(error.message)
 
   revalidatePath('/', 'layout')

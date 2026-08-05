@@ -1,10 +1,12 @@
-// @ts-nocheck
 import { createClient } from '@/lib/supabase/server'
 import { createPublicClient } from '@/lib/supabase/public'
 import { handleSupabaseError } from '@/utils/supabase-error'
 import { ArticleWithRelations } from '@/types/models'
+import type { Database } from '@/types/database'
 import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
+
+type ArticleType = Database['public']['Enums']['article_type']
 
 const ARTICLE_DETAIL_SELECT =
   '*, categories(*), authors(*), movies(*), list_items(*, movies(*)), spotlight_works(*, movies(*))'
@@ -44,7 +46,7 @@ export const getCachedPublicArticleBySlug = unstable_cache(
 
 // Returns published slugs by type — used in generateStaticParams
 export const getPublishedSlugs = unstable_cache(
-  async (type: string): Promise<{ slug: string }[]> => {
+  async (type: ArticleType): Promise<{ slug: string }[]> => {
     const supabase = createPublicClient()
     const { data } = await supabase
       .from('articles')
@@ -143,7 +145,7 @@ export const PAGE_SIZE = 18
 // listing pages can render page controls — previously every listing was hard
 // capped at 20 with no way to reach anything older.
 export const getPagedArticlesByType = unstable_cache(
-  async (type: string, page = 1, pageSize = PAGE_SIZE) => {
+  async (type: ArticleType, page = 1, pageSize = PAGE_SIZE) => {
     const supabase = createPublicClient()
     const safePage = Math.max(1, Math.floor(page) || 1)
     const from = (safePage - 1) * pageSize
@@ -246,9 +248,9 @@ function toPrefixTsQuery(raw: string): string {
   return terms.map((t, i) => (i === terms.length - 1 ? `${t}:*` : t)).join(' & ')
 }
 
+// Single literal — see the note in recommendations.ts on select-string inference.
 const SEARCH_COLUMNS =
-  'id, title, slug, type, excerpt, cover_image_url, rating, published_at, ' +
-  'categories(name, slug), authors(name, slug), movies(poster_url)'
+  'id, title, slug, type, excerpt, cover_image_url, rating, published_at, categories(name, slug), authors(name, slug), movies(poster_url)'
 
 export async function searchArticles(query: string, limit = 10): Promise<ArticleWithRelations[]> {
   const tsQuery = toPrefixTsQuery(query)

@@ -1,11 +1,23 @@
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'retrying'
 export type JobPriority = 'low' | 'normal' | 'high' | 'critical'
 
-export type JobType = 
-  | 'publish_article' 
-  | 'archive_article' 
-  | 'recalculate_trending' 
-  | 'rebuild_cache' 
+// jobs.priority is an INTEGER column, ordered DESC by the runner and by
+// idx_jobs_status_priority, so a higher number is more urgent. Callers use the
+// names above; this is the only place that knows the numeric encoding.
+export const JOB_PRIORITY: Record<JobPriority, number> = {
+  low: 1,
+  normal: 5,
+  high: 10,
+  critical: 20,
+}
+
+export type JobType =
+  | 'publish_article'
+  | 'archive_article'
+  | 'recalculate_trending'
+  | 'recalculate_recommendations'
+  | 'rebuild_cache'
+  | 'contact_form'
   | 'generate_sitemap' 
   | 'regenerate_og_images'
   | 'refresh_search_index'

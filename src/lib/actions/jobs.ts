@@ -1,8 +1,8 @@
-// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { JOB_PRIORITY } from '@/lib/jobs/types'
 
 export async function cancelJob(jobId: string) {
   const supabase = await createClient()
@@ -36,7 +36,7 @@ export async function triggerRunner() {
     job_type: 'rebuild_cache',
     payload: { triggered_by: 'manual' },
     status: 'pending',
-    priority: 'high',
+    priority: JOB_PRIORITY.high,
     attempts: 0,
     scheduled_at: new Date().toISOString(),
     created_by: user.id,

@@ -6,12 +6,14 @@ import { STORAGE_BUCKETS } from '@/lib/api/storage'
 import { createClient } from '@/lib/supabase/client'
 import { Trash2, Copy, Grid, List, Search, UploadCloud, X } from 'lucide-react'
 
+// mime_type and size_bytes are nullable in the media table — uploads
+// registered before those columns were populated have neither.
 type MediaFile = {
   id: string
   file_name: string
   file_url: string
-  mime_type: string
-  size_bytes: number
+  mime_type: string | null
+  size_bytes: number | null
   created_at: string
 }
 
@@ -163,10 +165,10 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
                     {file.file_name.split('_').pop()}
                   </td>
                   <td className="p-4 hidden md:table-cell text-xs font-black uppercase tracking-widest text-muted-foreground">
-                    {file.mime_type}
+                    {file.mime_type ?? '—'}
                   </td>
                   <td className="p-4 hidden md:table-cell text-xs font-black uppercase tracking-widest text-muted-foreground">
-                    {(file.size_bytes / 1024 / 1024).toFixed(2)} MB
+                    {file.size_bytes != null ? `${(file.size_bytes / 1024 / 1024).toFixed(2)} MB` : '—'}
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">

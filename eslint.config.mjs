@@ -12,7 +12,15 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated from the live schema — regenerate, don't lint.
+    "src/types/database.ts",
   ]),
+  {
+    // These must stay CommonJS: next.config.js is loaded by Node before any
+    // ESM transform, and polyfill.js is passed to --require.
+    files: ["*.js", "*.mjs", "*.cjs", "jest.config.js", "polyfill.js"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
 ]);
 
 export default eslintConfig;

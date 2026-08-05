@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 const ROLE_RANK: Record<string, number> = { admin: 3, editor: 2, writer: 1 }
@@ -29,7 +28,7 @@ export async function createMovie(formData: FormData) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/movies')
-  revalidateTag('movies')
+  updateTag('movies')
   redirect('/dashboard/movies')
 }
 
@@ -53,7 +52,7 @@ export async function updateMovie(id: string, formData: FormData) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/movies')
-  revalidateTag('movies')
+  updateTag('movies')
   redirect('/dashboard/movies')
 }
 
@@ -67,5 +66,5 @@ export async function deleteMovie(id: string) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/movies')
-  revalidateTag('movies')
+  updateTag('movies')
 }

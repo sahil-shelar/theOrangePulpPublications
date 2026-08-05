@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
@@ -106,7 +105,7 @@ export async function sendCampaign(formData: FormData) {
 
   const resend = new Resend(process.env.RESEND_API_KEY)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  const content = campaign.content || campaign.body || ''
+  const content = campaign.content || ''
 
   const BATCH = 100
   for (let i = 0; i < subscribers.length; i += BATCH) {

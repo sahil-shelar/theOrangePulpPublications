@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createClient } from '@/lib/supabase/server';
 
 type LogLevel = 'info' | 'warn' | 'error' | 'fatal';

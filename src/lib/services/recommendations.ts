@@ -1,13 +1,13 @@
-// @ts-nocheck
 import { createPublicClient } from '@/lib/supabase/public'
 import { ArticleWithRelations } from '@/types/models'
 
 // Only the columns the recommendation sidebar renders plus the ones scored
 // below. Notably excludes `content` — selecting * pulled 40 full markdown
 // article bodies over the wire to produce a 4-item list.
+// Must stay a single literal — supabase-js parses the select string at the type
+// level, and string concatenation makes it infer GenericStringError instead.
 const CANDIDATE_COLUMNS =
-  'id, title, slug, type, cover_image_url, category_id, movie_id, published_at, views_count, ' +
-  'categories(name, slug), authors(name, slug), movies(poster_url, backdrop_url)'
+  'id, title, slug, type, cover_image_url, category_id, movie_id, published_at, views_count, categories(name, slug), authors(name, slug), movies(poster_url, backdrop_url)'
 
 export async function getRecommendedArticles(
   sourceArticleId: string,

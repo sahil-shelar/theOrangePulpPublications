@@ -18,7 +18,11 @@ export default async function ArticlesPage({
     .order('created_at', { ascending: false })
 
   if (q) query = query.ilike('title', `%${q}%`)
-  if (status) query = query.eq('status', status)
+  // Only accept values the article_status enum actually allows — a bad ?status=
+  // would otherwise reach Postgres and error.
+  if (status && (['draft', 'published', 'archived'] as const).includes(status as any)) {
+    query = query.eq('status', status as 'draft' | 'published' | 'archived')
+  }
 
   const { data: articles } = await query
 

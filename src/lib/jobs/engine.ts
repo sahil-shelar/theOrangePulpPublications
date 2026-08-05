@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { createClient } from '@/lib/supabase/server'
-import { JobType, JobPriority, JobStatus } from './types'
+import { JobType, JobPriority, JobStatus, JOB_PRIORITY } from './types'
 
 export async function dispatchJob(
   jobType: JobType,
@@ -19,7 +18,7 @@ export async function dispatchJob(
       job_type: jobType,
       payload,
       status: 'pending' as JobStatus,
-      priority: options?.priority || 'normal',
+      priority: JOB_PRIORITY[options?.priority ?? 'normal'],
       scheduled_at: options?.scheduledAt ? options.scheduledAt.toISOString() : new Date().toISOString(),
       created_by: options?.createdBy,
       attempts: 0
@@ -69,14 +68,17 @@ export async function processJobs(limit = 10) {
 
   // 2. Process each job
   for (const job of pendingJobs) {
+    // attempts is nullable in the schema — rows inserted without it are null.
+    const attempt = (job.attempts ?? 0) + 1
+
     // Lock the job
-    await supabase.from('jobs').update({ status: 'running', started_at: new Date().toISOString(), attempts: job.attempts + 1 }).eq('id', job.id)
-    await logJob(job.id, 'info', `Job started (Attempt ${job.attempts + 1})`)
+    await supabase.from('jobs').update({ status: 'running', started_at: new Date().toISOString(), attempts: attempt }).eq('id', job.id)
+    await logJob(job.id, 'info', `Job started (Attempt ${attempt})`)
 
     try {
       // Execute Domain Logic based on job.job_type
-      await executeJobLogic(job.job_type, job.payload)
-      
+      await executeJobLogic(job.job_type as JobType, job.payload)
+
       // Mark Completed
       await supabase.from('jobs').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', job.id)
       await logJob(job.id, 'info', `Job completed successfully`)
@@ -84,7 +86,7 @@ export async function processJobs(limit = 10) {
     } catch (e: any) {
       // Mark Failed
       const maxAttempts = 3;
-      const status = job.attempts + 1 >= maxAttempts ? 'failed' : 'retrying'
+      const status = attempt >= maxAttempts ? 'failed' : 'retrying'
       
       await supabase.from('jobs').update({ 
         status, 

@@ -1,10 +1,9 @@
-// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
 import { handleSupabaseError } from '@/utils/supabase-error'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 
 type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 type ArticleUpdate = Database['public']['Tables']['articles']['Update']
@@ -32,7 +31,7 @@ export async function createArticle(data: ArticleInsert) {
   if (error) return handleSupabaseError(error)
 
   revalidatePath('/')
-  revalidateTag('articles')
+  updateTag('articles')
   return { data: article }
 }
 
@@ -56,7 +55,7 @@ export async function updateArticle(id: string, data: ArticleUpdate) {
   if (error) return handleSupabaseError(error)
 
   revalidatePath('/')
-  revalidateTag('articles')
+  updateTag('articles')
   if (article.slug) revalidatePath(`/${article.type}s/${article.slug}`)
   return { data: article }
 }
@@ -74,7 +73,7 @@ export async function deleteArticle(id: string) {
   if (error) return handleSupabaseError(error)
 
   revalidatePath('/')
-  revalidateTag('articles')
+  updateTag('articles')
   return { success: true }
 }
 
@@ -101,7 +100,7 @@ export async function replaceListItems(articleId: string, items: ListItemInput[]
     if (insErr) return handleSupabaseError(insErr)
   }
 
-  revalidateTag('articles')
+  updateTag('articles')
   return { success: true }
 }
 
@@ -127,7 +126,7 @@ export async function replaceSpotlightWorks(articleId: string, works: SpotlightW
     if (insErr) return handleSupabaseError(insErr)
   }
 
-  revalidateTag('articles')
+  updateTag('articles')
   return { success: true }
 }
 

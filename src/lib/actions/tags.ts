@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath, updateTag as revalidateCacheTag } from 'next/cache'
 
 const ROLE_RANK: Record<string, number> = { admin: 3, editor: 2, writer: 1 }
 const hasRole = (user: any, minRole: string) =>
@@ -18,7 +17,7 @@ export async function createTag(data: { name: string, slug: string, description?
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/tags')
-  revalidateTag('tags')
+  revalidateCacheTag('tags')
 }
 
 export async function updateTag(id: string, data: { name?: string, slug?: string, description?: string }) {
@@ -31,7 +30,7 @@ export async function updateTag(id: string, data: { name?: string, slug?: string
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/tags')
-  revalidateTag('tags')
+  revalidateCacheTag('tags')
 }
 
 export async function deleteTag(id: string) {
@@ -44,5 +43,5 @@ export async function deleteTag(id: string) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/tags')
-  revalidateTag('tags')
+  revalidateCacheTag('tags')
 }

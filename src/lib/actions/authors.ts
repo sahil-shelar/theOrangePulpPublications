@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 
 const ROLE_RANK: Record<string, number> = { admin: 3, editor: 2, writer: 1 }
 const hasRole = (user: any, minRole: string) =>
@@ -18,7 +17,7 @@ export async function createAuthor(data: { name: string, slug: string, bio?: str
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/authors')
-  revalidateTag('authors')
+  updateTag('authors')
 }
 
 export async function updateAuthor(id: string, data: { name?: string, slug?: string, bio?: string, avatar_url?: string }) {
@@ -31,7 +30,7 @@ export async function updateAuthor(id: string, data: { name?: string, slug?: str
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/authors')
-  revalidateTag('authors')
+  updateTag('authors')
 }
 
 export async function deleteAuthor(id: string) {
@@ -44,5 +43,5 @@ export async function deleteAuthor(id: string) {
   if (error) throw new Error(error.message)
 
   revalidatePath('/dashboard/authors')
-  revalidateTag('authors')
+  updateTag('authors')
 }
