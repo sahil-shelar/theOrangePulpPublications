@@ -44,13 +44,13 @@ export default async function ListDetailView({ article }: { article: ArticleWith
         ) : (
           <div className="absolute inset-0 bg-foreground" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25" />
+        <div className="absolute inset-0 img-scrim" />
 
         <Link href="/lists" className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors">
-          <ArrowLeft size={14} strokeWidth={3} /> Lists
+          <ArrowLeft size={14} strokeWidth={2.5} /> Lists
         </Link>
 
-        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-12 max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
               List
@@ -97,7 +97,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
 
       {/* Intro prose */}
       {article.content && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-10 pb-2">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-2">
           <div className="prose prose-base prose-p:font-medium prose-p:text-foreground/70 prose-em:text-muted-foreground prose-strong:font-black max-w-2xl">
             <ReactMarkdown>{article.content}</ReactMarkdown>
           </div>
@@ -106,7 +106,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
 
       {/* Ranked rows */}
       {items.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 pt-8 pb-6">
+        <div className="max-w-4xl mx-auto px-6 md:px-10 pt-8 pb-6">
           <div className="divide-y-[3px] divide-foreground border-y-[3px] border-foreground">
             {items.map((item: any) => {
               const title = item.movies?.title || item.custom_title || 'Untitled';
@@ -163,7 +163,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
       )}
 
       {/* Tags + share + comments + sidebar */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-10 md:py-14">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-10 md:py-14">
         <div className="lg:col-span-8">
           <div className="flex flex-wrap gap-2">
             {articleTags && articleTags.length > 0
@@ -220,7 +220,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
         </aside>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-16">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 pb-16">
         <AdSlot slotKey="article-bottom-leaderboard" className="mx-auto" />
       </div>
     </div>

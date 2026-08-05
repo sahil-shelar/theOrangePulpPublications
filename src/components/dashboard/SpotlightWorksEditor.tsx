@@ -46,8 +46,8 @@ export default function SpotlightWorksEditor({ movies, works, onChange }: Props)
             <div key={index} className="p-4 flex flex-col gap-3 bg-background">
               <div className="flex items-start gap-3">
                 <div className="flex flex-col gap-1 pt-1 shrink-0">
-                  <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronUp size={12} /></button>
-                  <button type="button" onClick={() => move(index, 1)} disabled={index === works.length - 1} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronDown size={12} /></button>
+                  <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronUp size={14} /></button>
+                  <button type="button" onClick={() => move(index, 1)} disabled={index === works.length - 1} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronDown size={14} /></button>
                 </div>
 
                 <div className="flex-1 flex flex-col gap-2 min-w-0">

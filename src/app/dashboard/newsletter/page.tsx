@@ -29,7 +29,7 @@ export default async function NewsletterDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-        <div className="brutal-card bg-background p-6">
+        <div className="brutal-card p-6">
           <div className="text-label font-black uppercase tracking-widest text-muted-foreground mb-2">Subscribers</div>
           <div className="font-heading text-5xl font-black">{(subscriberCount ?? 0).toLocaleString()}</div>
         </div>
@@ -37,7 +37,7 @@ export default async function NewsletterDashboard() {
           <div className="text-label font-black uppercase tracking-widest text-muted-foreground mb-2">Avg Open Rate</div>
           <div className="font-heading text-5xl font-black">—</div>
         </div>
-        <div className="brutal-card bg-background p-6">
+        <div className="brutal-card p-6">
           <div className="text-label font-black uppercase tracking-widest text-muted-foreground mb-2">Avg Click Rate</div>
           <div className="font-heading text-5xl font-black">—</div>
         </div>
@@ -48,7 +48,7 @@ export default async function NewsletterDashboard() {
       </div>
 
       {/* Campaigns table */}
-      <div className="brutal-card bg-background p-0 overflow-hidden">
+      <div className="brutal-card p-0 overflow-hidden">
         <div className="bg-foreground text-background p-4">
           <h2 className="font-heading text-lg font-black uppercase tracking-widest">Campaigns</h2>
         </div>
@@ -85,7 +85,7 @@ export default async function NewsletterDashboard() {
                       <form action={sendCampaign}>
                         <input type="hidden" name="campaignId" value={campaign.id} />
                         <button type="submit" className="text-label font-black uppercase tracking-widest flex items-center gap-1 hover:text-primary transition-colors">
-                          <Send size={13} /> Send
+                          <Send size={14} /> Send
                         </button>
                       </form>
                     )}

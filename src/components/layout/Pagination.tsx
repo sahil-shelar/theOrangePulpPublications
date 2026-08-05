@@ -34,11 +34,11 @@ export default function Pagination({ basePath, page, totalPages }: Props) {
     <nav aria-label="Pagination" className="flex flex-wrap items-center justify-center gap-2 mt-14">
       {page > 1 ? (
         <Link href={href(basePath, page - 1)} rel="prev" aria-label="Previous page" className={`${cell} px-4 gap-1 bg-background hover:bg-primary`}>
-          <ChevronLeft size={14} strokeWidth={3} /> Prev
+          <ChevronLeft size={14} strokeWidth={2.5} /> Prev
         </Link>
       ) : (
         <span aria-hidden="true" className={`${cell} px-4 gap-1 bg-muted text-muted-foreground border-foreground/30`}>
-          <ChevronLeft size={14} strokeWidth={3} /> Prev
+          <ChevronLeft size={14} strokeWidth={2.5} /> Prev
         </span>
       )}
 
@@ -60,11 +60,11 @@ export default function Pagination({ basePath, page, totalPages }: Props) {
 
       {page < totalPages ? (
         <Link href={href(basePath, page + 1)} rel="next" aria-label="Next page" className={`${cell} px-4 gap-1 bg-background hover:bg-primary`}>
-          Next <ChevronRight size={14} strokeWidth={3} />
+          Next <ChevronRight size={14} strokeWidth={2.5} />
         </Link>
       ) : (
         <span aria-hidden="true" className={`${cell} px-4 gap-1 bg-muted text-muted-foreground border-foreground/30`}>
-          Next <ChevronRight size={14} strokeWidth={3} />
+          Next <ChevronRight size={14} strokeWidth={2.5} />
         </span>
       )}
     </nav>

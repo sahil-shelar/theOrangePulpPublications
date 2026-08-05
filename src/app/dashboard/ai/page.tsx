@@ -29,7 +29,7 @@ export default async function AIOperationsCenter() {
         <div>
           <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Intelligence</p>
           <h1 className="font-heading text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-3">
-            <Sparkles size={36} className="text-primary" />
+            <Sparkles size={24} className="text-primary" />
             AI Center
           </h1>
         </div>
@@ -45,7 +45,7 @@ export default async function AIOperationsCenter() {
       {!aiTablesReady && (
         <div className="brutal-card bg-secondary p-8 flex flex-col md:flex-row items-start gap-6">
           <div className="w-12 h-12 shrink-0 border-[3px] border-foreground bg-primary flex items-center justify-center">
-            <Sparkles size={22} />
+            <Sparkles size={20} />
           </div>
           <div>
             <h2 className="font-heading text-2xl font-black uppercase text-foreground mb-2">AI Tables Not Yet Provisioned</h2>
@@ -61,23 +61,23 @@ export default async function AIOperationsCenter() {
 
       {/* Stats row — always visible */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="brutal-card bg-background p-6">
+        <div className="brutal-card p-6">
           <div className="flex items-center gap-3 mb-3">
-            <FileText size={18} className="text-primary" />
+            <FileText size={16} className="text-primary" />
             <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Total Articles</span>
           </div>
           <div className="font-heading text-5xl font-black">{articleCount ?? 0}</div>
         </div>
         <div className="brutal-card bg-primary p-6">
           <div className="flex items-center gap-3 mb-3">
-            <TrendingUp size={18} />
+            <TrendingUp size={16} />
             <span className="text-label font-black uppercase tracking-widest">Trend Signals</span>
           </div>
           <div className="font-heading text-5xl font-black">{trends?.length ?? '—'}</div>
         </div>
         <div className="brutal-card bg-secondary p-6">
           <div className="flex items-center gap-3 mb-3">
-            <AlertTriangle size={18} />
+            <AlertTriangle size={16} />
             <span className="text-label font-black uppercase tracking-widest">Coverage Gaps</span>
           </div>
           <div className="font-heading text-5xl font-black">{coverage?.length ?? '—'}</div>
@@ -88,10 +88,10 @@ export default async function AIOperationsCenter() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* Pending Suggestions */}
-          <div className="brutal-card bg-background p-0 overflow-hidden">
+          <div className="brutal-card p-0 overflow-hidden">
             <div className="bg-foreground text-background p-4 flex justify-between items-center">
               <h2 className="font-heading text-lg font-black uppercase tracking-widest flex items-center gap-2">
-                <Check size={18} /> Pending Approvals
+                <Check size={16} /> Pending Approvals
               </h2>
               <span className="bg-primary text-foreground text-label font-black px-2 py-1">{suggestions?.length ?? 0}</span>
             </div>
@@ -127,10 +127,10 @@ export default async function AIOperationsCenter() {
           <div className="flex flex-col gap-6">
 
             {/* Trend Opportunities */}
-            <div className="brutal-card bg-background p-0 overflow-hidden">
+            <div className="brutal-card p-0 overflow-hidden">
               <div className="bg-foreground text-background p-4">
                 <h2 className="font-heading text-lg font-black uppercase tracking-widest flex items-center gap-2">
-                  <TrendingUp size={18} /> Trend Detection
+                  <TrendingUp size={16} /> Trend Detection
                 </h2>
               </div>
               {trends && trends.length > 0 ? trends.map((t: any) => (
@@ -149,10 +149,10 @@ export default async function AIOperationsCenter() {
             </div>
 
             {/* Coverage Gaps */}
-            <div className="brutal-card bg-background p-0 overflow-hidden">
+            <div className="brutal-card p-0 overflow-hidden">
               <div className="bg-foreground text-background p-4">
                 <h2 className="font-heading text-lg font-black uppercase tracking-widest flex items-center gap-2">
-                  <AlertTriangle size={18} /> Coverage Gaps
+                  <AlertTriangle size={16} /> Coverage Gaps
                 </h2>
               </div>
               {coverage && coverage.length > 0 ? coverage.map((c: any) => (

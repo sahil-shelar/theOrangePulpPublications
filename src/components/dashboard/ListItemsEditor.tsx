@@ -49,8 +49,8 @@ export default function ListItemsEditor({ movies, items, onChange }: Props) {
                 <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
                   <span className="font-heading font-black text-lg text-muted-foreground w-6 text-center">{String(index + 1).padStart(2, '0')}</span>
                   <div className="flex gap-1">
-                    <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronUp size={12} /></button>
-                    <button type="button" onClick={() => move(index, 1)} disabled={index === items.length - 1} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronDown size={12} /></button>
+                    <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronUp size={14} /></button>
+                    <button type="button" onClick={() => move(index, 1)} disabled={index === items.length - 1} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronDown size={14} /></button>
                   </div>
                 </div>
 

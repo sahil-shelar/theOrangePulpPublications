@@ -2,7 +2,7 @@ export default function Loading() {
   return (
     <div className="w-full min-h-screen bg-background animate-pulse">
       <div className="border-b-[4px] border-foreground bg-foreground/80">
-        <div className="max-w-5xl mx-auto px-6 md:px-10 py-14 flex gap-8 items-end">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-14 flex gap-8 items-end">
           <div className="w-36 h-36 shrink-0 border-[4px] border-background bg-muted" />
           <div className="space-y-4 flex-1">
             <div className="h-3 w-20 bg-background/20 border border-background/10" />

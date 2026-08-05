@@ -26,9 +26,9 @@ export default function NewArticleTypePickerPage() {
             <Link
               key={type}
               href={`/dashboard/articles/new/${type}`}
-              className="group brutal-card bg-background p-6 flex flex-col gap-3 hover:-translate-y-1 hover:bg-primary transition-all"
+              className="group brutal-card p-6 flex flex-col gap-3 hover:-translate-y-1 hover:bg-primary transition-all"
             >
-              <Icon size={28} strokeWidth={2} />
+              <Icon size={24} strokeWidth={2.5} />
               <h2 className="font-heading text-xl font-black uppercase tracking-tight">{label}</h2>
               <p className="text-xs font-bold text-muted-foreground group-hover:text-foreground/80">{desc}</p>
             </Link>

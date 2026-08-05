@@ -38,14 +38,14 @@ export default function MovieCarousel({ movies, linkBase }: Props) {
         className="absolute left-0 top-1/2 -translate-y-1/2 z-10 -translate-x-1/2 w-10 h-10 bg-background border-[3px] border-foreground flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-opacity hover:bg-primary disabled:hidden"
         aria-label="Scroll left"
       >
-        <ChevronLeft size={18} />
+        <ChevronLeft size={16} />
       </button>
       <button
         onClick={() => scroll('right')}
         className="absolute right-0 top-1/2 -translate-y-1/2 z-10 translate-x-1/2 w-10 h-10 bg-background border-[3px] border-foreground flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-opacity hover:bg-primary"
         aria-label="Scroll right"
       >
-        <ChevronRight size={18} />
+        <ChevronRight size={16} />
       </button>
 
       {/* Track */}

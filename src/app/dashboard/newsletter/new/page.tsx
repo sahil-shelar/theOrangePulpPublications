@@ -13,7 +13,7 @@ export default function NewCampaignPage() {
         <h1 className="font-heading text-4xl font-black uppercase text-foreground">New Campaign</h1>
       </div>
 
-      <form action={createCampaign} className="space-y-6 brutal-card bg-background p-8">
+      <form action={createCampaign} className="space-y-6 brutal-card p-8">
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase tracking-widest text-foreground">Subject Line *</label>
           <input

@@ -71,10 +71,10 @@ function ArticleTable({ title, articles }: { title: string; articles: ArticleWit
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading text-xl font-black uppercase tracking-widest text-foreground">{title}</h2>
         <Link href="/dashboard/articles" className="flex items-center gap-1 text-label font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
-          View all <ArrowRight size={12} />
+          View all <ArrowRight size={14} />
         </Link>
       </div>
-      <div className="brutal-card bg-background p-0 overflow-hidden">
+      <div className="brutal-card p-0 overflow-hidden">
         {articles.length === 0 ? (
           <div className="p-8 text-center text-xs font-bold uppercase tracking-widest text-muted-foreground">
             No articles found

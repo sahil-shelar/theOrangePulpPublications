@@ -307,14 +307,14 @@ export default function ShareButtons({ title, accentBorder = "border-foreground"
           className="flex items-center gap-1.5 px-4 py-2 border-[2px] border-foreground text-xs font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
           title="Share to Instagram Stories"
         >
-          <Sparkles size={13} />
+          <Sparkles size={14} />
           {generatingStory ? "Generating…" : "Story"}
         </button>
         <button
           onClick={copy}
           className="flex items-center gap-1.5 px-4 py-2 border-[2px] border-foreground text-xs font-black uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors ml-auto"
         >
-          {copied ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+          {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
           {copied ? "Copied!" : "Copy Link"}
         </button>
       </div>

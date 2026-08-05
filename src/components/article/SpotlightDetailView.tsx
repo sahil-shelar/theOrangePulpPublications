@@ -74,13 +74,13 @@ export default async function SpotlightDetailView({ article }: { article: Articl
         ) : (
           <div className="absolute inset-0 bg-foreground" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25" />
+        <div className="absolute inset-0 img-scrim" />
 
         <Link href="/spotlight" prefetch={false} className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors">
-          <ArrowLeft size={14} strokeWidth={3} /> Spotlight
+          <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
         </Link>
 
-        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-10 max-w-6xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-10 max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-foreground border-foreground">
               Spotlight
@@ -108,7 +108,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
 
       {/* ── Pull quote ── */}
       {pullQuote && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-12 md:py-16 text-center">
+        <div className="max-w-4xl mx-auto px-6 md:px-10 py-12 md:py-16 text-center">
           <p className="font-heading text-2xl md:text-4xl font-black uppercase leading-tight text-foreground">
             &ldquo;{pullQuote}&rdquo;
           </p>
@@ -116,7 +116,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
       )}
 
       {/* ── Body + sidebar ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 pb-12 md:pb-16">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 pb-12 md:pb-16">
         <div className="lg:col-span-8">
           {article.content && (
             <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
@@ -213,7 +213,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
         </aside>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-16">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 pb-16">
         <AdSlot slotKey="article-bottom-leaderboard" className="mx-auto" />
       </div>
     </div>

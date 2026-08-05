@@ -63,7 +63,7 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
   return (
     <div className="mt-16 pt-8 border-t-[6px] border-foreground">
       <h3 className="font-heading text-3xl font-black uppercase text-foreground mb-8 flex items-center gap-3">
-        <MessageSquare size={32} /> Comments ({comments.length})
+        <MessageSquare size={24} /> Comments ({comments.length})
       </h3>
 
       {loading ? (

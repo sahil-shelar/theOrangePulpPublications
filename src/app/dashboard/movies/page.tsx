@@ -36,7 +36,7 @@ export default async function MoviesDashboardPage() {
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
-                    <Film size={28} />
+                    <Film size={24} />
                     <span className="text-label font-black uppercase tracking-widest text-center px-2">{movie.title}</span>
                   </div>
                 )}
@@ -47,7 +47,7 @@ export default async function MoviesDashboardPage() {
                     href={`/dashboard/movies/${movie.id}/edit`}
                     className="w-full bg-primary text-foreground font-black text-label uppercase tracking-widest px-3 py-2 border-[2px] border-foreground text-center hover:-translate-y-0.5 transition-transform"
                   >
-                    <Edit size={12} className="inline mr-1" /> Edit
+                    <Edit size={14} className="inline mr-1" /> Edit
                   </Link>
                   <MovieDeleteButton id={movie.id} />
                 </div>

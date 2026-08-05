@@ -31,7 +31,7 @@ export default async function UsersDashboardPage() {
       {/* Invite Form */}
       <div className="brutal-card bg-secondary p-6 mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <Mail size={18} />
+          <Mail size={16} />
           <h2 className="font-heading text-lg font-black uppercase tracking-widest">Invite New Member</h2>
         </div>
         <form action={inviteUser} className="flex flex-col sm:flex-row gap-3">
@@ -66,7 +66,7 @@ export default async function UsersDashboardPage() {
           { role: 'editor', desc: 'Publish articles · manage taxonomy' },
           { role: 'writer', desc: 'Create & submit drafts only' },
         ].map(({ role, desc }) => (
-          <div key={role} className="flex items-center gap-2 brutal-card bg-background px-3 py-2">
+          <div key={role} className="flex items-center gap-2 brutal-card px-3 py-2">
             <span className="text-label font-black uppercase tracking-widest bg-foreground text-background px-2 py-0.5">{role}</span>
             <span className="text-label font-bold text-muted-foreground hidden sm:block">{desc}</span>
           </div>
@@ -75,11 +75,11 @@ export default async function UsersDashboardPage() {
 
       {/* Users table */}
       {listError ? (
-        <div className="brutal-card bg-background p-6 border-l-[4px] border-primary text-sm font-bold text-muted-foreground">
+        <div className="brutal-card p-6 border-l-[4px] border-primary text-sm font-bold text-muted-foreground">
           Could not load users: {listError}
         </div>
       ) : (
-        <div className="brutal-card bg-background p-0 overflow-hidden">
+        <div className="brutal-card p-0 overflow-hidden">
           <div className="bg-foreground text-background p-4 flex items-center gap-3">
             <ShieldCheck size={16} />
             <h2 className="font-heading text-lg font-black uppercase tracking-widest">All Members</h2>

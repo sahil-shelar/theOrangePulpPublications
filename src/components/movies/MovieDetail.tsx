@@ -56,7 +56,8 @@ export default function MovieDetail({
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
         ) : null}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
+        {/* Backdrop fades into the page rather than cutting off hard. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground/40 via-transparent to-background" />
       </div>
 
       {/* ── Poster + Title row ── */}
@@ -123,7 +124,7 @@ export default function MovieDetail({
                 rel="noreferrer"
                 className="flex items-center gap-4 bg-foreground text-background px-6 py-4 border-[3px] border-foreground w-fit hover:-translate-y-0.5 transition-transform font-black uppercase tracking-widest text-sm"
               >
-                <Play size={18} fill="currentColor" />
+                <Play size={16} fill="currentColor" />
                 Watch Trailer
                 <ExternalLink size={14} className="opacity-50" />
               </a>

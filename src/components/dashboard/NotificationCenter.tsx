@@ -19,7 +19,7 @@ export default function NotificationCenter() {
         onClick={() => setIsOpen(!isOpen)}
         className="w-10 h-10 flex items-center justify-center border-[3px] border-foreground hover:bg-foreground hover:text-background transition-colors relative"
       >
-        <Bell size={18} />
+        <Bell size={16} />
         <span className="absolute -top-2 -right-2 w-4 h-4 bg-primary border-[2px] border-foreground rounded-full animate-bounce"></span>
       </button>
 

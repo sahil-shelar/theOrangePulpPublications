@@ -10,7 +10,7 @@ export default function NewCategoryPage() {
         <Link href="/dashboard/categories" className="text-xs font-black uppercase tracking-widest hover:underline text-foreground/70">Cancel</Link>
       </div>
 
-      <form action={createCategory} className="space-y-6 brutal-card bg-background p-8">
+      <form action={createCategory} className="space-y-6 brutal-card p-8">
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase tracking-widest text-foreground">Category Name</label>
           <input type="text" name="name" required className="w-full bg-background border-[3px] border-foreground p-3 font-bold" />
@@ -28,7 +28,7 @@ export default function NewCategoryPage() {
         
         <div className="pt-4 border-t-[3px] border-foreground">
           <button type="submit" className="brutal-button py-4 px-8 w-full flex items-center justify-center gap-2">
-            <Save size={18} /> Create Category
+            <Save size={16} /> Create Category
           </button>
         </div>
       </form>

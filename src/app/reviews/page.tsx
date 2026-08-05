@@ -65,7 +65,7 @@ function FeaturedCard({ post, href, accentColor }: { post: any; href: string; ac
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div className="aspect-[4/3] md:aspect-auto relative border-b-[4px] md:border-b-0 md:border-r-[4px] border-foreground overflow-hidden bg-muted">
           {image ? (
-            <img src={image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full bg-secondary" />
           )}

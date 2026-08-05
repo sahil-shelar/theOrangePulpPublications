@@ -74,7 +74,7 @@ export default async function ArticlesPage({
       </div>
 
       {/* Table */}
-      <div className="brutal-card bg-background overflow-hidden overflow-x-auto">
+      <div className="brutal-card overflow-hidden overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
             <tr className="bg-foreground text-background text-label font-black uppercase tracking-widest">
@@ -112,14 +112,14 @@ export default async function ArticlesPage({
                       className="p-2 border-[2px] border-foreground hover:bg-primary transition-colors bg-background"
                       title="Preview"
                     >
-                      <Eye size={15} />
+                      <Eye size={16} />
                     </Link>
                     <Link
                       href={`/dashboard/articles/${article.id}/edit`}
                       className="p-2 border-[2px] border-foreground hover:bg-primary transition-colors bg-background"
                       title="Edit"
                     >
-                      <Edit2 size={15} />
+                      <Edit2 size={16} />
                     </Link>
                     <ArticleDeleteButton id={article.id} />
                   </div>

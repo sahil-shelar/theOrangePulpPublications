@@ -89,14 +89,14 @@ export default function UserRow({ u, isYou }: { u: User; isYou: boolean }) {
               title={isBanned ? 'Unban' : 'Ban'}
               className="p-1.5 border-[2px] border-foreground hover:bg-primary transition-colors"
             >
-              {isBanned ? <CheckCircle size={13} /> : <Ban size={13} />}
+              {isBanned ? <CheckCircle size={14} /> : <Ban size={14} />}
             </button>
             <button
               onClick={handleDelete}
               title="Delete"
               className="p-1.5 border-[2px] border-foreground hover:bg-primary transition-colors"
             >
-              <Trash2 size={13} />
+              <Trash2 size={14} />
             </button>
           </div>
         )}

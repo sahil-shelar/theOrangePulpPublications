@@ -20,7 +20,7 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
             fill
             priority
             sizes="100vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full bg-secondary" />
@@ -28,7 +28,7 @@ export default function HeroArticle({ article }: { article: ArticleWithRelations
       </div>
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/65 to-foreground/20" />
+      <div className="absolute inset-0 img-scrim" />
 
       {/* Badges — top-left on mobile, bottom-right on desktop */}
       <div className="absolute top-4 left-4 md:top-auto md:bottom-8 md:left-auto md:right-8 flex items-center gap-2 z-10">

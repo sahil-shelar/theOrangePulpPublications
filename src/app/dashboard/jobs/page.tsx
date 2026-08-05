@@ -8,11 +8,11 @@ export const revalidate = 0
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { icon: React.ReactNode; cls: string }> = {
-    running:   { icon: <Activity size={13} className="animate-pulse" />, cls: 'text-blue-600 bg-blue-50' },
-    pending:   { icon: <Clock size={13} />,                              cls: 'text-yellow-600 bg-yellow-50' },
-    completed: { icon: <CheckCircle size={13} />,                        cls: 'text-green-600 bg-green-50' },
-    failed:    { icon: <XCircle size={13} />,                            cls: 'text-red-600 bg-red-50' },
-    cancelled: { icon: <Ban size={13} />,                                cls: 'text-muted-foreground bg-muted' },
+    running:   { icon: <Activity size={14} className="animate-pulse" />, cls: 'text-blue-600 bg-blue-50' },
+    pending:   { icon: <Clock size={14} />,                              cls: 'text-yellow-600 bg-yellow-50' },
+    completed: { icon: <CheckCircle size={14} />,                        cls: 'text-green-600 bg-green-50' },
+    failed:    { icon: <XCircle size={14} />,                            cls: 'text-red-600 bg-red-50' },
+    cancelled: { icon: <Ban size={14} />,                                cls: 'text-muted-foreground bg-muted' },
   }
   const s = map[status] ?? { icon: null, cls: 'bg-muted' }
   return (
@@ -40,7 +40,7 @@ export default async function JobsDashboardPage() {
         <TriggerRunnerButton />
       </div>
 
-      <div className="brutal-card bg-background p-0 overflow-hidden overflow-x-auto">
+      <div className="brutal-card p-0 overflow-hidden overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[600px]">
           <thead>
             <tr className="bg-foreground text-background text-label font-black uppercase tracking-widest">

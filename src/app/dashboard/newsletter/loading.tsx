@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="p-6 md:p-8 max-w-5xl animate-pulse">
+    <div className="p-6 md:p-8 max-w-6xl animate-pulse">
       <div className="h-4 w-20 bg-muted border border-foreground/10 mb-2" />
       <div className="h-10 w-40 bg-muted border border-foreground/10 mb-8" />
       <div className="brutal-card p-0 overflow-hidden">

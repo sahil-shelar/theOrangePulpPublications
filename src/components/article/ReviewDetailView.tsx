@@ -99,17 +99,17 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
         ) : (
           <div className="absolute inset-0 bg-primary" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25" />
+        <div className="absolute inset-0 img-scrim" />
 
         <Link
           href={`/${typeToRoute(article.type)}`}
           prefetch={false}
           className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors"
         >
-          <ArrowLeft size={14} strokeWidth={3} /> {typeToRoute(article.type)}
+          <ArrowLeft size={14} strokeWidth={2.5} /> {typeToRoute(article.type)}
         </Link>
 
-        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-12 max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-primary text-foreground border-foreground">
               Review
@@ -156,7 +156,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
 
       {/* ── Score strip ── */}
       <div className="bg-muted border-b-[3px] border-foreground">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center gap-x-8 gap-y-3">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 py-4 flex flex-wrap items-center gap-x-8 gap-y-3">
           {verdict && (
             <span className="text-label font-black uppercase tracking-widest px-3 py-2 border-[2px] border-foreground bg-secondary text-foreground">
               {VERDICT_LABEL[verdict] || verdict}
@@ -182,7 +182,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
           )}
           {streamingPlatforms.length > 0 && (
             <div className="flex items-center gap-1.5 ml-auto">
-              <Play size={12} className="text-muted-foreground" />
+              <Play size={14} className="text-muted-foreground" />
               <span className="text-label font-black uppercase tracking-widest text-foreground/70">
                 {streamingPlatforms.slice(0, 3).join(' · ')}
               </span>
@@ -197,7 +197,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
       </div>
 
       {/* ── Main content + sidebar ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-12 md:py-16">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-12 md:py-16">
 
         <div className="lg:col-span-8">
           <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
@@ -269,7 +269,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
         </aside>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-16">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 pb-16">
         <AdSlot slotKey="article-bottom-leaderboard" className="mx-auto" />
       </div>
     </div>

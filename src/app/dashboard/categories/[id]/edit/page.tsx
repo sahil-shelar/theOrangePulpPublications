@@ -25,7 +25,7 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      <form action={action} className="space-y-6 brutal-card bg-background p-8">
+      <form action={action} className="space-y-6 brutal-card p-8">
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase tracking-widest text-foreground">Category Name</label>
           <input
@@ -60,7 +60,7 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
 
         <div className="pt-4 border-t-[3px] border-foreground">
           <button type="submit" className="brutal-button py-4 px-8 w-full flex items-center justify-center gap-2">
-            <Save size={18} /> Update Category
+            <Save size={16} /> Update Category
           </button>
         </div>
       </form>

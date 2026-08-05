@@ -101,7 +101,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
         )}
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25" />
+        <div className="absolute inset-0 img-scrim" />
 
         {/* Back link */}
         <Link
@@ -109,11 +109,11 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
           prefetch={false}
           className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-background/70 hover:text-background text-label font-black uppercase tracking-widest transition-colors"
         >
-          <ArrowLeft size={14} strokeWidth={3} /> {typeToRoute(article.type)}
+          <ArrowLeft size={14} strokeWidth={2.5} /> {typeToRoute(article.type)}
         </Link>
 
 {/* Title + excerpt + author — all overlaid on image */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8 md:pb-12 max-w-6xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-12 max-w-6xl mx-auto">
           {/* Type + category badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className={`text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] ${accent.badge}`}>
@@ -189,7 +189,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
       </div>
 
       {/* ── Main content + sidebar ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-12 md:py-16">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-12 md:py-16">
 
         {/* Article body */}
         <div className="lg:col-span-8">
@@ -280,7 +280,7 @@ export default async function ArticleDetailView({ article }: { article: ArticleW
       </div>
 
       {/* Bottom ad */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-16">
+      <div className="max-w-6xl mx-auto px-6 md:px-10 pb-16">
         <AdSlot slotKey="article-bottom-leaderboard" className="mx-auto" />
       </div>
     </div>

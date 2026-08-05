@@ -19,7 +19,7 @@ export default async function TagsDashboardPage() {
         </Link>
       </div>
 
-      <div className="brutal-card bg-background p-0 overflow-hidden">
+      <div className="brutal-card p-0 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-foreground text-background text-label font-black uppercase tracking-widest">
@@ -40,7 +40,7 @@ export default async function TagsDashboardPage() {
               <tr key={tag.id} className="border-t-[3px] border-foreground hover:bg-muted transition-colors">
                 <td className="p-3.5">
                   <span className="flex items-center gap-1.5 font-bold text-sm">
-                    <Hash size={13} className="text-muted-foreground" />
+                    <Hash size={14} className="text-muted-foreground" />
                     {tag.name}
                   </span>
                 </td>

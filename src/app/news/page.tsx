@@ -38,7 +38,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
                       {(() => {
                         const img = (featured as any).cover_image_url || (featured as any).movies?.poster_url
                         return img ? (
-                          <img src={img} alt={(featured as any).title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <img src={img} alt={(featured as any).title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         ) : <div className="w-full h-full bg-secondary" />
                       })()}
                       <span className="absolute top-4 left-4 bg-foreground text-background text-label font-black uppercase tracking-widest px-3 py-1.5">

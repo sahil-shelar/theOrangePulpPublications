@@ -110,7 +110,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
         <span className="text-label font-black uppercase tracking-widest text-foreground">{label}</span>
         {value && (
           <button type="button" onClick={() => onChange('')} className="text-label font-black uppercase tracking-widest text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1">
-            <X size={11} /> Remove
+            <X size={14} /> Remove
           </button>
         )}
       </div>
@@ -128,7 +128,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
             className="absolute top-2 right-2 bg-background border-[2px] border-foreground p-1.5 hover:bg-muted transition-colors"
             title="Change image"
           >
-            <RefreshCw size={13} strokeWidth={2.5} />
+            <RefreshCw size={14} strokeWidth={2.5} />
           </button>
         </div>
       )}
@@ -149,7 +149,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
               tab === t ? 'bg-foreground text-background' : 'bg-background text-foreground hover:bg-muted'
             } ${t === 'url' ? 'border-l-[3px] border-foreground' : ''}`}
           >
-            {t === 'upload' ? <Upload size={12} /> : <LinkIcon size={12} />}
+            {t === 'upload' ? <Upload size={14} /> : <LinkIcon size={14} />}
             {t === 'upload' ? 'Upload' : 'URL'}
           </button>
         ))}
@@ -165,7 +165,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
             dragging ? 'border-primary bg-primary/10' : 'border-foreground/40 hover:border-foreground hover:bg-muted/40'
           } ${uploading ? 'pointer-events-none opacity-60' : ''}`}
         >
-          <ImageIcon size={28} className="text-muted-foreground" strokeWidth={1.5} />
+          <ImageIcon size={24} className="text-muted-foreground" strokeWidth={2.5} />
           <div className="text-center">
             <p className="text-xs font-black uppercase tracking-widest text-foreground/70">
               {uploading ? 'Uploading…' : dragging ? 'Drop to upload' : 'Drag & drop or click'}

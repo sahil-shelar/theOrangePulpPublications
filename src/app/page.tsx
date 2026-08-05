@@ -70,10 +70,10 @@ export default async function Homepage() {
         {/* ── Section Promo Row ── */}
         <section className="py-14 border-b-[3px] border-foreground">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <SectionPromo href="/reviews"   color="bg-primary"    label="Reviews"  desc="Critical Takes"  icon={<Star size={22}/>} />
-            <SectionPromo href="/news"      color="bg-secondary"  label="News"     desc="Latest Stories"  icon={<Newspaper size={22}/>} />
-            <SectionPromo href="/spotlight" color="bg-accent"     label="Spotlight" desc="Deep Dives"     icon={<Sparkles size={22}/>} />
-            <SectionPromo href="/lists"     color="bg-muted"      label="Rankings" desc="Best Of Lists"   icon={<Trophy size={22}/>} />
+            <SectionPromo href="/reviews"   color="bg-primary"    label="Reviews"  desc="Critical Takes"  icon={<Star size={20}/>} />
+            <SectionPromo href="/news"      color="bg-secondary"  label="News"     desc="Latest Stories"  icon={<Newspaper size={20}/>} />
+            <SectionPromo href="/spotlight" color="bg-accent"     label="Spotlight" desc="Deep Dives"     icon={<Sparkles size={20}/>} />
+            <SectionPromo href="/lists"     color="bg-muted"      label="Rankings" desc="Best Of Lists"   icon={<Trophy size={20}/>} />
           </div>
         </section>
 
@@ -163,8 +163,8 @@ export default async function Homepage() {
                       className="group relative overflow-hidden"
                     >
                       <div className="absolute inset-0">
-                        {image && <img src={image} alt={article.title} className="w-full h-full object-cover opacity-20 group-hover:opacity-30 group-hover:scale-105 transition-all duration-500" />}
-                        <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/60 to-transparent" />
+                        {image && <img src={image} alt={article.title} className="w-full h-full object-cover opacity-20 group-hover:opacity-30 group-hover:scale-105 transition-all duration-300" />}
+                        <div className="absolute inset-0 img-scrim" />
                       </div>
                       <div className="relative p-7 min-h-[280px] flex flex-col justify-between">
                         <span className="text-label font-black uppercase tracking-widest bg-primary text-foreground px-2 py-1 border-[2px] border-background/30 self-start">
@@ -200,7 +200,7 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
       </h2>
       {href && (
         <Link href={href} className="flex items-center gap-1 text-label font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
-          View All <ArrowRight size={13} />
+          View All <ArrowRight size={14} />
         </Link>
       )}
     </div>

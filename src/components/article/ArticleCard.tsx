@@ -22,7 +22,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
       <Link href={href} prefetch={false} className="group flex gap-0 brutal-card p-0 overflow-hidden hover:-translate-y-0.5 transition-transform">
         <div className="relative w-24 shrink-0 aspect-square border-r-[3px] border-foreground overflow-hidden bg-muted">
           {image ? (
-            <Image src={image} alt={article.title} fill sizes="96px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <Image src={image} alt={article.title} fill sizes="96px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full bg-secondary" />
           )}
@@ -64,7 +64,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
             alt={article.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 33vw, 300px"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full bg-secondary flex items-center justify-center p-8">

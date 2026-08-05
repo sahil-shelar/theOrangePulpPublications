@@ -18,7 +18,7 @@ export default async function CategoriesDashboardPage() {
         </Link>
       </div>
 
-      <div className="brutal-card bg-background p-0 overflow-hidden">
+      <div className="brutal-card p-0 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-foreground text-background text-label font-black uppercase tracking-widest">

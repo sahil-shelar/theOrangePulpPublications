@@ -35,21 +35,21 @@ export default async function SystemDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-        <div className="brutal-card bg-background p-6">
+        <div className="brutal-card p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Articles</span>
             <Database size={16} className="text-primary" />
           </div>
           <div className="font-heading text-5xl font-black">{totalArticles ?? 0}</div>
         </div>
-        <div className="brutal-card bg-background p-6">
+        <div className="brutal-card p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Authors</span>
             <Server size={16} className="text-primary" />
           </div>
           <div className="font-heading text-5xl font-black">{totalAuthors ?? 0}</div>
         </div>
-        <div className="brutal-card bg-background p-6">
+        <div className="brutal-card p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-label font-black uppercase tracking-widest text-muted-foreground">Active Jobs</span>
             <Activity size={16} className="text-primary" />
@@ -69,7 +69,7 @@ export default async function SystemDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="brutal-card bg-secondary p-7">
           <h2 className="font-heading text-xl font-black uppercase mb-5 flex items-center gap-2">
-            <HardDrive size={18} /> Storage
+            <HardDrive size={16} /> Storage
           </h2>
           <div className="space-y-3 font-bold uppercase tracking-widest text-sm">
             <div className="flex justify-between border-b-[2px] border-foreground/10 pb-3">
@@ -87,9 +87,9 @@ export default async function SystemDashboard() {
           </div>
         </div>
 
-        <div className="brutal-card bg-background p-7">
+        <div className="brutal-card p-7">
           <h2 className="font-heading text-xl font-black uppercase mb-5 flex items-center gap-2">
-            <Clock size={18} /> Performance
+            <Clock size={16} /> Performance
           </h2>
           <div className="space-y-3 font-bold uppercase tracking-widest text-sm">
             <div className="flex justify-between border-b-[2px] border-foreground/10 pb-3">

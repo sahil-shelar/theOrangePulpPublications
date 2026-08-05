@@ -91,10 +91,10 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
           </div>
           <div className="flex border-[3px] border-foreground bg-background">
             <button onClick={() => setView('grid')} className={`p-2 ${view === 'grid' ? 'bg-foreground text-background' : 'hover:bg-muted'}`}>
-              <Grid size={18} />
+              <Grid size={16} />
             </button>
             <button onClick={() => setView('list')} className={`p-2 border-l-[3px] border-foreground ${view === 'list' ? 'bg-foreground text-background' : 'hover:bg-muted'}`}>
-              <List size={18} />
+              <List size={16} />
             </button>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
             className="absolute inset-0 opacity-0 cursor-pointer"
           />
           <button className="w-full brutal-button py-2 px-6 flex items-center justify-center gap-2 text-sm">
-            <UploadCloud size={18} />
+            <UploadCloud size={16} />
             {isUploading ? `Uploading ${uploadProgress?.current}/${uploadProgress?.total}` : 'Upload Media'}
           </button>
         </div>
@@ -125,10 +125,10 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
                 
                 <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                   <button onClick={() => handleCopy(file.file_url)} className="bg-primary text-foreground font-black text-label uppercase tracking-widest px-3 py-2 border-[3px] border-foreground hover:-translate-y-1 transition-transform flex items-center gap-2">
-                    <Copy size={12} /> Copy URL
+                    <Copy size={14} /> Copy URL
                   </button>
                   <button onClick={() => handleDelete(file.id, file.file_name)} className="bg-red-500 text-white font-black text-label uppercase tracking-widest px-3 py-2 border-[3px] border-foreground hover:-translate-y-1 transition-transform flex items-center gap-2">
-                    <Trash2 size={12} /> Delete
+                    <Trash2 size={14} /> Delete
                   </button>
                 </div>
               </div>
@@ -188,7 +188,7 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
       )}
 
       {filteredFiles.length === 0 && (
-        <div className="brutal-card bg-background p-16 text-center font-black uppercase tracking-widest text-muted-foreground">
+        <div className="brutal-card p-16 text-center font-black uppercase tracking-widest text-muted-foreground">
           No media files found.
         </div>
       )}

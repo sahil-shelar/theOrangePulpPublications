@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
       <form action={updateSiteSettings} className="space-y-8">
         
-        <div className="brutal-card bg-background p-8">
+        <div className="brutal-card p-8">
           <h2 className="font-heading text-2xl font-black uppercase text-foreground mb-6 border-b-[3px] border-foreground pb-2">General</h2>
           
           <div className="space-y-6">
@@ -36,13 +36,13 @@ export default async function SettingsPage() {
           </div>
         </div>
 
-        <div className="brutal-card bg-background p-8 opacity-50 cursor-not-allowed">
+        <div className="brutal-card p-8 opacity-50 cursor-not-allowed">
           <h2 className="font-heading text-2xl font-black uppercase text-foreground mb-6 border-b-[3px] border-foreground pb-2">Advertisements (Coming Soon)</h2>
           <p className="font-bold text-sm text-foreground/80 mb-4">Ad slots and DFP network IDs will be configured here.</p>
         </div>
 
         <button type="submit" className="brutal-button py-4 px-8 flex items-center justify-center gap-2">
-          <Save size={18} /> Save Settings
+          <Save size={16} /> Save Settings
         </button>
 
       </form>

@@ -486,7 +486,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
                   <span className="font-black text-sm text-foreground">{score}%</span>
                 </div>
                 <div className="w-full h-2 bg-muted border-[2px] border-foreground/20">
-                  <div className={`h-full transition-all duration-500 ${scoreColor}`} style={{ width: `${score}%` }} />
+                  <div className={`h-full transition-all duration-300 ${scoreColor}`} style={{ width: `${score}%` }} />
                 </div>
               </div>
 
@@ -494,10 +494,10 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
                 {items.map(({ label, done, warn, hint }) => (
                   <div key={label} className={`flex items-center gap-3 px-5 py-2.5 ${done ? '' : 'bg-muted/30'}`}>
                     {done
-                      ? <CheckCircle2 size={15} className="text-green-600 shrink-0" strokeWidth={2.5} />
+                      ? <CheckCircle2 size={16} className="text-green-600 shrink-0" strokeWidth={2.5} />
                       : warn
-                        ? <AlertCircle size={15} className="text-amber-500 shrink-0" strokeWidth={2.5} />
-                        : <XCircle size={15} className="text-red-400 shrink-0" strokeWidth={2.5} />
+                        ? <AlertCircle size={16} className="text-amber-500 shrink-0" strokeWidth={2.5} />
+                        : <XCircle size={16} className="text-red-400 shrink-0" strokeWidth={2.5} />
                     }
                     <span className={`text-label font-black uppercase tracking-widest flex-1 ${done ? 'text-foreground' : 'text-muted-foreground'}`}>
                       {label}
@@ -517,14 +517,14 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
       {/* Right Column: Sidebar Settings */}
       <div className="w-full lg:w-80 flex flex-col gap-6 shrink-0">
 
-        <div className="brutal-card bg-background p-6 flex flex-col gap-4">
+        <div className="brutal-card p-6 flex flex-col gap-4">
            <button
              type="submit"
              id="save-btn"
              disabled={isSaving}
              className="w-full bg-primary text-foreground border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-hard transition-all flex items-center justify-center gap-2 disabled:opacity-50"
            >
-             <Save size={18} /> {isSaving ? 'Saving...' : 'Save Draft'}
+             <Save size={16} /> {isSaving ? 'Saving...' : 'Save Draft'}
            </button>
 
            <button
@@ -533,7 +533,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
              disabled={isSaving || formData.status === 'published'}
              className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-hard transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-muted disabled:text-foreground"
            >
-             <Send size={18} /> {formData.status === 'published' ? 'Published' : 'Publish Now'}
+             <Send size={16} /> {formData.status === 'published' ? 'Published' : 'Publish Now'}
            </button>
 
            {isEditing && (
@@ -544,7 +544,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
                  className="flex-1 bg-background border-[3px] border-foreground p-3 flex justify-center hover:bg-secondary transition-colors"
                  title="Preview Article"
                >
-                 <Eye size={18} />
+                 <Eye size={16} />
                </Link>
                <button
                  type="button"
@@ -552,7 +552,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
                  className="flex-1 bg-background border-[3px] border-foreground p-3 flex justify-center hover:bg-red-500 hover:text-white transition-colors text-red-600"
                  title="Delete Article"
                >
-                 <Trash2 size={18} />
+                 <Trash2 size={16} />
                </button>
              </div>
            )}
@@ -679,7 +679,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
         </div>
 
-        <div className="brutal-card bg-background p-6 flex flex-col gap-4">
+        <div className="brutal-card p-6 flex flex-col gap-4">
           <ImagePicker
             label="Cover Image"
             value={formData.cover_image_url}
