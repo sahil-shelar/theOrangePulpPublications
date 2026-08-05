@@ -65,12 +65,37 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: `Unknown template "${overrideTemplate}".` }, { status: 400 })
     }
     template = overrideTemplate
+
+    // Reject non-numeric input rather than coercing it. `Number('abc')` is NaN,
+    // and NaN propagated far enough to save a zero-item article before this
+    // guard existed.
+    const numeric = (name: string) => {
+      const raw = url.searchParams.get(name)
+      if (raw === null || raw === '') return { ok: true as const, value: undefined }
+      const value = Number(raw)
+      if (!Number.isInteger(value)) return { ok: false as const, name, raw }
+      return { ok: true as const, value }
+    }
+
+    const year = numeric('year')
+    const decade = numeric('decade')
+    const count = numeric('count')
+
+    for (const field of [year, decade, count]) {
+      if (!field.ok) {
+        return NextResponse.json(
+          { error: `Query param "${field.name}" must be an integer, got "${field.raw}".` },
+          { status: 400 }
+        )
+      }
+    }
+
     params = {
       genre: url.searchParams.get('genre') ?? undefined,
-      year: url.searchParams.get('year') ? Number(url.searchParams.get('year')) : undefined,
-      decade: url.searchParams.get('decade') ? Number(url.searchParams.get('decade')) : undefined,
+      year: year.ok ? year.value : undefined,
+      decade: decade.ok ? decade.value : undefined,
       person: url.searchParams.get('person') ?? undefined,
-      count: url.searchParams.get('count') ? Number(url.searchParams.get('count')) : undefined,
+      count: count.ok ? count.value : undefined,
     }
   } else {
     const slot = ROTATION[isoWeek(new Date()) % ROTATION.length]

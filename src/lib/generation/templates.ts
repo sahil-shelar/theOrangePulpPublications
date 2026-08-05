@@ -60,7 +60,11 @@ export type TemplateDef = {
 const titleCase = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase())
 
 function clampCount(count?: number) {
-  return Math.min(Math.max(count ?? 10, MIN_ITEMS), MAX_ITEMS)
+  // Number.isFinite guards NaN specifically: Math.min/max propagate it, and a
+  // NaN count made `slice(0, NaN)` return an empty list, which produced a
+  // zero-item article that still saved successfully.
+  if (!Number.isFinite(count)) return 10
+  return Math.min(Math.max(count as number, MIN_ITEMS), MAX_ITEMS)
 }
 
 async function resolveGenreId(genre?: string) {
@@ -77,10 +81,17 @@ async function resolveGenreId(genre?: string) {
 
 /** Fewer results than asked for means the ranking would be padded — reject. */
 function requireEnough(movies: TmdbDiscoverResult[], count: number, what: string) {
-  if (movies.length < Math.min(count, MIN_ITEMS)) {
-    throw new Error(`TMDB returned only ${movies.length} qualifying titles for ${what}; need at least ${Math.min(count, MIN_ITEMS)}.`)
+  const floor = Math.min(count, MIN_ITEMS)
+  if (movies.length < floor) {
+    throw new Error(`TMDB returned only ${movies.length} qualifying titles for ${what}; need at least ${floor}.`)
   }
-  return movies.slice(0, count)
+  const selected = movies.slice(0, count)
+  // Belt and braces: nothing downstream should ever receive an empty list, and
+  // a slice can only be empty here if count was not a sane positive integer.
+  if (selected.length < MIN_ITEMS) {
+    throw new Error(`Selected only ${selected.length} titles for ${what} (count=${count}); need at least ${MIN_ITEMS}.`)
+  }
+  return selected
 }
 
 export const TEMPLATES: Record<TemplateId, TemplateDef> = {

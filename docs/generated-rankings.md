@@ -106,6 +106,14 @@ renders publicly. A mismatch rejects the whole generation.
 **Rollback on partial failure.** If `list_items` insert fails the article row is
 deleted — an article with no items renders as an empty list.
 
+**Zero-item articles are refused at three layers.** The rollback above only
+fires on an insert *error*, and inserting an empty array succeeds — so
+`?count=abc` once produced `ok: true` with an article containing no items.
+Closed by: an integer guard on every numeric query param (400, no coercion),
+`Number.isFinite` in `clampCount`, and an explicit floor in `requireEnough` and
+`assertFaithful`. `count` is clamped to 5–15, so `count=0` yields 5 and
+`count=999` yields 15.
+
 **No prompt example naming a real film.** An earlier "good example" used Parasite
 and rank 1 returned it near-verbatim. The example is now a hypothetical.
 

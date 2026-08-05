@@ -161,6 +161,13 @@ async function uniqueSlug(supabase: ReturnType<typeof createAdminClient>, base: 
 function assertFaithful(generated: GeneratedList, movies: TmdbDiscoverResult[]) {
   const expected = new Map(movies.map((m, i) => [i + 1, m.title]))
 
+  // A zero-length comparison passes trivially, so state the floor outright.
+  // Without this an empty film set produced an article that saved fine and
+  // rendered as an empty list.
+  if (movies.length === 0 || generated.items.length === 0) {
+    throw new Error('Refusing to build a ranking with no items.')
+  }
+
   if (generated.items.length !== movies.length) {
     throw new Error(`Model returned ${generated.items.length} items, expected ${movies.length}.`)
   }
