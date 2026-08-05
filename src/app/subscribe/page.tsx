@@ -24,7 +24,7 @@ export default function SubscribePage() {
 
         <SubscribeForm />
 
-        <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mt-5">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-5">
           No spam, ever. Unsubscribe anytime.
         </p>
       </div>

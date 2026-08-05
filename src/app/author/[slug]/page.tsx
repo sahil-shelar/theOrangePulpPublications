@@ -31,11 +31,11 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-12">
         <h2 className="font-heading text-3xl font-black uppercase text-foreground mb-8 border-b-[3px] border-foreground pb-3">
           Articles by {author.name}
-          <span className="ml-3 text-foreground/30">({articles.length})</span>
+          <span className="ml-3 text-muted-foreground">({articles.length})</span>
         </h2>
 
         {articles.length === 0 ? (
-          <div className="py-20 text-center font-bold uppercase tracking-widest text-foreground/40 border-[3px] border-dashed border-foreground/20 bg-muted">
+          <div className="py-20 text-center font-bold uppercase tracking-widest text-muted-foreground border-[3px] border-dashed border-foreground/20 bg-muted">
             No articles published yet.
           </div>
         ) : (

@@ -73,7 +73,7 @@ function FeaturedCard({ post, href, accentColor }: { post: any; href: string; ac
           <div className="flex items-center gap-2">
             <span className="text-[9px] font-black uppercase tracking-widest bg-foreground text-background px-2 py-1">Review</span>
             {post.categories?.name && (
-              <span className="text-[9px] font-black uppercase tracking-widest text-foreground/60">{post.categories.name}</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">{post.categories.name}</span>
             )}
           </div>
           <h2 className="font-heading text-3xl md:text-5xl font-black uppercase text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-3">
@@ -82,7 +82,7 @@ function FeaturedCard({ post, href, accentColor }: { post: any; href: string; ac
           {post.excerpt && (
             <p className="text-sm font-medium text-foreground/70 leading-relaxed line-clamp-3">{post.excerpt}</p>
           )}
-          <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-foreground/50 pt-4 border-t-[2px] border-foreground/20">
+          <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-muted-foreground pt-4 border-t-[2px] border-foreground/20">
             <span>{post.authors?.name || 'Editorial'}</span>
             <span>{new Date(post.published_at || post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</span>
           </div>
@@ -94,7 +94,7 @@ function FeaturedCard({ post, href, accentColor }: { post: any; href: string; ac
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="py-24 text-center font-bold uppercase tracking-widest text-foreground/40 border-[3px] border-dashed border-foreground/20 bg-secondary">
+    <div className="py-24 text-center font-bold uppercase tracking-widest text-muted-foreground border-[3px] border-dashed border-foreground/20 bg-secondary">
       {message}
     </div>
   )

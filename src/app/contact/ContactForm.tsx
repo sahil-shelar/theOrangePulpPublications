@@ -26,7 +26,7 @@ export default function ContactForm() {
     return (
       <div className="border-[3px] border-foreground bg-muted px-8 py-12 text-center">
         <p className="font-heading text-2xl font-black uppercase text-foreground">Message Sent</p>
-        <p className="text-sm font-bold text-foreground/60 mt-2 uppercase tracking-widest">We'll get back to you within 2 business days.</p>
+        <p className="text-sm font-bold text-muted-foreground mt-2 uppercase tracking-widest">We'll get back to you within 2 business days.</p>
       </div>
     );
   }
@@ -44,7 +44,7 @@ export default function ContactForm() {
         { id: "subject", label: "Subject",       type: "text",  required: true },
       ].map(({ id, label, type, required }) => (
         <div key={id} className="border-[3px] border-foreground border-b-0">
-          <label htmlFor={id} className="block text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 px-5 pt-4 pb-1">
+          <label htmlFor={id} className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-5 pt-4 pb-1">
             {label}
           </label>
           <input
@@ -52,14 +52,14 @@ export default function ContactForm() {
             name={id}
             type={type}
             required={required}
-            className="w-full bg-transparent px-5 pb-4 text-sm font-bold text-foreground placeholder:text-foreground/30 focus:outline-none"
+            className="w-full bg-transparent px-5 pb-4 text-sm font-bold text-foreground placeholder:text-muted-foreground"
             placeholder={`Enter your ${label.toLowerCase()}`}
           />
         </div>
       ))}
 
       <div className="border-[3px] border-foreground border-b-0">
-        <label htmlFor="message" className="block text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 px-5 pt-4 pb-1">
+        <label htmlFor="message" className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-5 pt-4 pb-1">
           Message
         </label>
         <textarea
@@ -67,7 +67,7 @@ export default function ContactForm() {
           name="message"
           rows={6}
           required
-          className="w-full bg-transparent px-5 pb-4 text-sm font-bold text-foreground placeholder:text-foreground/30 focus:outline-none resize-none"
+          className="w-full bg-transparent px-5 pb-4 text-sm font-bold text-foreground placeholder:text-muted-foreground resize-none"
           placeholder="Write your message here..."
         />
       </div>

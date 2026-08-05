@@ -76,7 +76,7 @@ export default function DashboardSidebar({ userEmail, userRole, onNavigate }: Pr
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
         {NAV.filter(s => canAccess(userRole, s.minRole)).map(({ section, items }) => (
           <div key={section}>
-            <div className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/40 px-3 mb-1">
+            <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-3 mb-1">
               {section}
             </div>
             <div className="space-y-0.5">
@@ -107,7 +107,7 @@ export default function DashboardSidebar({ userEmail, userRole, onNavigate }: Pr
       <div className="border-t-[3px] border-foreground p-4 space-y-3">
         <div className="px-1">
           <div className="text-xs font-black text-foreground truncate">{userEmail || '—'}</div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-foreground/50 mt-0.5">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-0.5">
             {userRole || 'editor'}
           </div>
         </div>

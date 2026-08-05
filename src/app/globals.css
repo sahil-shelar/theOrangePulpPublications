@@ -130,4 +130,42 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading uppercase;
   }
+
+  /* Keyboard focus is visible everywhere; pointer clicks stay clean because
+     :focus-visible only matches keyboard/AT interaction. Uses --ring. */
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Text inputs and textareas sit on cream — the pink ring reads weakly there,
+     so pair it with a foreground offset for definition. */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 1px var(--foreground);
+  }
+
+  /* Skip link — offscreen until focused */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+  }
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+    @apply bg-foreground text-background border-[3px] border-background px-4 py-3 text-xs font-black uppercase tracking-widest;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

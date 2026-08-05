@@ -68,9 +68,9 @@ export default function AuthConfirmPage() {
         Link invalid or expired
       </p>
       {errorMsg && (
-        <p className="text-xs uppercase tracking-widest text-foreground/50 text-center max-w-sm">{errorMsg}</p>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground text-center max-w-sm">{errorMsg}</p>
       )}
-      <p className="text-xs uppercase tracking-widest text-foreground/50 text-center">
+      <p className="text-xs uppercase tracking-widest text-muted-foreground text-center">
         Contact an admin to send a new invite
       </p>
       <Link href="/login" className="text-xs font-black uppercase tracking-widest text-foreground underline underline-offset-4">

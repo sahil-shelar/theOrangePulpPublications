@@ -27,11 +27,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <form action={login} className="space-y-6">
           <div className="flex flex-col gap-2">
             <label className="text-xs font-black uppercase tracking-widest text-foreground">Email Address</label>
-            <input type="email" name="email" required className="bg-background border-[3px] border-foreground p-3 font-bold text-sm focus:outline-none focus:ring-0 text-foreground" />
+            <input type="email" name="email" required className="bg-background border-[3px] border-foreground p-3 font-bold text-sm focus:ring-0 text-foreground" />
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-xs font-black uppercase tracking-widest text-foreground">Password</label>
-            <input type="password" name="password" required className="bg-background border-[3px] border-foreground p-3 font-bold text-sm focus:outline-none focus:ring-0 text-foreground" />
+            <input type="password" name="password" required className="bg-background border-[3px] border-foreground p-3 font-bold text-sm focus:ring-0 text-foreground" />
           </div>
           
           <button type="submit" className="w-full bg-foreground text-background border-[3px] border-foreground px-4 py-4 text-sm font-black uppercase tracking-widest hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#E2BFCA] transition-all">

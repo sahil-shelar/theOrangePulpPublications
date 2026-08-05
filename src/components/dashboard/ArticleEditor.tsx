@@ -321,17 +321,17 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
             value={formData.title}
             onChange={handleChange}
             placeholder="ARTICLE TITLE..."
-            className="w-full bg-background border-b-[3px] border-foreground pb-2 font-heading text-4xl font-black uppercase tracking-tighter text-foreground placeholder:text-foreground/30 focus:outline-none"
+            className="w-full bg-background border-b-[3px] border-foreground pb-2 font-heading text-4xl font-black uppercase tracking-tighter text-foreground placeholder:text-muted-foreground"
           />
 
           <div className="flex items-center gap-2 text-sm font-bold bg-muted p-2 border-[3px] border-foreground">
-            <span className="text-foreground/60 uppercase tracking-widest text-xs">SLUG:</span>
+            <span className="text-muted-foreground uppercase tracking-widest text-xs">SLUG:</span>
             <input
               type="text"
               name="slug"
               value={formData.slug}
               onChange={handleChange}
-              className="flex-1 bg-transparent focus:outline-none text-foreground"
+              className="flex-1 bg-transparent text-foreground"
             />
           </div>
         </div>
@@ -343,18 +343,18 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-black uppercase tracking-widest">Subheadline</label>
               <input type="text" name="subheadline" value={formData.subheadline} onChange={handleChange}
-                className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none" placeholder="One line under the headline" />
+                className="w-full bg-background border-[3px] border-foreground p-3 text-sm" placeholder="One line under the headline" />
             </div>
             <div className="flex gap-4">
               <div className="flex flex-col gap-2 flex-1">
                 <label className="text-[10px] font-black uppercase tracking-widest">Source Name</label>
                 <input type="text" name="source_name" value={formData.source_name} onChange={handleChange}
-                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none" placeholder="Variety" />
+                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm" placeholder="Variety" />
               </div>
               <div className="flex flex-col gap-2 flex-1">
                 <label className="text-[10px] font-black uppercase tracking-widest">Source URL</label>
                 <input type="url" name="source_url" value={formData.source_url} onChange={handleChange}
-                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none" placeholder="https://..." />
+                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm" placeholder="https://..." />
               </div>
             </div>
           </div>
@@ -368,18 +368,18 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
               <div className="flex flex-col gap-2 flex-1">
                 <label className="text-[10px] font-black uppercase tracking-widest">Subject Name</label>
                 <input type="text" name="subject_name" value={formData.subject_name} onChange={handleChange}
-                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none" placeholder="Denis Villeneuve" />
+                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm" placeholder="Denis Villeneuve" />
               </div>
               <div className="flex flex-col gap-2 flex-1">
                 <label className="text-[10px] font-black uppercase tracking-widest">Role</label>
                 <input type="text" name="subject_role" value={formData.subject_role} onChange={handleChange}
-                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none" placeholder="Director" />
+                  className="w-full bg-background border-[3px] border-foreground p-3 text-sm" placeholder="Director" />
               </div>
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-black uppercase tracking-widest">Pull Quote</label>
               <textarea name="pull_quote" value={formData.pull_quote} onChange={handleChange} rows={2}
-                className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none resize-none" placeholder="A memorable quote from the subject" />
+                className="w-full bg-background border-[3px] border-foreground p-3 text-sm resize-none" placeholder="A memorable quote from the subject" />
             </div>
             <ImagePicker
               label="Subject Photo"
@@ -397,7 +397,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
             value={formData.excerpt}
             onChange={handleChange}
             rows={3}
-            className="w-full bg-background border-[3px] border-foreground p-4 font-medium focus:outline-none focus:ring-0 resize-none"
+            className="w-full bg-background border-[3px] border-foreground p-4 font-medium focus:ring-0 resize-none"
             placeholder={type === 'news' ? 'Lead paragraph...' : 'Write a short summary...'}
           />
         </div>
@@ -423,7 +423,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
             name="content"
             value={formData.content}
             onChange={handleChange}
-            className="w-full h-full min-h-[500px] bg-background border-[3px] border-foreground p-6 font-mono text-sm focus:outline-none focus:ring-0 leading-relaxed"
+            className="w-full h-full min-h-[500px] bg-background border-[3px] border-foreground p-6 font-mono text-sm focus:ring-0 leading-relaxed"
             placeholder="# Write here using Markdown..."
           />
         </div>
@@ -439,7 +439,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
               name="seo_title"
               value={formData.seo_title}
               onChange={handleChange}
-              className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none"
+              className="w-full bg-background border-[3px] border-foreground p-3 text-sm"
             />
           </div>
 
@@ -450,7 +450,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
               value={formData.seo_description}
               onChange={handleChange}
               rows={2}
-              className="w-full bg-background border-[3px] border-foreground p-3 text-sm focus:outline-none resize-none"
+              className="w-full bg-background border-[3px] border-foreground p-3 text-sm resize-none"
             />
           </div>
         </div>
@@ -482,7 +482,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
               <div className="px-5 pt-4 pb-2">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">Publish Readiness</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Publish Readiness</span>
                   <span className="font-black text-sm text-foreground">{score}%</span>
                 </div>
                 <div className="w-full h-2 bg-muted border-[2px] border-foreground/20">
@@ -499,11 +499,11 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
                         ? <AlertCircle size={15} className="text-amber-500 shrink-0" strokeWidth={2.5} />
                         : <XCircle size={15} className="text-red-400 shrink-0" strokeWidth={2.5} />
                     }
-                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 ${done ? 'text-foreground' : 'text-foreground/60'}`}>
+                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 ${done ? 'text-foreground' : 'text-muted-foreground'}`}>
                       {label}
                     </span>
                     {!done && hint && (
-                      <span className="text-[9px] font-bold text-foreground/35 uppercase tracking-wider">{hint}</span>
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{hint}</span>
                     )}
                   </div>
                 ))}
@@ -569,7 +569,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase tracking-widest">Visibility Status</label>
-            <select name="status" value={formData.status} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase focus:outline-none">
+            <select name="status" value={formData.status} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase">
               <option value="draft">Draft</option>
               <option value="published">Published</option>
               <option value="archived">Archived</option>
@@ -578,7 +578,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase tracking-widest">Workflow State</label>
-            <select name="workflow_status" value={formData.workflow_status} onChange={handleChange} className="w-full bg-primary text-foreground border-[3px] border-foreground p-3 text-xs font-black uppercase focus:outline-none">
+            <select name="workflow_status" value={formData.workflow_status} onChange={handleChange} className="w-full bg-primary text-foreground border-[3px] border-foreground p-3 text-xs font-black uppercase">
               <option value="idea">Idea</option>
               <option value="research">Research</option>
               <option value="draft">Draft</option>
@@ -590,7 +590,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase tracking-widest">Assignee</label>
-            <select name="assignee_id" value={formData.assignee_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase focus:outline-none">
+            <select name="assignee_id" value={formData.assignee_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase">
               <option value="">Unassigned</option>
               {authors.map(author => (
                 <option key={author.id} value={author.id}>{author.name}</option>
@@ -600,7 +600,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase tracking-widest">Priority</label>
-            <select name="priority" value={formData.priority} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase focus:outline-none">
+            <select name="priority" value={formData.priority} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase">
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
@@ -612,7 +612,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
             <>
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase tracking-widest">Movie</label>
-                <select name="movie_id" value={formData.movie_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase focus:outline-none">
+                <select name="movie_id" value={formData.movie_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase">
                   <option value="">No Movie Linked</option>
                   {movies.map(movie => (
                     <option key={movie.id} value={movie.id}>{movie.title}</option>
@@ -620,25 +620,25 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
                 </select>
               </div>
               <div className="border-t-[2px] border-foreground/20 pt-4 flex flex-col gap-4">
-                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Rating Breakdown</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Rating Breakdown</span>
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest">OP Score (0–5)</label>
                   <input type="number" name="rating" value={formData.rating} onChange={handleChange} min="0" max="5" step="0.1" placeholder="e.g. 4.5"
-                    className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold focus:outline-none" />
+                    className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold" />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest">IMDb Score (0–10)</label>
                   <input type="number" name="imdb_score" value={formData.imdb_score} onChange={handleChange} min="0" max="10" step="0.1" placeholder="e.g. 8.1"
-                    className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold focus:outline-none" />
+                    className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold" />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest">Rotten Tomatoes (0–100)</label>
                   <input type="number" name="rt_score" value={formData.rt_score} onChange={handleChange} min="0" max="100" step="1" placeholder="e.g. 93"
-                    className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold focus:outline-none" />
+                    className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold" />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest">Verdict</label>
-                  <select name="verdict" value={formData.verdict} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase focus:outline-none">
+                  <select name="verdict" value={formData.verdict} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase">
                     {VERDICTS.map(v => <option key={v.value} value={v.value}>{v.label}</option>)}
                   </select>
                 </div>
@@ -648,7 +648,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase tracking-widest">Category</label>
-            <select name="category_id" value={formData.category_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase focus:outline-none">
+            <select name="category_id" value={formData.category_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase">
               <option value="">Select Category</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -658,7 +658,7 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black uppercase tracking-widest">Author</label>
-            <select name="author_id" value={formData.author_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase focus:outline-none">
+            <select name="author_id" value={formData.author_id} onChange={handleChange} className="w-full bg-background border-[3px] border-foreground p-3 text-xs font-bold uppercase">
               <option value="">Select Author</option>
               {authors.map(author => (
                 <option key={author.id} value={author.id}>{author.name}</option>

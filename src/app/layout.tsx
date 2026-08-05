@@ -44,6 +44,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${headingFont.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <ThemeProvider>
           <NextTopLoader
             color="#E2BFCA"
@@ -55,7 +56,7 @@ export default function RootLayout({
           />
           <AutoAds />
           <Navbar />
-          <main className="flex-1">
+          <main id="main-content" className="flex-1">
             {children}
           </main>
           <Footer />

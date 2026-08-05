@@ -28,14 +28,14 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
         </div>
         <div className="flex-1 min-w-0 p-3 flex flex-col justify-between bg-background">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50 mb-1 truncate">
+            <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 truncate">
               {article.categories?.name || article.type}
             </div>
             <h3 className="font-heading text-sm font-black uppercase leading-tight text-foreground line-clamp-2 group-hover:text-primary transition-colors">
               {article.title}
             </h3>
           </div>
-          <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40 mt-2 truncate">{date}</div>
+          <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-2 truncate">{date}</div>
         </div>
       </Link>
     )
@@ -44,11 +44,11 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
   if (variant === 'compact') {
     return (
       <Link href={href} prefetch={false} className="group block py-4 border-b-[2px] border-foreground last:border-b-0 hover:bg-muted/30 transition-colors px-2">
-        <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50 mb-1">{article.categories?.name || article.type}</div>
+        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">{article.categories?.name || article.type}</div>
         <h3 className="font-heading text-lg font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
           {article.title}
         </h3>
-        <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40 mt-1.5">{date}</div>
+        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-1.5">{date}</div>
       </Link>
     )
   }
@@ -65,7 +65,7 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
           />
         ) : (
           <div className="w-full h-full bg-secondary flex items-center justify-center p-8">
-            <span className="font-heading text-3xl font-black text-foreground/20 uppercase text-center leading-tight">
+            <span className="font-heading text-3xl font-black text-foreground/60 uppercase text-center leading-tight">
               {article.title}
             </span>
           </div>
@@ -85,14 +85,14 @@ export default function ArticleCard({ article, variant = 'default', accentColor 
       {/* Content — grows to fill, byline pinned to bottom */}
       <div className="p-5 bg-background flex flex-col gap-2 flex-1">
         {article.categories && (
-          <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50">
+          <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
             {article.categories.name}
           </div>
         )}
         <h3 className="font-heading text-xl font-black uppercase leading-tight text-foreground line-clamp-2 group-hover:text-primary transition-colors">
           {article.title}
         </h3>
-        <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-foreground/40 pt-1 border-t-[2px] border-foreground/10 mt-auto">
+        <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-muted-foreground pt-1 border-t-[2px] border-foreground/10 mt-auto">
           <span>{article.authors?.name || 'Editorial'}</span>
           <span>{date}</span>
         </div>

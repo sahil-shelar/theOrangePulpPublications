@@ -142,13 +142,13 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                           <img src={poster} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         ) : (
                           <div className="w-full h-full bg-accent flex items-center justify-center p-3">
-                            <span className="font-heading text-xs font-black uppercase text-center text-foreground/60 leading-tight">{title}</span>
+                            <span className="font-heading text-xs font-black uppercase text-center text-muted-foreground leading-tight">{title}</span>
                           </div>
                         )}
                       </div>
                       <div>
                         <h3 className="font-heading text-sm font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">{title}</h3>
-                        {work.note && <div className="text-[10px] font-bold text-foreground/50 mt-0.5 line-clamp-2">{work.note}</div>}
+                        {work.note && <div className="text-[10px] font-bold text-muted-foreground mt-0.5 line-clamp-2">{work.note}</div>}
                       </div>
                     </Wrapper>
                   );
@@ -196,7 +196,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                         <div className="w-16 h-12 shrink-0 border-[2px] border-foreground bg-muted" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40 mb-0.5">{art.type}</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
                         <h4 className="font-heading text-sm font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">{art.title}</h4>
                       </div>
                     </Link>

@@ -78,13 +78,13 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
       <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-primary p-4 border-[3px] border-foreground brutal-card">
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input 
               type="text" 
               placeholder="Search files..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-background border-[3px] border-foreground pl-10 pr-4 py-2 text-sm font-bold focus:outline-none"
+              className="w-full bg-background border-[3px] border-foreground pl-10 pr-4 py-2 text-sm font-bold"
             />
           </div>
           <div className="flex border-[3px] border-foreground bg-background">
@@ -162,10 +162,10 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
                   <td className="p-4 font-bold text-sm truncate max-w-[200px]">
                     {file.file_name.split('_').pop()}
                   </td>
-                  <td className="p-4 hidden md:table-cell text-xs font-black uppercase tracking-widest text-foreground/50">
+                  <td className="p-4 hidden md:table-cell text-xs font-black uppercase tracking-widest text-muted-foreground">
                     {file.mime_type}
                   </td>
-                  <td className="p-4 hidden md:table-cell text-xs font-black uppercase tracking-widest text-foreground/50">
+                  <td className="p-4 hidden md:table-cell text-xs font-black uppercase tracking-widest text-muted-foreground">
                     {(file.size_bytes / 1024 / 1024).toFixed(2)} MB
                   </td>
                   <td className="p-4">
@@ -186,7 +186,7 @@ export default function MediaLibraryManager({ initialFiles }: { initialFiles: Me
       )}
 
       {filteredFiles.length === 0 && (
-        <div className="brutal-card bg-background p-16 text-center font-black uppercase tracking-widest text-foreground/50">
+        <div className="brutal-card bg-background p-16 text-center font-black uppercase tracking-widest text-muted-foreground">
           No media files found.
         </div>
       )}

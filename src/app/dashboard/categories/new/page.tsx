@@ -13,17 +13,17 @@ export default function NewCategoryPage() {
       <form action={createCategory} className="space-y-6 brutal-card bg-background p-8">
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase tracking-widest text-foreground">Category Name</label>
-          <input type="text" name="name" required className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none" />
+          <input type="text" name="name" required className="w-full bg-background border-[3px] border-foreground p-3 font-bold" />
         </div>
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase tracking-widest text-foreground">URL Slug</label>
-          <input type="text" name="slug" required className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none font-mono text-sm" placeholder="e.g. movie-reviews" />
+          <input type="text" name="slug" required className="w-full bg-background border-[3px] border-foreground p-3 font-bold font-mono text-sm" placeholder="e.g. movie-reviews" />
         </div>
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase tracking-widest text-foreground">Description</label>
-          <textarea name="description" rows={4} className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none" />
+          <textarea name="description" rows={4} className="w-full bg-background border-[3px] border-foreground p-3 font-bold" />
         </div>
         
         <div className="pt-4 border-t-[3px] border-foreground">

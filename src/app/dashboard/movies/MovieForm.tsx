@@ -59,7 +59,7 @@ export default function MovieForm({ initialData }: { initialData?: MovieData }) 
     })
   }
 
-  const inputClass = 'w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none text-sm'
+  const inputClass = 'w-full bg-background border-[3px] border-foreground p-3 font-bold text-sm'
   const labelClass = 'text-[10px] font-black uppercase tracking-widest text-foreground'
 
   return (

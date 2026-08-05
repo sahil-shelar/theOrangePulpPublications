@@ -97,7 +97,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
       {/* Intro prose */}
       {article.content && (
         <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-10 pb-2">
-          <div className="prose prose-base prose-p:font-medium prose-p:text-foreground/70 prose-em:text-foreground/55 prose-strong:font-black max-w-2xl">
+          <div className="prose prose-base prose-p:font-medium prose-p:text-foreground/70 prose-em:text-muted-foreground prose-strong:font-black max-w-2xl">
             <ReactMarkdown>{article.content}</ReactMarkdown>
           </div>
         </div>
@@ -117,7 +117,9 @@ export default async function ListDetailView({ article }: { article: ArticleWith
 
               return (
                 <Wrapper key={item.id} href={href ?? undefined} className="group flex gap-4 sm:gap-6 py-6 hover:bg-muted/30 transition-colors">
-                  <span className="font-heading text-4xl sm:text-5xl font-black text-foreground/25 w-14 sm:w-16 shrink-0 text-center pt-1">
+                  {/* Faint watermark numeral: /60 is the lowest tier that clears
+                      3:1 for large text in both themes (3.49 light / 4.87 dark). */}
+                  <span className="font-heading text-4xl sm:text-5xl font-black text-foreground/60 w-14 sm:w-16 shrink-0 text-center pt-1">
                     {String(item.rank).padStart(2, "0")}
                   </span>
 
@@ -126,7 +128,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                       <img src={poster} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
                       <div className="w-full h-full bg-primary flex items-center justify-center p-1">
-                        <span className="font-heading text-[9px] font-black uppercase text-center text-foreground/60 leading-tight">{title}</span>
+                        <span className="font-heading text-[9px] font-black uppercase text-center text-muted-foreground leading-tight">{title}</span>
                       </div>
                     )}
                   </div>
@@ -136,15 +138,15 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                       <h3 className="font-heading text-lg sm:text-xl font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors">
                         {title}
                       </h3>
-                      {year && <span className="text-[10px] font-bold text-foreground/40">{year}</span>}
+                      {year && <span className="text-[10px] font-bold text-muted-foreground">{year}</span>}
                     </div>
 
                     {rating != null && (
                       <div className="flex items-center gap-0.5 mt-1.5">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className={`text-sm ${i < Math.round(rating) ? 'text-foreground' : 'text-foreground/20'}`}>★</span>
+                          <span key={i} className={`text-sm ${i < Math.round(rating) ? 'text-foreground' : 'text-muted-foreground'}`}>★</span>
                         ))}
-                        <span className="text-[10px] font-black text-foreground/40 ml-1">{rating}/5</span>
+                        <span className="text-[10px] font-black text-muted-foreground ml-1">{rating}/5</span>
                       </div>
                     )}
 
@@ -201,7 +203,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
                         <div className="w-16 h-12 shrink-0 border-[2px] border-foreground bg-muted" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40 mb-0.5">{art.type}</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
                         <h4 className="font-heading text-sm font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">{art.title}</h4>
                       </div>
                     </Link>

@@ -11,7 +11,7 @@ export default async function TagsDashboardPage() {
     <div className="p-6 md:p-8 max-w-4xl">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Taxonomy</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Taxonomy</p>
           <h1 className="font-heading text-4xl font-black uppercase text-foreground">Tags</h1>
         </div>
         <Link href="/dashboard/tags/new" className="brutal-button px-5 py-3 flex items-center justify-center gap-2 text-xs">
@@ -32,7 +32,7 @@ export default async function TagsDashboardPage() {
           <tbody>
             {tags.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-10 text-center font-bold text-foreground/40 uppercase tracking-widest text-xs">
+                <td colSpan={4} className="p-10 text-center font-bold text-muted-foreground uppercase tracking-widest text-xs">
                   No tags yet
                 </td>
               </tr>
@@ -40,12 +40,12 @@ export default async function TagsDashboardPage() {
               <tr key={tag.id} className="border-t-[3px] border-foreground hover:bg-muted transition-colors">
                 <td className="p-3.5">
                   <span className="flex items-center gap-1.5 font-bold text-sm">
-                    <Hash size={13} className="text-foreground/40" />
+                    <Hash size={13} className="text-muted-foreground" />
                     {tag.name}
                   </span>
                 </td>
-                <td className="p-3.5 hidden md:table-cell text-[10px] font-black tracking-widest text-foreground/50">{tag.slug}</td>
-                <td className="p-3.5 hidden lg:table-cell text-xs font-medium text-foreground/60 max-w-[180px] truncate">
+                <td className="p-3.5 hidden md:table-cell text-[10px] font-black tracking-widest text-muted-foreground">{tag.slug}</td>
+                <td className="p-3.5 hidden lg:table-cell text-xs font-medium text-muted-foreground max-w-[180px] truncate">
                   {tag.description || '—'}
                 </td>
                 <td className="p-3.5 text-right">

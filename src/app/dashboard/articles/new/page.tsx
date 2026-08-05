@@ -19,7 +19,7 @@ export default function NewArticleTypePickerPage() {
 
       <div className="max-w-5xl mx-auto">
         <h1 className="font-heading text-3xl md:text-4xl font-black uppercase tracking-tighter mb-2">New Article</h1>
-        <p className="text-sm font-medium text-foreground/60 mb-8">Pick a type — each has its own fields and page layout. This can't be changed after creation.</p>
+        <p className="text-sm font-medium text-muted-foreground mb-8">Pick a type — each has its own fields and page layout. This can't be changed after creation.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {TYPES.map(({ type, label, desc, icon: Icon }) => (
@@ -30,7 +30,7 @@ export default function NewArticleTypePickerPage() {
             >
               <Icon size={28} strokeWidth={2} />
               <h2 className="font-heading text-xl font-black uppercase tracking-tight">{label}</h2>
-              <p className="text-xs font-bold text-foreground/60 group-hover:text-foreground/80">{desc}</p>
+              <p className="text-xs font-bold text-muted-foreground group-hover:text-foreground/80">{desc}</p>
             </Link>
           ))}
         </div>

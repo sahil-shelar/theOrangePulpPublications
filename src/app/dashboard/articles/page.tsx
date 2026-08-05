@@ -27,7 +27,7 @@ export default async function ArticlesPage({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Content</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Content</p>
           <h1 className="font-heading text-4xl font-black uppercase tracking-tighter text-foreground">Articles</h1>
         </div>
         <Link href="/dashboard/articles/new" className="brutal-button px-5 py-3 text-xs flex items-center gap-2 bg-primary">
@@ -44,7 +44,7 @@ export default async function ArticlesPage({
             name="q"
             placeholder="Search articles…"
             defaultValue={q}
-            className="flex-1 bg-background border-[3px] border-foreground px-3 py-2 font-bold text-sm focus:outline-none"
+            className="flex-1 bg-background border-[3px] border-foreground px-3 py-2 font-bold text-sm"
           />
           <button type="submit" className="bg-foreground text-background px-4 py-2 font-black uppercase text-[10px] border-[3px] border-foreground hover:bg-primary hover:text-foreground transition-colors">
             Search
@@ -85,14 +85,14 @@ export default async function ArticlesPage({
           <tbody>
             {(!articles || articles.length === 0) ? (
               <tr>
-                <td colSpan={6} className="p-10 text-center font-bold text-foreground/40 uppercase tracking-widest text-xs">
+                <td colSpan={6} className="p-10 text-center font-bold text-muted-foreground uppercase tracking-widest text-xs">
                   No articles found
                 </td>
               </tr>
             ) : articles.map((article: any) => (
               <tr key={article.id} className="border-t-[3px] border-foreground hover:bg-muted transition-colors">
                 <td className="p-3.5 font-bold text-sm max-w-[280px] truncate">{article.title}</td>
-                <td className="p-3.5 text-[10px] font-black uppercase tracking-widest text-foreground/60">{article.type}</td>
+                <td className="p-3.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">{article.type}</td>
                 <td className="p-3.5 text-[10px] font-bold uppercase tracking-wider text-foreground/70">{article.categories?.name || '—'}</td>
                 <td className="p-3.5">
                   <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 border-[2px] border-foreground ${article.status === 'published' ? 'bg-primary' : 'bg-muted'}`}>

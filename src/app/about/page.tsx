@@ -12,7 +12,7 @@ export default function AboutPage() {
       {/* Header */}
       <div className="border-b-[4px] border-foreground bg-primary">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-3">Who We Are</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-3">Who We Are</p>
           <h1 className="font-heading text-6xl md:text-8xl font-black uppercase text-foreground leading-none">
             About
           </h1>
@@ -45,7 +45,7 @@ export default function AboutPage() {
 
         {/* Sidebar stats */}
         <div className="md:col-span-5 space-y-0">
-          <h2 className="font-heading text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-6">By The Numbers</h2>
+          <h2 className="font-heading text-sm font-black uppercase tracking-[0.2em] text-muted-foreground mb-6">By The Numbers</h2>
           {[
             ["500+", "Reviews Published"],
             ["50+", "Writers & Contributors"],
@@ -54,7 +54,7 @@ export default function AboutPage() {
           ].map(([stat, label]) => (
             <div key={label} className="border-[3px] border-foreground border-b-0 last:border-b-[3px] px-6 py-5 flex items-center justify-between">
               <span className="font-heading text-3xl font-black uppercase text-foreground">{stat}</span>
-              <span className="text-xs font-black uppercase tracking-widest text-foreground/50">{label}</span>
+              <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">{label}</span>
             </div>
           ))}
         </div>
@@ -72,7 +72,7 @@ export default function AboutPage() {
             ].map(({ title, body }) => (
               <div key={title} className="border-[3px] border-foreground border-r-0 last:border-r-[3px] p-8">
                 <h3 className="font-heading text-lg font-black uppercase text-foreground mb-3">{title}</h3>
-                <p className="text-sm text-foreground/65 leading-relaxed">{body}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
               </div>
             ))}
           </div>

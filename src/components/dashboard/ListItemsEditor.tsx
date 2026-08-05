@@ -47,7 +47,7 @@ export default function ListItemsEditor({ movies, items, onChange }: Props) {
             <div key={index} className="p-4 flex flex-col gap-3 bg-background">
               <div className="flex items-start gap-3">
                 <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
-                  <span className="font-heading font-black text-lg text-foreground/40 w-6 text-center">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="font-heading font-black text-lg text-muted-foreground w-6 text-center">{String(index + 1).padStart(2, '0')}</span>
                   <div className="flex gap-1">
                     <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronUp size={12} /></button>
                     <button type="button" onClick={() => move(index, 1)} disabled={index === items.length - 1} className="p-1 border-[2px] border-foreground disabled:opacity-20 hover:bg-muted"><ChevronDown size={12} /></button>
@@ -59,7 +59,7 @@ export default function ListItemsEditor({ movies, items, onChange }: Props) {
                     <select
                       value={item.movie_id ?? ''}
                       onChange={e => update(index, { movie_id: e.target.value || null, custom_title: e.target.value ? '' : item.custom_title })}
-                      className="flex-1 bg-background border-[2px] border-foreground p-2 text-xs font-bold uppercase focus:outline-none min-w-0"
+                      className="flex-1 bg-background border-[2px] border-foreground p-2 text-xs font-bold uppercase min-w-0"
                     >
                       <option value="">— Custom title (no movie link) —</option>
                       {movies.map(m => (
@@ -71,7 +71,7 @@ export default function ListItemsEditor({ movies, items, onChange }: Props) {
                       placeholder="Rating"
                       value={item.item_rating}
                       onChange={e => update(index, { item_rating: e.target.value })}
-                      className="w-24 bg-background border-[2px] border-foreground p-2 text-xs font-bold focus:outline-none shrink-0"
+                      className="w-24 bg-background border-[2px] border-foreground p-2 text-xs font-bold shrink-0"
                     />
                     <button type="button" onClick={() => remove(index)} className="p-2 border-[2px] border-foreground hover:bg-red-500 hover:text-white transition-colors shrink-0">
                       <X size={14} />
@@ -84,11 +84,11 @@ export default function ListItemsEditor({ movies, items, onChange }: Props) {
                       placeholder="Title (not in movie database)"
                       value={item.custom_title}
                       onChange={e => update(index, { custom_title: e.target.value })}
-                      className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-bold"
                     />
                   )}
                   {selectedMovie && (
-                    <div className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                       {selectedMovie.poster_url && <img src={selectedMovie.poster_url} alt="" className="w-5 h-7 object-cover border border-foreground" />}
                       Linked to movie database
                     </div>
@@ -99,7 +99,7 @@ export default function ListItemsEditor({ movies, items, onChange }: Props) {
                     value={item.blurb}
                     onChange={e => update(index, { blurb: e.target.value })}
                     rows={2}
-                    className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-medium focus:outline-none resize-none"
+                    className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-medium resize-none"
                   />
                 </div>
               </div>

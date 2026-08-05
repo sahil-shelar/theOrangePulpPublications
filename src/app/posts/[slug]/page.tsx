@@ -83,7 +83,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </div>
 
         {/* Article Ad Placeholder */}
-        <div className="my-12 w-full py-10 bg-muted border border-border flex flex-col items-center justify-center rounded-lg text-foreground/40 font-mono text-sm">
+        <div className="my-12 w-full py-10 bg-muted border border-border flex flex-col items-center justify-center rounded-lg text-muted-foreground font-mono text-sm">
           <span>[ In-Article Advertisement ]</span>
           <span className="text-xs mt-2">Support Independent Journalism</span>
         </div>

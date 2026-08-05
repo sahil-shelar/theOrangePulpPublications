@@ -9,7 +9,7 @@ export default async function SettingsPage() {
   return (
     <div className="p-6 md:p-8 max-w-4xl">
       <div className="mb-8">
-        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Admin</p>
+        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Admin</p>
         <h1 className="font-heading text-4xl font-black uppercase text-foreground">Settings</h1>
       </div>
 
@@ -21,12 +21,12 @@ export default async function SettingsPage() {
           <div className="space-y-6">
             <div className="flex flex-col gap-2">
               <label className="text-xs font-black uppercase tracking-widest text-foreground">Site Name</label>
-              <input type="text" name="site_name" defaultValue={settings.site_name} className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none" />
+              <input type="text" name="site_name" defaultValue={settings.site_name} className="w-full bg-background border-[3px] border-foreground p-3 font-bold" />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-xs font-black uppercase tracking-widest text-foreground">Site Description</label>
-              <textarea name="site_description" defaultValue={settings.site_description} rows={3} className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none" />
+              <textarea name="site_description" defaultValue={settings.site_description} rows={3} className="w-full bg-background border-[3px] border-foreground p-3 font-bold" />
             </div>
             
             <div className="flex items-center gap-4 border-[3px] border-foreground p-4 bg-secondary">

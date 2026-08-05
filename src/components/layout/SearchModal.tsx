@@ -96,17 +96,17 @@ export default function SearchModal({ onClose }: Props) {
 
           {/* Input row */}
           <div className="flex items-center gap-3 px-4 py-4 border-b-[3px] border-foreground">
-            <Search className="w-5 h-5 text-foreground/50 shrink-0" strokeWidth={2.5} />
+            <Search className="w-5 h-5 text-muted-foreground shrink-0" strokeWidth={2.5} />
             <input
               ref={inputRef}
               value={query}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               placeholder="Search reviews, news, spotlights…"
-              className="flex-1 bg-transparent text-foreground text-base font-bold placeholder:text-foreground/30 focus:outline-none"
+              className="flex-1 bg-transparent text-foreground text-base font-bold placeholder:text-muted-foreground"
             />
             {loading && (
-              <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40 animate-pulse">
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">
                 Searching…
               </span>
             )}
@@ -143,7 +143,7 @@ export default function SearchModal({ onClose }: Props) {
                         {r.type}
                       </span>
                       {r.categories && (
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/40">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
                           {r.categories.name}
                         </span>
                       )}
@@ -152,10 +152,10 @@ export default function SearchModal({ onClose }: Props) {
                       {r.title}
                     </p>
                     {r.authors && (
-                      <p className="text-[10px] font-bold text-foreground/45 mt-0.5">{r.authors.name}</p>
+                      <p className="text-[10px] font-bold text-muted-foreground mt-0.5">{r.authors.name}</p>
                     )}
                   </div>
-                  <ArrowRight size={14} className="shrink-0 text-foreground/30 group-hover:text-primary transition-colors" />
+                  <ArrowRight size={14} className="shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
                 </Link>
               ))}
             </div>
@@ -164,7 +164,7 @@ export default function SearchModal({ onClose }: Props) {
           {/* No results */}
           {query.length >= 2 && !loading && results.length === 0 && (
             <div className="px-6 py-8 text-center">
-              <p className="font-heading text-sm font-black uppercase text-foreground/40 tracking-widest">
+              <p className="font-heading text-sm font-black uppercase text-muted-foreground tracking-widest">
                 No results for "{query}"
               </p>
             </div>
@@ -173,7 +173,7 @@ export default function SearchModal({ onClose }: Props) {
           {/* Hint */}
           {query.length === 0 && (
             <div className="px-4 py-3 flex items-center gap-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 Type to search · ESC to close · ↑↓ navigate · Enter to open
               </span>
             </div>

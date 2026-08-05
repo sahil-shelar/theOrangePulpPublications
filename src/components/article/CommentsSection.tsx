@@ -71,7 +71,7 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
       ) : (
         <form onSubmit={handleSubmit} className="mb-12">
           {!user && visitorName && (
-            <div className="mb-3 text-xs font-black uppercase tracking-widest text-foreground/40">
+            <div className="mb-3 text-xs font-black uppercase tracking-widest text-muted-foreground">
               Commenting as <span className="text-primary">{visitorName}</span>
             </div>
           )}
@@ -80,7 +80,7 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="LEAVE A BRUTAL REVIEW..."
             rows={4}
-            className="w-full bg-background border-[4px] border-foreground p-4 font-bold text-foreground focus:outline-none focus:ring-0 resize-none shadow-[8px_8px_0_0_#173D2A] mb-4 uppercase"
+            className="w-full bg-background border-[4px] border-foreground p-4 font-bold text-foreground focus:ring-0 resize-none shadow-[8px_8px_0_0_#173D2A] mb-4 uppercase"
             required
           />
           <button
@@ -98,24 +98,24 @@ export default function CommentsSection({ articleId }: { articleId: string }) {
           <div key={comment.id} className="bg-background border-[3px] border-foreground p-6">
             <div className="flex justify-between items-start mb-4">
               <div className="font-black uppercase tracking-widest text-sm text-primary">{displayName(comment)}</div>
-              <div className="text-[10px] font-bold text-foreground/50">{new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</div>
+              <div className="text-[10px] font-bold text-muted-foreground">{new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</div>
             </div>
             <p className="font-medium text-foreground mb-6 leading-relaxed">{comment.content}</p>
             <div className="flex items-center gap-4 border-t-[2px] border-foreground/10 pt-4">
-              <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/60 hover:text-primary transition-colors">
+              <button className="flex items-center gap-1 text-xs font-black uppercase text-muted-foreground hover:text-primary transition-colors">
                 <ThumbsUp size={14} /> {comment.upvotes || 0}
               </button>
-              <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/60 hover:text-red-500 transition-colors">
+              <button className="flex items-center gap-1 text-xs font-black uppercase text-muted-foreground hover:text-red-500 transition-colors">
                 <ThumbsDown size={14} /> {comment.downvotes || 0}
               </button>
-              <button className="flex items-center gap-1 text-xs font-black uppercase text-foreground/40 hover:text-foreground transition-colors ml-auto">
+              <button className="flex items-center gap-1 text-xs font-black uppercase text-muted-foreground hover:text-foreground transition-colors ml-auto">
                 <Flag size={14} /> Report
               </button>
             </div>
           </div>
         ))}
         {!loading && comments.length === 0 && (
-          <div className="text-center font-bold text-foreground/50 py-12 border-[3px] border-dashed border-foreground/20">
+          <div className="text-center font-bold text-muted-foreground py-12 border-[3px] border-dashed border-foreground/20">
             NO COMMENTS YET. BE THE FIRST.
           </div>
         )}

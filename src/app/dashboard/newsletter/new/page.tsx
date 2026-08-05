@@ -21,7 +21,7 @@ export default function NewCampaignPage() {
             name="subject"
             required
             placeholder="e.g. This Week at The Orange Pulp"
-            className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none"
+            className="w-full bg-background border-[3px] border-foreground p-3 font-bold"
           />
         </div>
 
@@ -32,9 +32,9 @@ export default function NewCampaignPage() {
             rows={12}
             required
             placeholder="Write your newsletter content here…"
-            className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none resize-y font-mono text-sm"
+            className="w-full bg-background border-[3px] border-foreground p-3 font-bold resize-y font-mono text-sm"
           />
-          <p className="text-[9px] font-bold uppercase tracking-widest text-foreground/40">Saved as draft. Use the Send button in the campaign list to send.</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Saved as draft. Use the Send button in the campaign list to send.</p>
         </div>
 
         <div className="pt-4 border-t-[3px] border-foreground">

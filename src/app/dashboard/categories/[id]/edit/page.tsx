@@ -33,7 +33,7 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
             name="name"
             defaultValue={category.name}
             required
-            className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none"
+            className="w-full bg-background border-[3px] border-foreground p-3 font-bold"
           />
         </div>
 
@@ -44,7 +44,7 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
             name="slug"
             defaultValue={category.slug}
             required
-            className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none font-mono text-sm"
+            className="w-full bg-background border-[3px] border-foreground p-3 font-bold font-mono text-sm"
           />
         </div>
 
@@ -54,7 +54,7 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
             name="description"
             rows={4}
             defaultValue={category.description || ''}
-            className="w-full bg-background border-[3px] border-foreground p-3 font-bold focus:outline-none"
+            className="w-full bg-background border-[3px] border-foreground p-3 font-bold"
           />
         </div>
 

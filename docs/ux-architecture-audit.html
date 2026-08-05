@@ -1,0 +1,480 @@
+<title>UX &amp; Architecture Audit — The Orange Pulp</title>
+<style>
+  :root {
+    --bg: #F5EFE4;
+    --fg: #173D2A;
+    --card: #FFFFFF;
+    --muted: #EEE9DF;
+    --muted-fg: #3E6648;
+    --pink: #E2BFCA;
+    --yellow: #ECEA82;
+    --blue: #99B4C8;
+    --rule: #173D2A;
+    --sev-crit: #A8322A;
+    --sev-high: #B4671A;
+    --sev-med: #2F6E8F;
+    --sev-low: #4B6B57;
+    --ok: #2E6B3E;
+    --fail: #A8322A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12301F;
+      --fg: #F5EFE4;
+      --card: #1A3D28;
+      --muted: #1C4430;
+      --muted-fg: #A8C8B0;
+      --rule: #C8D6C4;
+      --sev-crit: #F09A90;
+      --sev-high: #F0BE7C;
+      --sev-med: #A8CEE4;
+      --sev-low: #A8C8B0;
+      --ok: #8DD2A0;
+      --fail: #F09A90;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12301F; --fg: #F5EFE4; --card: #1A3D28; --muted: #1C4430;
+    --muted-fg: #A8C8B0; --rule: #C8D6C4;
+    --sev-crit: #F09A90; --sev-high: #F0BE7C; --sev-med: #A8CEE4; --sev-low: #A8C8B0;
+    --ok: #8DD2A0; --fail: #F09A90;
+  }
+  :root[data-theme="light"] {
+    --bg: #F5EFE4; --fg: #173D2A; --card: #FFFFFF; --muted: #EEE9DF;
+    --muted-fg: #3E6648; --rule: #173D2A;
+    --sev-crit: #A8322A; --sev-high: #B4671A; --sev-med: #2F6E8F; --sev-low: #4B6B57;
+    --ok: #2E6B3E; --fail: #A8322A;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", ui-sans-serif, Inter, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display {
+    font-family: "Futura", "Century Gothic", "Avenir Next", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .label {
+    font-family: "Futura", "Century Gothic", "Avenir Next", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px;
+  }
+  a { color: inherit; }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.86em;
+    background: var(--muted);
+    padding: 1px 5px;
+    white-space: nowrap;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 28px; }
+
+  /* ── Masthead ── */
+  header.top { padding: 56px 0 32px; }
+  header.top .kicker { color: var(--muted-fg); }
+  header.top h1 { font-size: clamp(30px, 5vw, 50px); margin: 10px 0 14px; line-height: 1.02; text-wrap: balance; }
+  header.top p.lede { max-width: 62ch; font-size: 17px; color: var(--muted-fg); margin: 0; }
+  .constraint {
+    margin-top: 22px; border: 3px solid var(--rule); background: var(--yellow);
+    color: #173D2A; padding: 14px 18px; font-size: 14.5px; font-weight: 600;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .constraint b { font-weight: 800; }
+
+  /* ── Scoreboard ── */
+  .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border: 3px solid var(--rule); margin: 36px 0 8px; }
+  .board .cell { padding: 18px 20px; border-right: 3px solid var(--rule); background: var(--card); }
+  .board .cell:last-child { border-right: none; }
+  .board .cell .n { font-family: "Futura","Century Gothic","Avenir Next",system-ui,sans-serif; font-weight: 800; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .board .cell .k { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-fg); margin-top: 6px; }
+  .board .cell.crit .n { color: var(--sev-crit); }
+  .board .cell.high .n { color: var(--sev-high); }
+  .board .cell.med  .n { color: var(--sev-med); }
+  .board .cell.low  .n { color: var(--sev-low); }
+  .board-note { font-size: 13px; color: var(--muted-fg); margin: 0 0 44px; }
+
+  /* ── Sections ── */
+  h2.sec {
+    font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800;
+    border-bottom: 3px solid var(--rule); padding-bottom: 10px; margin: 56px 0 28px;
+  }
+
+  /* ── Finding ── */
+  .finding { border: 3px solid var(--rule); background: var(--card); margin-bottom: 22px; }
+  .finding > .head {
+    display: flex; gap: 14px; align-items: baseline; padding: 16px 20px;
+    border-bottom: 3px solid var(--rule);
+  }
+  .finding > .head .rank {
+    font-family: "Futura","Century Gothic","Avenir Next",system-ui,sans-serif;
+    font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums;
+    color: var(--muted-fg); flex: none; min-width: 30px;
+  }
+  .finding > .head h3 { margin: 0; font-size: 20px; flex: 1; line-height: 1.2; text-wrap: balance; }
+  .chip {
+    flex: none; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 9px; border: 2px solid currentColor;
+  }
+  .chip.crit { color: var(--sev-crit); }
+  .chip.high { color: var(--sev-high); }
+  .chip.med  { color: var(--sev-med); }
+  .chip.low  { color: var(--sev-low); }
+
+  .finding .body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .finding .body > div > .label { display: block; color: var(--muted-fg); margin-bottom: 5px; font-size: 11px; }
+  .finding .body p { margin: 0; }
+  .finding .body ul { margin: 0; padding-left: 20px; }
+  .finding .body li { margin-bottom: 4px; }
+  .measured {
+    border-left: 5px solid var(--blue); padding-left: 14px;
+  }
+  .fix { border-left: 5px solid var(--ok); padding-left: 14px; }
+
+  /* ── Table ── */
+  .tablewrap { overflow-x: auto; border: 3px solid var(--rule); background: var(--card); }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid color-mix(in srgb, var(--rule) 22%, transparent); }
+  th { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; color: var(--muted-fg); background: var(--muted); }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+  .v-fail { color: var(--fail); font-weight: 800; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .v-ok   { color: var(--ok);   font-weight: 800; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .v-warn { color: var(--sev-high); font-weight: 800; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .swatch { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--rule); vertical-align: -2px; margin-right: 7px; }
+  .caption { font-size: 13px; color: var(--muted-fg); margin: 10px 0 0; }
+
+  /* ── Sequence ── */
+  ol.seq { counter-reset: s; list-style: none; padding: 0; margin: 0; border: 3px solid var(--rule); }
+  ol.seq li {
+    counter-increment: s; display: flex; gap: 16px; padding: 16px 20px;
+    border-bottom: 1px solid color-mix(in srgb, var(--rule) 22%, transparent);
+    background: var(--card);
+  }
+  ol.seq li:last-child { border-bottom: none; }
+  ol.seq li::before {
+    content: counter(s); flex: none;
+    font-family: "Futura","Century Gothic","Avenir Next",system-ui,sans-serif;
+    font-weight: 800; font-size: 17px; color: var(--muted-fg); min-width: 24px;
+    font-variant-numeric: tabular-nums;
+  }
+  ol.seq li .t { font-weight: 700; }
+  ol.seq li .d { color: var(--muted-fg); font-size: 14px; }
+
+  footer.end { border-top: 3px solid var(--rule); margin-top: 56px; padding: 24px 0 80px; }
+  footer.end p { font-size: 13.5px; color: var(--muted-fg); max-width: 74ch; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="kicker label">The Orange Pulp · Engineering Audit · Aug 2026</div>
+    <h1 class="display">What to fix, in what order, and the numbers behind each call</h1>
+    <p class="lede">A measured pass over design, color, accessibility, and architecture across 177 source files. Every finding below is backed by a count or a computed value from this codebase — nothing here is a matter of taste.</p>
+
+    <div class="constraint">
+      <span>🔒</span>
+      <span><b>The palette is not a finding.</b> Every real token passes WCAG AA or better in both themes — cream/green 10.56:1, green on pink 7.22:1, green on yellow 9.59:1, green on blue 5.59:1. The color problem is the <em>opacity modifiers</em> layered on top of those tokens, and the fix introduces <b>zero new hues</b>.</span>
+    </div>
+  </header>
+
+  <div class="board">
+    <div class="cell crit"><div class="n">2</div><div class="k">Critical</div></div>
+    <div class="cell high"><div class="n">3</div><div class="k">High</div></div>
+    <div class="cell med"><div class="n">4</div><div class="k">Medium</div></div>
+    <div class="cell low"><div class="n">2</div><div class="k">Low / hygiene</div></div>
+  </div>
+  <p class="board-note">Ranked by impact × effort. The top two are mechanical fixes with sitewide reach — do those first regardless of what else gets scheduled.</p>
+
+  <h2 class="sec">Findings</h2>
+
+  <!-- 1 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">01</span>
+      <h3 class="display">Keyboard navigation is invisible on every page</h3>
+      <span class="chip crit">Critical</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p><code>focus:outline-none</code> appears <b>61 times</b>. <code>focus-visible</code> appears <b>0 times</b>. There is no skip-to-content link, and only 7 <code>aria-label</code>s exist across the entire app.</p>
+      </div>
+      <p>Focus rings are removed everywhere and never replaced. A keyboard or switch-device user tabbing through the nav, the search modal, the comment form, or any dashboard editor has no visual indication of where they are. This is the single most severe issue in the codebase and also among the cheapest to fix.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Add one global rule in <code>globals.css</code> using the <code>--ring</code> token that is <em>already defined and currently unused</em>: <code>:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }</code>. Then delete the 61 <code>focus:outline-none</code> instances — with <code>:focus-visible</code> in place, mouse clicks won't show a ring anyway, which is what those declarations were trying to achieve. Add a skip link in <code>layout.tsx</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">02</span>
+      <h3 class="display">All metadata text fails contrast, at sizes below the legibility floor</h3>
+      <span class="chip crit">Critical</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p><b>246 uses</b> of 9–10px type (140 × <code>text-[10px]</code>, 106 × <code>text-[9px]</code>). <b>193 uses</b> of <code>text-foreground/20</code>–<code>/60</code>, every one of which computes below 4.5:1 against the background.</p>
+      </div>
+      <p>Bylines, dates, categories, view counts, rank labels, and every dashboard field label are rendered at 9–10px in a colour that measures as low as 1.43:1. These are compounding failures: undersized <em>and</em> under-contrast. Composite values below are the true alpha blend against <code>--background</code>, not an approximation.</p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Class</th><th>Renders as</th><th class="num">Light</th><th>Verdict</th><th class="num">Dark</th><th>Verdict</th><th class="num">Uses</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>foreground/20</code></td><td><span class="swatch" style="background:#c9cbbf"></span>#c9cbbf</td><td class="num">1.43</td><td><span class="v-fail">Fail</span></td><td class="num">1.76</td><td><span class="v-fail">Fail</span></td><td class="num">6</td></tr>
+            <tr><td><code>foreground/30</code></td><td><span class="swatch" style="background:#b2baac"></span>#b2baac</td><td class="num">1.75</td><td><span class="v-fail">Fail</span></td><td class="num">2.32</td><td><span class="v-fail">Fail</span></td><td class="num">15</td></tr>
+            <tr><td><code>foreground/40</code></td><td><span class="swatch" style="background:#9ca89a"></span>#9ca89a</td><td class="num">2.17</td><td><span class="v-fail">Fail</span></td><td class="num">3.02</td><td><span class="v-warn">Large only</span></td><td class="num">60</td></tr>
+            <tr><td><code>foreground/50</code></td><td><span class="swatch" style="background:#869687"></span>#869687</td><td class="num">2.73</td><td><span class="v-fail">Fail</span></td><td class="num">3.87</td><td><span class="v-warn">Large only</span></td><td class="num">81</td></tr>
+            <tr><td><code>foreground/60</code></td><td><span class="swatch" style="background:#708474"></span>#708474</td><td class="num">3.49</td><td><span class="v-warn">Large only</span></td><td class="num">4.87</td><td><span class="v-ok">AA</span></td><td class="num">31</td></tr>
+            <tr><td><code>foreground/70</code></td><td><span class="swatch" style="background:#5a7262"></span>#5a7262</td><td class="num">4.55</td><td><span class="v-ok">AA</span></td><td class="num">6.04</td><td><span class="v-ok">AA</span></td><td class="num">22</td></tr>
+            <tr><td><code>foreground/80</code></td><td><span class="swatch" style="background:#43614f"></span>#43614f</td><td class="num">6.02</td><td><span class="v-ok">AA</span></td><td class="num">7.37</td><td><span class="v-ok">AAA</span></td><td class="num">10</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption">"Large only" means it clears 3:1 — valid for 18px+ bold text, but every one of these sites is 9–11px. At the sizes actually used, <code>/20</code> through <code>/60</code> all fail. That is 193 of the 226 opacity usages.</p>
+
+      <div class="fix">
+        <span class="label">Fix — validated, no new colours</span>
+        <p>Replace <code>text-foreground/20</code>–<code>/60</code> with the existing <code>--muted-foreground</code> token. Verified against all four surface combinations:</p>
+        <ul>
+          <li>Light <code>#3E6648</code> on background — <b>5.74:1 AA</b>; on <code>--muted</code> — <b>5.43:1 AA</b></li>
+          <li>Dark <code>#A8C8B0</code> on background — <b>6.65:1 AA</b>; on <code>--muted</code> — <b>6.02:1 AA</b></li>
+        </ul>
+        <p>One token swap clears both themes on both surfaces. Separately, raise the small-text floor from 9px to 12px — 9px is below what most users can read comfortably and is not recoverable by contrast alone.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">03</span>
+      <h3 class="display">No image optimization anywhere in the app</h3>
+      <span class="chip high">High</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p><b>0</b> imports of <code>next/image</code>. <b>40</b> raw <code>&lt;img&gt;</code> tags. No <code>width</code>/<code>height</code>, no <code>loading</code>, no <code>sizes</code> on any of them.</p>
+      </div>
+      <p>Three consequences, all user-facing: every image causes layout shift as it loads because no intrinsic dimensions are declared; nothing below the fold is lazy-loaded; and TMDB posters requested at <code>w780</code> and <code>original</code> are being painted into 64px-wide slots in the related-articles sidebar and 16px thumbnails on the homepage. On a phone connection the hero article page is downloading several megabytes it cannot use.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Convert to <code>next/image</code> with <code>remotePatterns</code> for <code>image.tmdb.org</code> and the Supabase storage host in <code>next.config.js</code>. Start with the three highest-traffic surfaces — <code>HeroArticle</code>, <code>ArticleCard</code>, and the ranked rows in <code>ListDetailView</code> — since those cover the LCP element on nearly every route. Request the appropriate TMDB size per slot rather than <code>original</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">04</span>
+      <h3 class="display">The type scale has no reading-size middle</h3>
+      <span class="chip high">High</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p>403 uses at ≤12px (9px, 10px, <code>text-xs</code>) · 129 at 14px · <b>13 at 16px</b> · then 25 at 18px, 23 at 20px, and 88 across 24–36px+.</p>
+      </div>
+      <p>The distribution is bimodal: tiny labels and huge headlines, with almost nothing in between. Outside of <code>prose</code> blocks there are only 13 instances of body-sized text in the whole app. That is why pages read as "labels and billboards" rather than as something with a comfortable middle register — and it is the underlying <em>design</em> reason the 9–10px metadata is doing so much work it shouldn't be doing.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Define an explicit scale as tokens — 12 / 14 / 16 / 18 / 24 / 32 / 48 / 64 — and use 16px as the default for anything a reader is meant to actually read (blurbs, notes, card descriptions, dashboard help text). Reserve ≤12px for genuine labels only. The brutalist identity lives in the weight, the uppercase, and the borders; it does not require starving the body copy.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">05</span>
+      <h3 class="display">Recommendations over-fetch full article bodies on every page render</h3>
+      <span class="chip high">High</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p><code>src/lib/services/recommendations.ts:12</code> — <code>select('*, categories(*), authors(*), movies(...)')</code> with <code>.limit(40)</code>, then scores in JavaScript and discards all but 4.</p>
+      </div>
+      <p><code>select('*')</code> on <code>articles</code> includes <code>content</code> — the entire markdown body of each article. Forty full article bodies are pulled over the wire to produce a four-item sidebar, on every review, news, spotlight, and list page. <code>getRelatedMovies</code> has the same shape at <code>.limit(50)</code>. It's cached for 300s so it isn't hitting the database on every request, but each cache miss transfers far more than it needs and the payload grows linearly as the archive does.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Project only the columns the sidebar renders: <code>id, title, slug, type, cover_image_url, category_id, movie_id, published_at, views_count</code>. That alone removes the body text. If the candidate pool later needs to grow past 40, move the scoring expression into a Postgres function so ranking happens where the data lives.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">06</span>
+      <h3 class="display">Search silently misses most of what users type</h3>
+      <span class="chip med">Medium</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured — probed against the live database</span>
+        <ul>
+          <li><code>title=wfts.odyssey</code> → returns "The odyssey" ✓</li>
+          <li><code>title=wfts.odys</code> → <b>returns nothing</b> — full-text matches whole words only, so as-you-type search finds nothing until a complete word is typed</li>
+          <li><code>title=wfts.villeneuve</code> (a word present in article bodies) → <b>returns nothing</b> — only <code>title</code> is searched</li>
+        </ul>
+      </div>
+      <p>Two corrections to what the code implies. First, the <code>textSearch</code> call does <em>not</em> error, so the <code>ilike</code> fallback branch in <code>searchArticles</code> is dead code that never executes. Second, because the search modal fires as the user types, the whole-word-only behaviour means the results panel stays empty through most of the typing. Separately: the <code>pg_trgm</code> GIN index intended for this is commented out in <code>20260719000001_performance_indexes.sql</code>, so the match is an unindexed per-row <code>to_tsvector</code> evaluation. Also a minor bug — <code>searchArticles(query, limit)</code> ignores its <code>limit</code> parameter and hardcodes 20 in both branches.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Add a generated <code>tsvector</code> column covering <code>title</code>, <code>excerpt</code>, and <code>content</code> with a GIN index, and query it with a prefix-matching tsquery (append <code>:*</code> to the final term) so typing "odys" matches. Remove the dead fallback branch and honour the <code>limit</code> argument.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">07</span>
+      <h3 class="display">Touch targets below the 44px minimum in the sticky header</h3>
+      <span class="chip med">Medium</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p><code>Navbar.tsx:71</code> — mobile menu toggle is <code>p-1.5</code> around a <code>w-5 h-5</code> icon ≈ <b>26px</b>. <code>Navbar.tsx:54</code> and <code>ThemeToggle</code> — <code>p-2</code> around <code>w-4 h-4</code> ≈ <b>32px</b>. Dashboard row actions at <code>p-1</code> with 12px icons ≈ <b>20px</b>.</p>
+      </div>
+      <p>All below the 44px guideline, and the mobile menu button is the primary navigation affordance on phones. The <code>h-16</code> header leaves room to grow them without changing the layout.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Set a <code>min-w-[44px] min-h-[44px]</code> floor on icon-only controls, centring the icon inside. The visible border can stay its current size — pad the hit area, not the outline, if you want to preserve the compact look.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">08</span>
+      <h3 class="display">Hero metadata sits on arbitrary images, where contrast can't be guaranteed</h3>
+      <span class="chip med">Medium</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p>Every detail view overlays <code>text-background/55</code> and <code>/65</code> on an editor-uploaded photo behind a <code>from-foreground/95 via-foreground/40 to-foreground/10</code> gradient. 44 uses of <code>text-background/NN</code> total.</p>
+      </div>
+      <p>Contrast here is not statically computable — it depends on whichever image an editor uploads. At <code>via-foreground/40</code> in the middle of the gradient, a light backdrop leaves byline and date text effectively unreadable, and the failure is invisible to whoever published the article because it depends on their specific image.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Raise the scrim floor where text actually sits — take the bottom stop to <code>/95</code> and the middle to <code>/70</code> — and lift the metadata opacity to <code>/80</code> minimum. For a guaranteed result regardless of image, put the byline row on a solid <code>--foreground</code> plate rather than directly on the gradient.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">09</span>
+      <h3 class="display">The homepage is the stalest page on the site</h3>
+      <span class="chip med">Medium</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p><code>src/app/page.tsx:12</code> — <code>revalidate = 3600</code>. Every listing page — <code>revalidate = 60</code>. Article detail — <code>60</code>.</p>
+      </div>
+      <p>A newly published article appears on <code>/reviews</code> within a minute but can take an hour to reach the homepage. For a publication whose front page is the main entry point, the highest-traffic surface has the longest lag. The underlying data functions are already cached at 300s, so the page-level hour buys very little.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Bring the homepage to <code>revalidate = 60</code> to match the listings, or call <code>revalidatePath('/')</code> on publish — which <code>createArticle</code> and <code>updateArticle</code> already do, meaning the 3600 mainly affects TMDB-driven sections. Either way the inconsistency should be deliberate rather than incidental.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">10</span>
+      <h3 class="display">Every listing is hard-capped at 20 items with no pagination</h3>
+      <span class="chip low">Low · pre-emptive</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p>No <code>searchParams</code>, <code>.range()</code>, or offset handling in any listing route. Current published article count: <b>3</b>.</p>
+      </div>
+      <p>Not a live problem — flagging it as a ceiling rather than a defect. Once the archive passes 20 articles of any type, older content becomes permanently unreachable through navigation, and it will only be discoverable via search and sitemap. There is also no <code>robots.ts</code>, though <code>sitemap.ts</code> exists.</p>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Worth building before the archive grows rather than after: <code>?page=</code> with <code>.range()</code> in the cached fetchers, or a "load more" cursor. Cheap now, a content-migration problem later. Add <code>robots.ts</code> pointing at the existing sitemap while you're there.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 -->
+  <div class="finding">
+    <div class="head">
+      <span class="rank">11</span>
+      <h3 class="display">Type checking is disabled across a fifth of the codebase</h3>
+      <span class="chip low">Low · hygiene</span>
+    </div>
+    <div class="body">
+      <div class="measured">
+        <span class="label">Measured</span>
+        <p><code>@ts-nocheck</code> in <b>39 of 177</b> source files (22%), including every file in <code>lib/api</code> and <code>lib/actions</code> — precisely the layer the generated database types exist to protect.</p>
+      </div>
+      <p>This is how <code>src/types/database.ts</code> drifted out of sync with the actual schema: the editorial-workflow migration added six columns in July that never reached the type file, and nothing complained because the files that consume those types have checking switched off. The types are doing no work where they matter most.</p>
+      <p>Related cleanup, all verified present:</p>
+      <ul>
+        <li>Orphaned route shells — <code>/posts/[slug]</code> reads MDX off the filesystem and is unreachable from any nav; <code>/spotlights</code> is a redirect stub</li>
+        <li><code>user_bookmarks</code> table plus RLS policies exist with <b>zero</b> UI referencing them</li>
+        <li><code>/person/[slug]</code> returns entirely fabricated data — <code>getPersonBySlug</code> synthesises a bio and filmography from the slug string</li>
+        <li>Stray files at repo root: <code>12.0.1</code> (an npm error artifact), <code>db-check.js</code>, <code>fix-supabase.js</code>, <code>test-supabase.js</code>, <code>query_schema.js</code></li>
+        <li>Two migrations both named <code>initial_schema</code>, the second being an ALTER patch</li>
+      </ul>
+      <div class="fix">
+        <span class="label">Fix</span>
+        <p>Regenerate <code>database.ts</code> from the live schema with <code>supabase gen types</code> rather than hand-maintaining it, then remove <code>@ts-nocheck</code> file by file starting with <code>lib/api</code> and <code>lib/actions</code>. Delete the stray root scripts and the orphaned routes; either build the bookmarks UI or drop the table.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec">What is already right</h2>
+  <div class="finding">
+    <div class="body">
+      <ul>
+        <li><b>The palette.</b> Every token clears AA or better in both themes. It is a genuinely distinctive scheme and it is correctly implemented at the token layer.</li>
+        <li><b>The repository/action split.</b> <code>lib/api</code> for reads, <code>lib/actions</code> for mutations, no direct Supabase calls in components. Consistently followed.</li>
+        <li><b>Caching discipline.</b> <code>unstable_cache</code> with tag-based invalidation, <code>cache()</code> for per-render dedup between <code>generateMetadata</code> and the page body. Well judged.</li>
+        <li><b>RLS coverage.</b> Enabled on every table, with the dev-era anon write policies properly revoked in <code>20260725000003_lockdown_rls_production</code>.</li>
+        <li><b>Role gating in server actions.</b> Writers can't publish, only admins delete — enforced server-side, not in the UI.</li>
+        <li><b>Loading and error boundaries.</b> <code>loading.tsx</code> and <code>error.tsx</code> present across routes, including <code>global-error.tsx</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="sec">Suggested order of work</h2>
+  <ol class="seq">
+    <li><div><div class="t">One CSS commit: focus rings + the token swap</div><div class="d">Global <code>:focus-visible</code> rule, skip link, and <code>foreground/20</code>–<code>/60</code> → <code>muted-foreground</code>. Fixes findings 01 and most of 02 across all 177 files with no component restructuring.</div></div></li>
+    <li><div><div class="t">Raise the type floor</div><div class="d">9px → 12px, and 16px for anything meant to be read. Findings 02 and 04. Mechanical, high perceived quality gain.</div></div></li>
+    <li><div><div class="t">Images on the three hottest surfaces</div><div class="d"><code>next/image</code> in <code>HeroArticle</code>, <code>ArticleCard</code>, <code>ListDetailView</code>. Finding 03 — biggest measurable Core Web Vitals move.</div></div></li>
+    <li><div><div class="t">Two query fixes</div><div class="d">Column projection in <code>recommendations.ts</code>; tsvector column + GIN index + prefix matching for search. Findings 05 and 06.</div></div></li>
+    <li><div><div class="t">Touch targets, hero scrim, homepage revalidate</div><div class="d">Findings 07–09. Small, independent, safe to ship together.</div></div></li>
+    <li><div><div class="t">Pagination before the archive needs it</div><div class="d">Finding 10 — cheap at 3 articles, awkward at 60.</div></div></li>
+    <li><div><div class="t">Regenerate types, then peel off @ts-nocheck</div><div class="d">Finding 11. Ongoing rather than a single task; start with <code>lib/</code>.</div></div></li>
+  </ol>
+
+  <footer class="end">
+    <p>Counts obtained by grep over <code>src/</code>; contrast values computed as true alpha composites (<code>fg·α + bg·(1−α)</code>) then WCAG 2.1 relative luminance, both themes, against <code>--background</code> and <code>--muted</code>; search behaviour probed directly against the linked Supabase project read-only. No source files were modified in producing this audit.</p>
+  </footer>
+</div>

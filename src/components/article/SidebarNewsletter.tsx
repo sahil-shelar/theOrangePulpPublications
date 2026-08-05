@@ -9,7 +9,7 @@ export default function SidebarNewsletter() {
     return (
       <div className="brutal-card bg-primary p-6">
         <p className="font-heading text-lg font-black uppercase text-foreground">You're in!</p>
-        <p className="text-xs font-bold text-foreground/60 mt-1 uppercase tracking-widest">Check your inbox.</p>
+        <p className="text-xs font-bold text-muted-foreground mt-1 uppercase tracking-widest">Check your inbox.</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export default function SidebarNewsletter() {
           type="email"
           placeholder="your@email.com"
           required
-          className="w-full bg-background border-[3px] border-foreground border-b-0 px-4 py-3 text-sm font-bold text-foreground focus:outline-none placeholder:text-foreground/40"
+          className="w-full bg-background border-[3px] border-foreground border-b-0 px-4 py-3 text-sm font-bold text-foreground placeholder:text-muted-foreground"
         />
         <button
           type="submit"

@@ -10,7 +10,7 @@ export function NewsletterForm() {
         type="email"
         placeholder="your@email.com"
         required
-        className="flex-1 bg-background/10 border-[3px] border-background/30 text-background placeholder:text-background/40 px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary"
+        className="flex-1 bg-background/10 border-[3px] border-background/30 text-background placeholder:text-background/40 px-4 py-3 text-sm font-bold focus:border-primary"
       />
       <button
         type="submit"

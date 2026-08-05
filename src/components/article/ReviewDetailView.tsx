@@ -163,25 +163,25 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
           )}
           {article.rating != null && (
             <div className="flex items-baseline gap-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">OP Score</span>
-              <span className="font-heading text-xl font-black text-foreground tabular-nums">{article.rating}<span className="text-xs text-foreground/40">/5</span></span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">OP Score</span>
+              <span className="font-heading text-xl font-black text-foreground tabular-nums">{article.rating}<span className="text-xs text-muted-foreground">/5</span></span>
             </div>
           )}
           {(article as any).imdb_score != null && (
             <div className="flex items-baseline gap-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">IMDb</span>
-              <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).imdb_score}<span className="text-xs text-foreground/40">/10</span></span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">IMDb</span>
+              <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).imdb_score}<span className="text-xs text-muted-foreground">/10</span></span>
             </div>
           )}
           {(article as any).rt_score != null && (
             <div className="flex items-baseline gap-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-foreground/50">Rotten Tomatoes</span>
-              <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).rt_score}<span className="text-xs text-foreground/40">%</span></span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Rotten Tomatoes</span>
+              <span className="font-heading text-xl font-black text-foreground tabular-nums">{(article as any).rt_score}<span className="text-xs text-muted-foreground">%</span></span>
             </div>
           )}
           {streamingPlatforms.length > 0 && (
             <div className="flex items-center gap-1.5 ml-auto">
-              <Play size={12} className="text-foreground/50" />
+              <Play size={12} className="text-muted-foreground" />
               <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70">
                 {streamingPlatforms.slice(0, 3).join(' · ')}
               </span>
@@ -250,7 +250,7 @@ export default async function ReviewDetailView({ article }: { article: ArticleWi
                         <div className="w-16 h-12 shrink-0 border-[2px] border-foreground bg-muted" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40 mb-0.5">{art.type}</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">{art.type}</div>
                         <h4 className="font-heading text-sm font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
                           {art.title}
                         </h4>

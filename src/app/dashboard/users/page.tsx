@@ -21,9 +21,9 @@ export default async function UsersDashboardPage() {
     <div className="p-6 md:p-8 max-w-5xl">
       {/* Header */}
       <div className="mb-8">
-        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Admin</p>
+        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Admin</p>
         <h1 className="font-heading text-4xl font-black uppercase text-foreground">Users</h1>
-        <p className="text-xs text-foreground/50 mt-1 font-bold uppercase tracking-widest">
+        <p className="text-xs text-muted-foreground mt-1 font-bold uppercase tracking-widest">
           {users.length} member{users.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -40,11 +40,11 @@ export default async function UsersDashboardPage() {
             name="email"
             required
             placeholder="colleague@email.com"
-            className="flex-1 bg-background border-[3px] border-foreground px-4 py-2.5 text-sm font-bold placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="flex-1 bg-background border-[3px] border-foreground px-4 py-2.5 text-sm font-bold placeholder:text-muted-foreground focus:ring-2 focus:ring-primary"
           />
           <select
             name="role"
-            className="bg-background border-[3px] border-foreground px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary uppercase tracking-widest"
+            className="bg-background border-[3px] border-foreground px-4 py-2.5 text-sm font-bold focus:ring-2 focus:ring-primary uppercase tracking-widest"
           >
             <option value="writer">Writer</option>
             <option value="editor">Editor</option>
@@ -54,7 +54,7 @@ export default async function UsersDashboardPage() {
             <Mail size={14} /> Send Invite
           </button>
         </form>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mt-3">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-3">
           Invitee receives a setup email. No public signup available.
         </p>
       </div>
@@ -68,14 +68,14 @@ export default async function UsersDashboardPage() {
         ].map(({ role, desc }) => (
           <div key={role} className="flex items-center gap-2 brutal-card bg-background px-3 py-2">
             <span className="text-[9px] font-black uppercase tracking-widest bg-foreground text-background px-2 py-0.5">{role}</span>
-            <span className="text-[10px] font-bold text-foreground/50 hidden sm:block">{desc}</span>
+            <span className="text-[10px] font-bold text-muted-foreground hidden sm:block">{desc}</span>
           </div>
         ))}
       </div>
 
       {/* Users table */}
       {listError ? (
-        <div className="brutal-card bg-background p-6 border-l-[4px] border-primary text-sm font-bold text-foreground/60">
+        <div className="brutal-card bg-background p-6 border-l-[4px] border-primary text-sm font-bold text-muted-foreground">
           Could not load users: {listError}
         </div>
       ) : (
@@ -87,7 +87,7 @@ export default async function UsersDashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
-                <tr className="border-b-[3px] border-foreground text-[9px] font-black uppercase tracking-widest bg-muted text-foreground/60">
+                <tr className="border-b-[3px] border-foreground text-[9px] font-black uppercase tracking-widest bg-muted text-muted-foreground">
                   <th className="p-3.5">Email</th>
                   <th className="p-3.5">Role</th>
                   <th className="p-3.5 hidden sm:table-cell">Status</th>
@@ -98,7 +98,7 @@ export default async function UsersDashboardPage() {
               <tbody>
                 {sorted.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-10 text-center font-bold text-foreground/40 uppercase tracking-widest text-xs">
+                    <td colSpan={5} className="p-10 text-center font-bold text-muted-foreground uppercase tracking-widest text-xs">
                       No users found
                     </td>
                   </tr>

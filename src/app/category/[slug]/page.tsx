@@ -35,12 +35,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       {/* Header */}
       <div className="border-b-[4px] border-foreground bg-primary">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-16">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/40 mb-2">Category</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">Category</p>
           <h1 className="font-heading text-6xl md:text-8xl font-black uppercase text-foreground leading-none mb-4">
             {category.name}
           </h1>
           {category.description && (
-            <p className="text-base font-bold text-foreground/60 max-w-xl">{category.description}</p>
+            <p className="text-base font-bold text-muted-foreground max-w-xl">{category.description}</p>
           )}
         </div>
       </div>
@@ -50,7 +50,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         {/* Articles */}
         <div className="lg:col-span-8">
           {articles.length === 0 ? (
-            <div className="py-20 text-center font-bold uppercase tracking-widest text-foreground/40 border-[3px] border-dashed border-foreground/20 bg-muted">
+            <div className="py-20 text-center font-bold uppercase tracking-widest text-muted-foreground border-[3px] border-dashed border-foreground/20 bg-muted">
               No articles in this category yet.
             </div>
           ) : (
@@ -80,7 +80,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                         {featured.excerpt && (
                           <p className="text-sm font-medium text-foreground/70 line-clamp-2">{featured.excerpt}</p>
                         )}
-                        <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50">
+                        <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
                           {new Date(featured.published_at || featured.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                         </div>
                       </div>

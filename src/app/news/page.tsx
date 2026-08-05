@@ -17,7 +17,7 @@ export default async function NewsPage() {
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-12">
 
         {news.length === 0 ? (
-          <div className="py-24 text-center font-bold uppercase tracking-widest text-foreground/40 border-[3px] border-dashed border-foreground/20 bg-secondary">
+          <div className="py-24 text-center font-bold uppercase tracking-widest text-muted-foreground border-[3px] border-dashed border-foreground/20 bg-secondary">
             No news published yet.
           </div>
         ) : (
@@ -48,7 +48,7 @@ export default async function NewsPage() {
                       {(featured as any).excerpt && (
                         <p className="text-sm font-medium text-foreground/70 leading-relaxed line-clamp-3">{(featured as any).excerpt}</p>
                       )}
-                      <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50 pt-4 border-t-[1px] border-foreground/20">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground pt-4 border-t-[1px] border-foreground/20">
                         {(featured as any).authors?.name || 'Editorial'} · {new Date((featured as any).published_at || (featured as any).created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                       </div>
                     </div>

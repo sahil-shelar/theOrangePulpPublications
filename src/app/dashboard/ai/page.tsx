@@ -27,7 +27,7 @@ export default async function AIOperationsCenter() {
       {/* Header */}
       <div className="flex items-end justify-between border-b-[3px] border-foreground pb-6">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Intelligence</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Intelligence</p>
           <h1 className="font-heading text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-3">
             <Sparkles size={36} className="text-primary" />
             AI Center
@@ -64,7 +64,7 @@ export default async function AIOperationsCenter() {
         <div className="brutal-card bg-background p-6">
           <div className="flex items-center gap-3 mb-3">
             <FileText size={18} className="text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Total Articles</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Articles</span>
           </div>
           <div className="font-heading text-5xl font-black">{articleCount ?? 0}</div>
         </div>
@@ -116,7 +116,7 @@ export default async function AIOperationsCenter() {
                   </div>
                 </div>
               )) : (
-                <div className="p-10 text-center font-bold uppercase tracking-widest text-foreground/40 text-xs">
+                <div className="p-10 text-center font-bold uppercase tracking-widest text-muted-foreground text-xs">
                   No pending suggestions.
                 </div>
               )}
@@ -137,12 +137,12 @@ export default async function AIOperationsCenter() {
                 <div key={t.id} className="p-4 border-b-[2px] border-foreground/10 flex justify-between items-center hover:bg-muted transition-colors">
                   <div>
                     <div className="font-bold text-sm uppercase tracking-wider">{t.topic}</div>
-                    <div className="text-[9px] font-black text-foreground/50 mt-0.5 uppercase tracking-widest">Source: {t.source}</div>
+                    <div className="text-[9px] font-black text-muted-foreground mt-0.5 uppercase tracking-widest">Source: {t.source}</div>
                   </div>
                   <div className="font-heading text-2xl font-black text-primary shrink-0">{t.opportunity_score}</div>
                 </div>
               )) : (
-                <div className="p-8 text-center font-bold uppercase tracking-widest text-foreground/40 text-xs">
+                <div className="p-8 text-center font-bold uppercase tracking-widest text-muted-foreground text-xs">
                   No active trends detected.
                 </div>
               )}
@@ -165,7 +165,7 @@ export default async function AIOperationsCenter() {
                   </div>
                 </div>
               )) : (
-                <div className="p-8 text-center font-bold uppercase tracking-widest text-foreground/40 text-xs">
+                <div className="p-8 text-center font-bold uppercase tracking-widest text-muted-foreground text-xs">
                   No critical coverage gaps.
                 </div>
               )}

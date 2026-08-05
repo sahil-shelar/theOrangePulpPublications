@@ -24,7 +24,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Logo */}
-        <Link href="/" className="shrink-0 focus:outline-none group flex items-center gap-0">
+        <Link href="/" className="shrink-0 group flex items-center gap-0">
           <span className="font-heading text-xl sm:text-2xl md:text-3xl font-black tracking-tighter text-foreground uppercase leading-none">
             THE ORANGE
           </span>

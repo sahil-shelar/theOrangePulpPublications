@@ -69,7 +69,7 @@ export default function MovieDetail({
               <img src={poster_url} alt={title} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-primary flex items-center justify-center p-4">
-                <span className="font-heading text-sm font-black uppercase text-center text-foreground/60 leading-tight">{title}</span>
+                <span className="font-heading text-sm font-black uppercase text-center text-muted-foreground leading-tight">{title}</span>
               </div>
             )}
           </div>
@@ -79,11 +79,11 @@ export default function MovieDetail({
             <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-black uppercase text-foreground leading-[0.9] tracking-tight">
               {title}
             </h1>
-            <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] font-black uppercase tracking-widest text-foreground/60">
+            <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] font-black uppercase tracking-widest text-muted-foreground">
               {year && <span>{year}</span>}
-              {runtime && <><span className="text-foreground/20">·</span><span>{runtime} min</span></>}
-              {director && <><span className="text-foreground/20">·</span><span>Dir. {director}</span></>}
-              {certification && certification !== 'NR' && <><span className="text-foreground/20">·</span><span className="border-[1px] border-foreground/40 px-1.5 py-0.5">{certification}</span></>}
+              {runtime && <><span className="text-muted-foreground">·</span><span>{runtime} min</span></>}
+              {director && <><span className="text-muted-foreground">·</span><span>Dir. {director}</span></>}
+              {certification && certification !== 'NR' && <><span className="text-muted-foreground">·</span><span className="border-[1px] border-foreground/40 px-1.5 py-0.5">{certification}</span></>}
             </div>
             {genres.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
@@ -95,7 +95,7 @@ export default function MovieDetail({
               </div>
             )}
             {tagline && (
-              <p className="mt-3 text-sm font-black uppercase tracking-widest text-foreground/50 italic">{tagline}</p>
+              <p className="mt-3 text-sm font-black uppercase tracking-widest text-muted-foreground italic">{tagline}</p>
             )}
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function MovieDetail({
                     <div className="min-w-0">
                       <div className="font-black text-[11px] uppercase tracking-wide leading-tight truncate">{c.name}</div>
                       {c.character && (
-                        <div className="font-bold text-[10px] text-foreground/50 truncate">{c.character}</div>
+                        <div className="font-bold text-[10px] text-muted-foreground truncate">{c.character}</div>
                       )}
                     </div>
                   </div>
@@ -174,7 +174,7 @@ export default function MovieDetail({
                 ))}
               </div>
             ) : (
-              <p className="text-[11px] font-bold text-foreground/50 uppercase tracking-widest">Not currently streaming</p>
+              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Not currently streaming</p>
             )}
           </div>
 
@@ -186,13 +186,13 @@ export default function MovieDetail({
               <div className="space-y-3">
                 {budget ? (
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/50">Budget</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Budget</span>
                     <span className="font-black text-sm">${(budget / 1_000_000).toFixed(0)}M</span>
                   </div>
                 ) : null}
                 {revenue ? (
                   <div className="flex justify-between items-center border-t-[2px] border-foreground/10 pt-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/50">Worldwide</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Worldwide</span>
                     <span className="font-black text-sm">${(revenue / 1_000_000).toFixed(0)}M</span>
                   </div>
                 ) : null}

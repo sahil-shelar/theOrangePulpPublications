@@ -88,11 +88,11 @@ export default async function Homepage() {
                     href={`/${typeToRoute(art.type)}/${art.slug}`}
                     className="flex items-center gap-5 py-4 group hover:bg-muted/40 transition-colors px-2"
                   >
-                    <span className="font-heading text-4xl font-black text-foreground/15 group-hover:text-primary transition-colors w-10 shrink-0 leading-none">
+                    <span className="font-heading text-4xl font-black text-foreground/60 group-hover:text-primary transition-colors w-10 shrink-0 leading-none">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40 mb-0.5">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
                         {art.categories?.name || art.type}
                       </div>
                       <h4 className="font-heading text-lg font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
@@ -135,7 +135,7 @@ export default async function Homepage() {
                       {m.title}
                     </h4>
                     {m.release_date && (
-                      <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40 -mt-0.5">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground -mt-0.5">
                         {new Date(m.release_date).getFullYear()}
                       </div>
                     )}
@@ -197,7 +197,7 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
         {title}
       </h2>
       {href && (
-        <Link href={href} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:text-primary transition-colors">
+        <Link href={href} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
           View All <ArrowRight size={13} />
         </Link>
       )}

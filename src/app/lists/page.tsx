@@ -17,7 +17,7 @@ export default async function ListsPage() {
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-12">
 
         {lists.length === 0 ? (
-          <div className="py-24 text-center font-bold uppercase tracking-widest text-foreground/40 border-[3px] border-dashed border-foreground/20 bg-primary">
+          <div className="py-24 text-center font-bold uppercase tracking-widest text-muted-foreground border-[3px] border-dashed border-foreground/20 bg-primary">
             No lists published yet.
           </div>
         ) : (

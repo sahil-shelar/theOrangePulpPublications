@@ -70,7 +70,7 @@ export default function SetupAccountPage() {
               type="email"
               value={email}
               readOnly
-              className="bg-background/50 border-[3px] border-foreground/30 p-3 font-bold text-sm text-foreground/50 cursor-not-allowed"
+              className="bg-background/50 border-[3px] border-foreground/30 p-3 font-bold text-sm text-muted-foreground cursor-not-allowed"
             />
           </div>
 
@@ -81,7 +81,7 @@ export default function SetupAccountPage() {
               name="name"
               required
               placeholder="Your name"
-              className="bg-background border-[3px] border-foreground p-3 font-bold text-sm focus:outline-none text-foreground"
+              className="bg-background border-[3px] border-foreground p-3 font-bold text-sm text-foreground"
             />
           </div>
 
@@ -93,7 +93,7 @@ export default function SetupAccountPage() {
               minLength={6}
               required
               placeholder="Min. 6 characters"
-              className="bg-background border-[3px] border-foreground p-3 font-bold text-sm focus:outline-none text-foreground"
+              className="bg-background border-[3px] border-foreground p-3 font-bold text-sm text-foreground"
             />
           </div>
 

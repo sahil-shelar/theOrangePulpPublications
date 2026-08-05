@@ -55,7 +55,7 @@ export default function SpotlightWorksEditor({ movies, works, onChange }: Props)
                     <select
                       value={work.movie_id ?? ''}
                       onChange={e => update(index, { movie_id: e.target.value || null, custom_title: e.target.value ? '' : work.custom_title })}
-                      className="flex-1 bg-background border-[2px] border-foreground p-2 text-xs font-bold uppercase focus:outline-none min-w-0"
+                      className="flex-1 bg-background border-[2px] border-foreground p-2 text-xs font-bold uppercase min-w-0"
                     >
                       <option value="">— Custom title (no movie link) —</option>
                       {movies.map(m => (
@@ -73,11 +73,11 @@ export default function SpotlightWorksEditor({ movies, works, onChange }: Props)
                       placeholder="Title (not in movie database)"
                       value={work.custom_title}
                       onChange={e => update(index, { custom_title: e.target.value })}
-                      className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-bold"
                     />
                   )}
                   {selectedMovie && (
-                    <div className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                       {selectedMovie.poster_url && <img src={selectedMovie.poster_url} alt="" className="w-5 h-7 object-cover border border-foreground" />}
                       Linked to movie database
                     </div>
@@ -88,7 +88,7 @@ export default function SpotlightWorksEditor({ movies, works, onChange }: Props)
                     placeholder="Note — role, award, why it matters"
                     value={work.note}
                     onChange={e => update(index, { note: e.target.value })}
-                    className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-medium focus:outline-none"
+                    className="w-full bg-background border-[2px] border-foreground p-2 text-xs font-medium"
                   />
                 </div>
               </div>

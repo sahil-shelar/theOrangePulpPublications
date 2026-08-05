@@ -35,7 +35,7 @@ export default function NotificationCenter() {
               <div key={n.id} className="p-3 border-b-[2px] border-foreground/10 hover:bg-muted transition-colors cursor-pointer flex flex-col gap-1">
                 <div className="flex justify-between items-start">
                   <span className="font-black uppercase tracking-widest text-xs">{n.title}</span>
-                  <span className="text-[9px] font-bold text-foreground/50">{n.time}</span>
+                  <span className="text-[9px] font-bold text-muted-foreground">{n.time}</span>
                 </div>
                 <p className="text-xs font-medium text-foreground/80">{n.message}</p>
               </div>

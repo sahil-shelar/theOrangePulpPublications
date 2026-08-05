@@ -19,7 +19,7 @@ export default async function EditMoviePage({ params }: { params: Promise<{ id: 
           <ArrowLeft size={16} /> Back to Movies
         </Link>
         <h1 className="font-heading text-4xl font-black uppercase text-foreground">Edit Movie</h1>
-        <p className="text-foreground/50 font-bold text-sm mt-1 uppercase tracking-widest">{movie.title}</p>
+        <p className="text-muted-foreground font-bold text-sm mt-1 uppercase tracking-widest">{movie.title}</p>
       </div>
       <MovieForm initialData={movie} />
     </div>

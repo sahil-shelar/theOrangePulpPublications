@@ -19,7 +19,7 @@ export default async function NewsletterDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-[3px] border-foreground pb-6">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-0.5">Publishing</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Publishing</p>
           <h1 className="font-heading text-5xl font-black uppercase tracking-tighter text-foreground">Newsletter</h1>
         </div>
         <Link href="/dashboard/newsletter/new" className="brutal-button px-5 py-3 flex items-center gap-2 text-xs bg-primary">
@@ -30,15 +30,15 @@ export default async function NewsletterDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         <div className="brutal-card bg-background p-6">
-          <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50 mb-2">Subscribers</div>
+          <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2">Subscribers</div>
           <div className="font-heading text-5xl font-black">{(subscriberCount ?? 0).toLocaleString()}</div>
         </div>
         <div className="brutal-card bg-secondary p-6">
-          <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50 mb-2">Avg Open Rate</div>
+          <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2">Avg Open Rate</div>
           <div className="font-heading text-5xl font-black">—</div>
         </div>
         <div className="brutal-card bg-background p-6">
-          <div className="text-[9px] font-black uppercase tracking-widest text-foreground/50 mb-2">Avg Click Rate</div>
+          <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2">Avg Click Rate</div>
           <div className="font-heading text-5xl font-black">—</div>
         </div>
         <div className="brutal-card bg-primary p-6">
@@ -55,7 +55,7 @@ export default async function NewsletterDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[600px]">
             <thead>
-              <tr className="border-b-[3px] border-foreground text-[9px] font-black uppercase tracking-widest text-foreground/50 bg-muted">
+              <tr className="border-b-[3px] border-foreground text-[9px] font-black uppercase tracking-widest text-muted-foreground bg-muted">
                 <th className="p-3.5">Subject</th>
                 <th className="p-3.5">Status</th>
                 <th className="p-3.5">Date</th>
@@ -73,7 +73,7 @@ export default async function NewsletterDashboard() {
                       {campaign.status}
                     </span>
                   </td>
-                  <td className="p-3.5 text-xs font-bold text-foreground/60">
+                  <td className="p-3.5 text-xs font-bold text-muted-foreground">
                     {campaign.sent_at || campaign.scheduled_at
                       ? new Date(campaign.sent_at || campaign.scheduled_at).toLocaleDateString()
                       : '—'}
@@ -93,7 +93,7 @@ export default async function NewsletterDashboard() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6} className="p-10 text-center font-bold text-foreground/40 uppercase tracking-widest text-xs">
+                  <td colSpan={6} className="p-10 text-center font-bold text-muted-foreground uppercase tracking-widest text-xs">
                     No campaigns yet
                   </td>
                 </tr>

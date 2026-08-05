@@ -68,7 +68,7 @@ export default function MovieCarousel({ movies, linkBase }: Props) {
                   />
                 ) : (
                   <div className="w-full h-full bg-secondary flex items-center justify-center p-2">
-                    <span className="text-[9px] font-black uppercase text-center text-foreground/40 leading-tight">{movie.title}</span>
+                    <span className="text-[9px] font-black uppercase text-center text-muted-foreground leading-tight">{movie.title}</span>
                   </div>
                 )}
               </div>
@@ -77,7 +77,7 @@ export default function MovieCarousel({ movies, linkBase }: Props) {
                 <div className="text-[10px] font-black uppercase leading-tight text-foreground line-clamp-2 group-hover/card:text-primary transition-colors">
                   {movie.title}
                 </div>
-                {year && <div className="text-[9px] font-bold text-foreground/40 mt-0.5">{year}</div>}
+                {year && <div className="text-[9px] font-bold text-muted-foreground mt-0.5">{year}</div>}
               </div>
             </div>
           )

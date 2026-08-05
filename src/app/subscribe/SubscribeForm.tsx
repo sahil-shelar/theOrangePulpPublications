@@ -9,7 +9,7 @@ export default function SubscribeForm() {
     return (
       <div className="border-[3px] border-foreground bg-muted px-6 py-8">
         <p className="font-heading text-2xl font-black uppercase text-foreground">You're subscribed!</p>
-        <p className="text-sm font-bold text-foreground/60 mt-1 uppercase tracking-widest">Check your inbox for a confirmation.</p>
+        <p className="text-sm font-bold text-muted-foreground mt-1 uppercase tracking-widest">Check your inbox for a confirmation.</p>
       </div>
     );
   }
@@ -24,7 +24,7 @@ export default function SubscribeForm() {
         { id: "email", label: "Email Address", type: "email", placeholder: "chris@example.com" },
       ].map(({ id, label, type, placeholder }) => (
         <div key={id} className="border-[3px] border-foreground border-b-0">
-          <label htmlFor={id} className="block text-[9px] font-black uppercase tracking-[0.2em] text-foreground/50 px-5 pt-4 pb-1">
+          <label htmlFor={id} className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-5 pt-4 pb-1">
             {label}
           </label>
           <input
@@ -33,7 +33,7 @@ export default function SubscribeForm() {
             type={type}
             placeholder={placeholder}
             required
-            className="w-full bg-transparent px-5 pb-4 text-base font-bold text-foreground placeholder:text-foreground/30 focus:outline-none"
+            className="w-full bg-transparent px-5 pb-4 text-base font-bold text-foreground placeholder:text-muted-foreground"
           />
         </div>
       ))}

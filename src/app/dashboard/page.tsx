@@ -12,7 +12,7 @@ export default async function DashboardPage() {
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-[3px] border-foreground pb-6">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/50 mb-1">Editorial</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Editorial</p>
           <h1 className="font-heading text-5xl font-black uppercase tracking-tighter text-foreground leading-none">
             Dashboard
           </h1>
@@ -49,7 +49,7 @@ function StatCard({ label, value, accent = 'bg-background' }: { label: string; v
   return (
     <div className={`brutal-card ${accent} p-5 flex flex-col`}>
       <span className="font-heading text-4xl font-black text-foreground leading-none mb-2">{value}</span>
-      <span className="text-[9px] font-black uppercase tracking-[0.15em] text-foreground/60">{label}</span>
+      <span className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground">{label}</span>
     </div>
   )
 }
@@ -70,13 +70,13 @@ function ArticleTable({ title, articles }: { title: string; articles: ArticleWit
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading text-xl font-black uppercase tracking-widest text-foreground">{title}</h2>
-        <Link href="/dashboard/articles" className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-foreground/50 hover:text-primary transition-colors">
+        <Link href="/dashboard/articles" className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
           View all <ArrowRight size={12} />
         </Link>
       </div>
       <div className="brutal-card bg-background p-0 overflow-hidden">
         {articles.length === 0 ? (
-          <div className="p-8 text-center text-xs font-bold uppercase tracking-widest text-foreground/40">
+          <div className="p-8 text-center text-xs font-bold uppercase tracking-widest text-muted-foreground">
             No articles found
           </div>
         ) : (
@@ -91,7 +91,7 @@ function ArticleTable({ title, articles }: { title: string; articles: ArticleWit
                   <div className="font-bold text-sm text-foreground truncate group-hover:text-primary transition-colors">
                     {article.title}
                   </div>
-                  <div className="flex gap-2 mt-1 text-[9px] font-black uppercase tracking-widest text-foreground/50">
+                  <div className="flex gap-2 mt-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
                     <span>{article.type}</span>
                     <span>·</span>
                     <span>{article.categories?.name || 'Uncategorized'}</span>
@@ -101,7 +101,7 @@ function ArticleTable({ title, articles }: { title: string; articles: ArticleWit
                   <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 border-[2px] border-foreground ${article.status === 'published' ? 'bg-primary' : 'bg-background'}`}>
                     {article.status}
                   </span>
-                  <Edit2 size={14} className="text-foreground/30 group-hover:text-foreground transition-colors" />
+                  <Edit2 size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                 </div>
               </Link>
             ))}

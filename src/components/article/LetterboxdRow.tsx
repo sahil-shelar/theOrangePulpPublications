@@ -32,19 +32,19 @@ export default function LetterboxdRow({ post, href }: Props) {
           <h3 className="font-heading text-base font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
             {post.title}
           </h3>
-          {year && <span className="text-[10px] font-bold text-foreground/40 shrink-0">{year}</span>}
+          {year && <span className="text-[10px] font-bold text-muted-foreground shrink-0">{year}</span>}
         </div>
 
         {post.rating && (
           <div className="flex items-center gap-0.5 mt-1">
             {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={`text-[11px] ${i < Math.round(post.rating) ? 'text-foreground' : 'text-foreground/20'}`}>★</span>
+              <span key={i} className={`text-[11px] ${i < Math.round(post.rating) ? 'text-foreground' : 'text-muted-foreground'}`}>★</span>
             ))}
-            <span className="text-[9px] font-black text-foreground/40 ml-1">{post.rating}/5</span>
+            <span className="text-[9px] font-black text-muted-foreground ml-1">{post.rating}/5</span>
           </div>
         )}
 
-        <div className="text-[9px] font-bold uppercase tracking-widest text-foreground/40 mt-1">
+        <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mt-1">
           {post.authors?.name || 'Editorial'} · {date}
         </div>
       </div>

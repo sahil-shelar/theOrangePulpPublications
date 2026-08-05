@@ -109,7 +109,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{label}</span>
         {value && (
-          <button type="button" onClick={() => onChange('')} className="text-[9px] font-black uppercase tracking-widest text-foreground/40 hover:text-red-500 transition-colors flex items-center gap-1">
+          <button type="button" onClick={() => onChange('')} className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1">
             <X size={11} /> Remove
           </button>
         )}
@@ -165,12 +165,12 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
             dragging ? 'border-primary bg-primary/10' : 'border-foreground/40 hover:border-foreground hover:bg-muted/40'
           } ${uploading ? 'pointer-events-none opacity-60' : ''}`}
         >
-          <ImageIcon size={28} className="text-foreground/30" strokeWidth={1.5} />
+          <ImageIcon size={28} className="text-muted-foreground" strokeWidth={1.5} />
           <div className="text-center">
             <p className="text-xs font-black uppercase tracking-widest text-foreground/70">
               {uploading ? 'Uploading…' : dragging ? 'Drop to upload' : 'Drag & drop or click'}
             </p>
-            <p className="text-[10px] font-bold text-foreground/40 mt-0.5">JPG · PNG · WebP · AVIF · max 50 MB</p>
+            <p className="text-[10px] font-bold text-muted-foreground mt-0.5">JPG · PNG · WebP · AVIF · max 50 MB</p>
           </div>
           <input
             ref={fileRef}
@@ -191,7 +191,7 @@ export default function ImagePicker({ value, onChange, label = 'Cover Image', bu
             onChange={e => setUrlInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleUrlSubmit())}
             placeholder="https://example.com/image.jpg"
-            className="flex-1 bg-background border-[3px] border-foreground border-r-0 px-3 py-2.5 text-xs font-bold text-foreground placeholder:text-foreground/30 focus:outline-none"
+            className="flex-1 bg-background border-[3px] border-foreground border-r-0 px-3 py-2.5 text-xs font-bold text-foreground placeholder:text-muted-foreground"
           />
           <button
             type="button"

@@ -52,7 +52,7 @@ export default function UserRow({ u, isYou }: { u: User; isYou: boolean }) {
           </div>
           <div>
             <div className="text-sm font-bold truncate max-w-[180px]">{u.email}</div>
-            {isYou && <div className="text-[9px] font-black uppercase tracking-widest text-foreground/40">You</div>}
+            {isYou && <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">You</div>}
           </div>
         </div>
       </td>
@@ -63,7 +63,7 @@ export default function UserRow({ u, isYou }: { u: User; isYou: boolean }) {
           <select
             defaultValue={role}
             onChange={handleRole}
-            className="bg-background border-[2px] border-foreground px-2 py-1 text-[10px] font-black uppercase tracking-widest focus:outline-none"
+            className="bg-background border-[2px] border-foreground px-2 py-1 text-[10px] font-black uppercase tracking-widest"
           >
             <option value="writer">Writer</option>
             <option value="editor">Editor</option>
@@ -74,13 +74,13 @@ export default function UserRow({ u, isYou }: { u: User; isYou: boolean }) {
       <td className="p-3.5 hidden sm:table-cell">
         <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border-[2px] ${
           isBanned ? 'bg-primary text-foreground border-foreground' :
-          pending ? 'bg-muted text-foreground/50 border-foreground/30' :
-          'bg-background text-foreground/60 border-foreground/20'
+          pending ? 'bg-muted text-muted-foreground border-foreground/30' :
+          'bg-background text-muted-foreground border-foreground/20'
         }`}>
           {isBanned ? 'Banned' : pending ? 'Pending' : 'Active'}
         </span>
       </td>
-      <td className="p-3.5 hidden md:table-cell text-[10px] font-bold text-foreground/40">{date}</td>
+      <td className="p-3.5 hidden md:table-cell text-[10px] font-bold text-muted-foreground">{date}</td>
       <td className="p-3.5 text-right">
         {!isYou && (
           <div className="flex items-center justify-end gap-1.5">
