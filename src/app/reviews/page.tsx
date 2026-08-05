@@ -1,14 +1,18 @@
 // @ts-nocheck
 import Link from 'next/link'
-import { getCachedReviews } from '@/lib/api/articles'
+import { getPagedArticlesByType } from '@/lib/api/articles'
+import Pagination from '@/components/layout/Pagination'
 import ArticleCard from '@/components/article/ArticleCard'
 import LetterboxdRow from '@/components/article/LetterboxdRow'
 
 export const revalidate = 60
 
-export default async function ReviewsPage() {
-  const reviews = await getCachedReviews(20)
-  const [featured, ...rest] = reviews
+export default async function ReviewsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page: pageParam } = await searchParams
+  const { articles: reviews, page: currentPage, totalPages } = await getPagedArticlesByType('review', Number(pageParam) || 1)
+  // The oversized featured card only makes sense on the first page.
+  const featured = currentPage === 1 ? reviews[0] : null
+  const rest = currentPage === 1 ? reviews.slice(1) : reviews
 
   return (
     <div className="w-full bg-background min-h-screen">
@@ -46,6 +50,8 @@ export default async function ReviewsPage() {
             )}
           </>
         )}
+
+        <Pagination basePath="/reviews" page={currentPage} totalPages={totalPages} />
       </div>
     </div>
   )

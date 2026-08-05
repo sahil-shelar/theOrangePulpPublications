@@ -1,13 +1,17 @@
 import Link from 'next/link'
-import { getCachedSpotlight } from '@/lib/api/articles'
+import { getPagedArticlesByType } from '@/lib/api/articles'
+import Pagination from '@/components/layout/Pagination'
 import ArticleCard from '@/components/article/ArticleCard'
 import LetterboxdRow from '@/components/article/LetterboxdRow'
 
 export const revalidate = 60
 
-export default async function SpotlightPage() {
-  const spotlight = await getCachedSpotlight(20)
-  const [featured, ...rest] = spotlight
+export default async function SpotlightPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page: pageParam } = await searchParams
+  const { articles: spotlight, page: currentPage, totalPages } = await getPagedArticlesByType('spotlight', Number(pageParam) || 1)
+  // The oversized featured card only makes sense on the first page.
+  const featured = currentPage === 1 ? spotlight[0] : null
+  const rest = currentPage === 1 ? spotlight.slice(1) : spotlight
 
   return (
     <div className="w-full bg-background min-h-screen">
@@ -69,6 +73,8 @@ export default async function SpotlightPage() {
             )}
           </>
         )}
+
+        <Pagination basePath="/spotlight" page={currentPage} totalPages={totalPages} />
       </div>
     </div>
   )

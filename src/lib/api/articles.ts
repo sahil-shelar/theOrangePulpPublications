@@ -137,6 +137,38 @@ export const getCachedLists = unstable_cache(
   { revalidate: 60, tags: ['articles'] }
 )
 
+export const PAGE_SIZE = 18
+
+// Paginated listing by type. Returns the slice plus the total count so the
+// listing pages can render page controls — previously every listing was hard
+// capped at 20 with no way to reach anything older.
+export const getPagedArticlesByType = unstable_cache(
+  async (type: string, page = 1, pageSize = PAGE_SIZE) => {
+    const supabase = createPublicClient()
+    const safePage = Math.max(1, Math.floor(page) || 1)
+    const from = (safePage - 1) * pageSize
+
+    const { data, count } = await supabase
+      .from('articles')
+      .select('*, categories(*), authors(*), movies(*)', { count: 'exact' })
+      .eq('status', 'published')
+      .eq('type', type)
+      .order('published_at', { ascending: false })
+      .range(from, from + pageSize - 1)
+
+    const total = count ?? 0
+    return {
+      articles: (data ?? []) as ArticleWithRelations[],
+      total,
+      page: safePage,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    }
+  },
+  ['paged-articles-by-type'],
+  { revalidate: 60, tags: ['articles'] }
+)
+
 export async function getLatestArticles(limit = 10): Promise<ArticleWithRelations[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -201,30 +233,69 @@ export const getArticlesByTag = unstable_cache(
   { revalidate: 60, tags: ['articles'] }
 )
 
+// Builds a prefix-matching tsquery so as-you-type search finds partial words:
+// "denis vil" -> "denis & vil:*". Strips every tsquery operator, since any
+// stray & | ! ( ) : * from user input is a syntax error in to_tsquery.
+function toPrefixTsQuery(raw: string): string {
+  const terms = raw
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+  if (terms.length === 0) return ''
+  return terms.map((t, i) => (i === terms.length - 1 ? `${t}:*` : t)).join(' & ')
+}
+
+const SEARCH_COLUMNS =
+  'id, title, slug, type, excerpt, cover_image_url, rating, published_at, ' +
+  'categories(name, slug), authors(name, slug), movies(poster_url)'
+
 export async function searchArticles(query: string, limit = 10): Promise<ArticleWithRelations[]> {
+  const tsQuery = toPrefixTsQuery(query)
+  if (!tsQuery) return []
+
   const supabase = await createClient()
-  
-  // Try Full Text Search if column exists, else fallback to ilike
-  const { data, error } = await supabase
-    .from('articles')
-    .select(`*, categories ( name, slug ), authors ( name, slug )`)
-    .eq('status', 'published')
-    .textSearch('title', query, { type: 'websearch' })
-    .order('published_at', { ascending: false })
-    .limit(20)
-    
-  if (error) {
-    const { data: fallback, error: fallbackError } = await supabase
+
+  // Two indexed passes, because neither alone is sufficient for as-you-type:
+  //
+  //  1. Full-text over title/excerpt/subheadline/content (GIN on search_vector).
+  //     Broad coverage and word-aware, but English stemming mangles partial
+  //     words — "odys" stems to "odi" (plural strip, then the y->i rule), so
+  //     it will not prefix-match "odyssey".
+  //  2. Substring match on title (GIN trigram). Catches the partials that
+  //     stemming loses, and matches mid-word too.
+  const [fts, substr] = await Promise.all([
+    supabase
       .from('articles')
-      .select(`*, categories ( name, slug ), authors ( name, slug )`)
+      .select(SEARCH_COLUMNS)
       .eq('status', 'published')
-      .ilike('title', `%${query}%`)
+      .textSearch('search_vector', tsQuery)
       .order('published_at', { ascending: false })
-      .limit(20)
-    if (fallbackError) return []
-    return fallback
+      .limit(limit),
+    supabase
+      .from('articles')
+      .select(SEARCH_COLUMNS)
+      .eq('status', 'published')
+      .ilike('title', `%${query.trim()}%`)
+      .order('published_at', { ascending: false })
+      .limit(limit),
+  ])
+
+  if (fts.error && substr.error) {
+    handleSupabaseError(fts.error)
+    return []
   }
-  return data
+
+  // Full-text hits rank first — they matched on indexed content, not just a
+  // title substring.
+  const seen = new Set<string>()
+  const merged: ArticleWithRelations[] = []
+  for (const row of [...(fts.data ?? []), ...(substr.data ?? [])] as ArticleWithRelations[]) {
+    if (seen.has(row.id)) continue
+    seen.add(row.id)
+    merged.push(row)
+  }
+  return merged.slice(0, limit)
 }
 
 export async function getFeaturedArticle(): Promise<ArticleWithRelations | null> {

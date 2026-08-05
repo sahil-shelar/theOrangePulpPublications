@@ -1,13 +1,17 @@
 import Link from 'next/link'
-import { getCachedLists } from '@/lib/api/articles'
+import { getPagedArticlesByType } from '@/lib/api/articles'
+import Pagination from '@/components/layout/Pagination'
 import ArticleCard from '@/components/article/ArticleCard'
 import LetterboxdRow from '@/components/article/LetterboxdRow'
 
 export const revalidate = 60
 
-export default async function ListsPage() {
-  const lists = await getCachedLists(20)
-  const [featured, ...rest] = lists
+export default async function ListsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page: pageParam } = await searchParams
+  const { articles: lists, page: currentPage, totalPages } = await getPagedArticlesByType('list', Number(pageParam) || 1)
+  // The oversized featured card only makes sense on the first page.
+  const featured = currentPage === 1 ? lists[0] : null
+  const rest = currentPage === 1 ? lists.slice(1) : lists
 
   return (
     <div className="w-full bg-background min-h-screen">
@@ -69,6 +73,8 @@ export default async function ListsPage() {
             )}
           </>
         )}
+
+        <Pagination basePath="/lists" page={currentPage} totalPages={totalPages} />
       </div>
     </div>
   )

@@ -1,13 +1,17 @@
 import Link from 'next/link'
-import { getCachedNews } from '@/lib/api/articles'
+import { getPagedArticlesByType } from '@/lib/api/articles'
+import Pagination from '@/components/layout/Pagination'
 import ArticleCard from '@/components/article/ArticleCard'
 import LetterboxdRow from '@/components/article/LetterboxdRow'
 
 export const revalidate = 60
 
-export default async function NewsPage() {
-  const news = await getCachedNews(20)
-  const [featured, ...rest] = news
+export default async function NewsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page: pageParam } = await searchParams
+  const { articles: news, page: currentPage, totalPages } = await getPagedArticlesByType('news', Number(pageParam) || 1)
+  // The oversized featured card only makes sense on the first page.
+  const featured = currentPage === 1 ? news[0] : null
+  const rest = currentPage === 1 ? news.slice(1) : news
 
   return (
     <div className="w-full bg-background min-h-screen">
@@ -69,6 +73,8 @@ export default async function NewsPage() {
             )}
           </>
         )}
+
+        <Pagination basePath="/news" page={currentPage} totalPages={totalPages} />
       </div>
     </div>
   )

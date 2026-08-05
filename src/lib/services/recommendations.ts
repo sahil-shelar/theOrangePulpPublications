@@ -2,6 +2,13 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { ArticleWithRelations } from '@/types/models'
 
+// Only the columns the recommendation sidebar renders plus the ones scored
+// below. Notably excludes `content` — selecting * pulled 40 full markdown
+// article bodies over the wire to produce a 4-item list.
+const CANDIDATE_COLUMNS =
+  'id, title, slug, type, cover_image_url, category_id, movie_id, published_at, views_count, ' +
+  'categories(name, slug), authors(name, slug), movies(poster_url, backdrop_url)'
+
 export async function getRecommendedArticles(
   sourceArticleId: string,
   limit = 5,
@@ -11,7 +18,7 @@ export async function getRecommendedArticles(
 
   const { data: candidates, error } = await supabase
     .from('articles')
-    .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
+    .select(CANDIDATE_COLUMNS)
     .eq('status', 'published')
     .neq('id', sourceArticleId)
     .limit(40)
@@ -23,7 +30,8 @@ export async function getRecommendedArticles(
     if (hint?.category_id && candidate.category_id === hint.category_id) score += 30
     if (hint?.type && candidate.type === hint.type) score += 10
     if (hint?.movie_id && candidate.movie_id === hint.movie_id) score += 50
-    const ageDays = (Date.now() - new Date(candidate.published_at).getTime()) / 86_400_000
+    const publishedAt = candidate.published_at ? new Date(candidate.published_at).getTime() : NaN
+    const ageDays = Number.isNaN(publishedAt) ? Infinity : (Date.now() - publishedAt) / 86_400_000
     if (ageDays < 7) score += 20
     else if (ageDays < 30) score += 10
     if (candidate.views_count > 1000) score += 15
@@ -38,10 +46,20 @@ export async function getRecommendedArticles(
 export async function getRelatedMovies(sourceMovieId: string, limit = 5) {
   const supabase = createPublicClient()
 
-  const { data: source } = await supabase.from('movies').select('*').eq('id', sourceMovieId).single()
+  const { data: source } = await supabase
+    .from('movies')
+    .select('id, director, release_year')
+    .eq('id', sourceMovieId)
+    .single()
   if (!source) return []
 
-  const { data: candidates } = await supabase.from('movies').select('*').neq('id', sourceMovieId).limit(50)
+  // Excludes synopsis/cast_list/crew_list/metadata — none are used for scoring
+  // or in the rendered card.
+  const { data: candidates } = await supabase
+    .from('movies')
+    .select('id, title, slug, poster_url, release_year, director')
+    .neq('id', sourceMovieId)
+    .limit(50)
   if (!candidates) return []
 
   const scored = candidates.map(candidate => {
