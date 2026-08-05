@@ -141,6 +141,13 @@ gemini-2.5-flash
 `JSON.parse` strictly — no fence-stripping needed. It constrains shape, never
 truth.
 
+## Ratings
+
+`list_items.item_rating` is documented out of 5 and the detail view renders it as
+`{rating}/5` over five stars. TMDB scores out of 10, so the generator halves the
+value (`toFiveScale`) and rounds to one decimal to match `DECIMAL(3,1)`. Writing
+`vote_average` straight through produced "8.5/5" with every star filled.
+
 ## Known limits
 
 - Only one director is supplied per film. `parseTmdbToInternalMovie` takes the

@@ -10,6 +10,7 @@ import ReaderControls from "./ReaderControls";
 import CommentsSection from "./CommentsSection";
 import ShareButtons from "./ShareButtons";
 import SidebarNewsletter from "./SidebarNewsletter";
+import RankedItems from "./RankedItems";
 import { getRecommendedArticles } from "@/lib/services/recommendations";
 import { createClient } from "@/lib/supabase/server";
 import { ArrowLeft } from "lucide-react";
@@ -104,63 +105,8 @@ export default async function ListDetailView({ article }: { article: ArticleWith
         </div>
       )}
 
-      {/* Ranked rows */}
-      {items.length > 0 && (
-        <div className="max-w-4xl mx-auto px-6 md:px-10 pt-8 pb-6">
-          <div className="divide-y-[3px] divide-foreground border-y-[3px] border-foreground">
-            {items.map((item: any) => {
-              const title = item.movies?.title || item.custom_title || 'Untitled';
-              const poster = item.movies?.poster_url;
-              const year = item.movies?.release_year;
-              const href = item.movies?.slug ? `/movie/${item.movies.slug}` : null;
-              const Wrapper = href ? Link : 'div';
-              const rating = item.item_rating;
-
-              return (
-                <Wrapper key={item.id} href={href ?? undefined} className="group flex gap-4 sm:gap-6 py-6 hover:bg-muted/30 transition-colors">
-                  {/* Faint watermark numeral: /60 is the lowest tier that clears
-                      3:1 for large text in both themes (3.49 light / 4.87 dark). */}
-                  <span className="font-heading text-4xl sm:text-5xl font-black text-foreground/60 w-14 sm:w-16 shrink-0 text-center pt-1">
-                    {String(item.rank).padStart(2, "0")}
-                  </span>
-
-                  <div className="relative w-16 sm:w-20 shrink-0 aspect-[2/3] border-[3px] border-foreground overflow-hidden bg-muted">
-                    {poster ? (
-                      <Image src={poster} alt={title} fill sizes="80px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className="w-full h-full bg-primary flex items-center justify-center p-1">
-                        <span className="font-heading text-label font-black uppercase text-center text-muted-foreground leading-tight">{title}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                      <h3 className="font-heading text-lg sm:text-xl font-black uppercase leading-tight text-foreground group-hover:text-primary transition-colors">
-                        {title}
-                      </h3>
-                      {year && <span className="text-label font-bold text-muted-foreground">{year}</span>}
-                    </div>
-
-                    {rating != null && (
-                      <div className="flex items-center gap-0.5 mt-1.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className={`text-sm ${i < Math.round(rating) ? 'text-foreground' : 'text-muted-foreground'}`}>★</span>
-                        ))}
-                        <span className="text-label font-black text-muted-foreground ml-1">{rating}/5</span>
-                      </div>
-                    )}
-
-                    {item.blurb && (
-                      <p className="text-base font-medium text-foreground/80 mt-2 leading-relaxed max-w-[60ch]">{item.blurb}</p>
-                    )}
-                  </div>
-                </Wrapper>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* Ranked items — layout switch lives in the client component */}
+      <RankedItems items={items} />
 
       {/* Tags + share + comments + sidebar */}
       <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-10 md:py-14">

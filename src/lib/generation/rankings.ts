@@ -130,6 +130,19 @@ ${lines.join('\n\n')}`
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80)
 
+/**
+ * TMDB scores out of 10; `list_items.item_rating` is documented out of 5 and the
+ * detail view renders it as `{rating}/5` over five stars. Writing vote_average
+ * straight through produced "8.5/5" with every star filled.
+ *
+ * Rounded to one decimal to match DECIMAL(3,1) — otherwise Postgres rounds on
+ * insert and the returned row disagrees with what we computed.
+ */
+function toFiveScale(voteAverage: number | null | undefined): number | null {
+  if (voteAverage == null) return null
+  return Math.round((voteAverage / 2) * 10) / 10
+}
+
 /** Resolve the author generated drafts are attributed to. */
 async function resolveAuthorId(supabase: ReturnType<typeof createAdminClient>) {
   if (process.env.GENERATED_AUTHOR_ID) return process.env.GENERATED_AUTHOR_ID
@@ -298,7 +311,7 @@ export async function generateRankingDraft(
         movie_id: movieIds[item.rank - 1] ?? null,
         custom_title: item.title,
         blurb: item.blurb,
-        item_rating: movies[item.rank - 1]?.vote_average ?? null,
+        item_rating: toFiveScale(movies[item.rank - 1]?.vote_average),
       }))
   )
 
