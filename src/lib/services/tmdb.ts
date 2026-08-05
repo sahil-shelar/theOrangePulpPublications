@@ -83,6 +83,133 @@ export async function getTmdbTrendingWeek() {
   }
 }
 
+export type TmdbDiscoverResult = {
+  tmdb_id: number
+  title: string
+  release_date: string | null
+  release_year: number | null
+  vote_average: number | null
+  vote_count: number
+  overview: string
+  poster_url: string | null
+}
+
+/**
+ * Discover movies by structured criteria. Used by the generation templates,
+ * each of which maps to a fixed query so the facts handed to the model are
+ * fully determined by the query rather than by anything a model invented.
+ *
+ * `vote_count.gte` is not optional in spirit: without it `vote_average.desc`
+ * surfaces obscure titles with a handful of votes sitting at 10.0, which are
+ * both bad rankings and the titles a model is most likely to fabricate about.
+ */
+export async function discoverTmdbMovies(params: Record<string, string | number>) {
+  const query = new URLSearchParams({
+    include_adult: 'false',
+    include_video: 'false',
+    language: 'en-US',
+    ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
+  })
+
+  try {
+    const res = await fetch(`${TMDB_BASE_URL}/discover/movie?${query}`, {
+      headers: getHeaders(),
+      next: { revalidate: 3600 },
+    })
+    const data = await res.json()
+    return ((data.results || []) as any[]).map((m): TmdbDiscoverResult => ({
+      tmdb_id: m.id,
+      title: m.title,
+      release_date: m.release_date || null,
+      release_year: m.release_date ? Number(m.release_date.slice(0, 4)) : null,
+      vote_average: m.vote_average ? Math.round(m.vote_average * 10) / 10 : null,
+      vote_count: m.vote_count ?? 0,
+      overview: m.overview || '',
+      poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+    }))
+  } catch (e) {
+    console.error('TMDB discover failed:', e)
+    return []
+  }
+}
+
+/** Genre name -> TMDB genre id, for templates parameterised by genre. */
+export async function getTmdbGenreMap(): Promise<Record<string, number>> {
+  try {
+    const res = await fetch(`${TMDB_BASE_URL}/genre/movie/list?language=en`, {
+      headers: getHeaders(),
+      next: { revalidate: 86400 },
+    })
+    const data = await res.json()
+    const map: Record<string, number> = {}
+    for (const g of data.genres || []) map[g.name.toLowerCase()] = g.id
+    return map
+  } catch (e) {
+    console.error('TMDB genre list failed:', e)
+    return {}
+  }
+}
+
+/** Best-match person, for the "top films by {director}" template. */
+export async function searchTmdbPerson(query: string) {
+  try {
+    const res = await fetch(
+      `${TMDB_BASE_URL}/search/person?query=${encodeURIComponent(query)}&include_adult=false&language=en-US`,
+      { headers: getHeaders(), next: { revalidate: 86400 } }
+    )
+    const data = await res.json()
+    const best = (data.results || [])[0]
+    if (!best) return null
+    return { id: best.id as number, name: best.name as string }
+  } catch (e) {
+    console.error('TMDB person search failed:', e)
+    return null
+  }
+}
+
+/**
+ * Films a person actually DIRECTED, best-scored first.
+ *
+ * Not /discover&with_crew: that matches any crew role, so a prolific producer
+ * (Spielberg) would return films they never directed under a headline claiming
+ * they did. movie_credits carries the `job` field, which is the only way to
+ * assert direction.
+ */
+export async function getTmdbPersonDirectedMovies(personId: number, minVotes = 150) {
+  try {
+    const res = await fetch(`${TMDB_BASE_URL}/person/${personId}/movie_credits?language=en-US`, {
+      headers: getHeaders(),
+      next: { revalidate: 86400 },
+    })
+    const data = await res.json()
+
+    const directed = ((data.crew || []) as any[]).filter(c => c.job === 'Director')
+
+    // A person can hold several crew jobs on one film, so de-duplicate by id.
+    const seen = new Set<number>()
+    return directed
+      .filter(m => {
+        if (seen.has(m.id) || (m.vote_count ?? 0) < minVotes) return false
+        seen.add(m.id)
+        return true
+      })
+      .map((m): TmdbDiscoverResult => ({
+        tmdb_id: m.id,
+        title: m.title,
+        release_date: m.release_date || null,
+        release_year: m.release_date ? Number(m.release_date.slice(0, 4)) : null,
+        vote_average: m.vote_average ? Math.round(m.vote_average * 10) / 10 : null,
+        vote_count: m.vote_count ?? 0,
+        overview: m.overview || '',
+        poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+      }))
+      .sort((a, b) => (b.vote_average ?? 0) - (a.vote_average ?? 0) || b.vote_count - a.vote_count)
+  } catch (e) {
+    console.error('TMDB person credits failed:', e)
+    return []
+  }
+}
+
 export function parseTmdbToInternalMovie(tmdbData: any) {
   if (!tmdbData || !tmdbData.id) return null
 

@@ -24,9 +24,10 @@ export type JobType =
   | 'optimize_image' 
   | 'newsletter_queue' 
   | 'tmdb_sync' 
-  | 'box_office_sync' 
-  | 'analytics_aggregation' 
+  | 'box_office_sync'
+  | 'analytics_aggregation'
   | 'rss_import'
+  | 'generate_ranking'
 
 export interface Job {
   id: string
