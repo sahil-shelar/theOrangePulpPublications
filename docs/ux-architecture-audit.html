@@ -181,6 +181,11 @@
       <span>🔒</span>
       <span><b>The palette is not a finding.</b> Every real token passes WCAG AA or better in both themes — cream/green 10.56:1, green on pink 7.22:1, green on yellow 9.59:1, green on blue 5.59:1. The color problem is the <em>opacity modifiers</em> layered on top of those tokens, and the fix introduces <b>zero new hues</b>.</span>
     </div>
+
+    <div class="constraint" style="background: var(--card); border-color: var(--ok); color: var(--fg);">
+      <span>✅</span>
+      <span><b>All eleven findings have since been fixed</b> across four commits (<code>e96ad77</code>, <code>43d68df</code>, <code>e6dad6b</code>, <code>15c5ea4</code>). Removing <code>@ts-nocheck</code> from the data layer additionally exposed <b>five features that were failing at runtime</b> — tag creation, contact-form submit, manual cache rebuild, saving site settings, and every job-log write. Those are described at the end of finding 11. Two items remain open by choice: 25 <code>@ts-nocheck</code> files in <code>app/</code> and <code>components/</code> (down from 39), and 228 pre-existing <code>no-explicit-any</code> lint errors.</span>
+    </div>
   </header>
 
   <div class="board">
@@ -445,6 +450,19 @@
       <div class="fix">
         <span class="label">Fix</span>
         <p>Regenerate <code>database.ts</code> from the live schema with <code>supabase gen types</code> rather than hand-maintaining it, then remove <code>@ts-nocheck</code> file by file starting with <code>lib/api</code> and <code>lib/actions</code>. Delete the stray root scripts and the orphaned routes; either build the bookmarks UI or drop the table.</p>
+      </div>
+
+      <div class="measured" style="border-left-color: var(--sev-crit);">
+        <span class="label">What this actually uncovered</span>
+        <p>Type-checking the data layer turned out to matter more than the hygiene framing suggested. Five features were broken in production, each silently:</p>
+        <ul>
+          <li><b>Tag create/update always failed.</b> <code>TagForm</code> has a Description field and submits it, but <code>tags</code> had no such column — every save returned <em>column description of relation tags does not exist</em>.</li>
+          <li><b>Contact-form submit and manual cache rebuild always failed.</b> <code>jobs.priority</code> is <code>INTEGER</code>; both inserted the strings <code>'low'</code> and <code>'high'</code>.</li>
+          <li><b>Saving site settings always failed, and the form always rendered blank.</b> <code>site_settings</code> is a key/value table, but the action upserted <code>{ id: 1, site_name, … }</code> — wrong columns, and <code>id</code> is a uuid. The read path had the same mismatch, so stored values never reached the form.</li>
+          <li><b>Every job-log write always failed.</b> <code>engine.ts</code> writes to <code>job_logs</code> and <code>types.ts</code> declares a <code>JobLog</code> interface, but the table was never created.</li>
+          <li><b>Nullable dereferences</b> on <code>job.attempts</code>, <code>media.size_bytes</code> and <code>media.mime_type</code>.</li>
+        </ul>
+        <p>Separately, Next 16 deprecated single-argument <code>revalidateTag</code> — the docs note it "currently works if TypeScript errors are suppressed," which is precisely what <code>@ts-nocheck</code> was doing across all 17 call sites. And <code>npm run lint</code> had been failing outright since the upgrade, because <code>next lint</code> was removed in Next 16.</p>
       </div>
     </div>
   </div>
