@@ -66,8 +66,13 @@ export default function ListItemsEditor({ movies, items, onChange }: Props) {
                         <option key={m.id} value={m.id}>{m.title}{m.release_year ? ` (${m.release_year})` : ''}</option>
                       ))}
                     </select>
+                    {/* step 0.1, not 0.5: item_rating is DECIMAL(3,1) and the
+                        generator writes one decimal (TMDB's /10 score halved), so
+                        step="0.5" made HTML5 validation reject 3.4 and block the
+                        whole save — "the two nearest valid values are 3 and 3.5".
+                        Matches the review `rating` field, same scale and column type. */}
                     <input
-                      type="number" min="0" max="5" step="0.5"
+                      type="number" min="0" max="5" step="0.1"
                       placeholder="Rating"
                       value={item.item_rating}
                       onChange={e => update(index, { item_rating: e.target.value })}
