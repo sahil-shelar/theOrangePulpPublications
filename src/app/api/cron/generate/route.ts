@@ -9,8 +9,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { JOB_PRIORITY } from '@/lib/jobs/types'
-import { generateRankingDraft } from '@/lib/generation/rankings'
+import { generateRankingDraft, generateRankingFromResolved } from '@/lib/generation/rankings'
 import { isTemplateId, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
+import { resolveTopic, UnsupportedTopicError } from '@/lib/generation/intent'
 
 // A run does ~10 TMDB detail fetches plus one Gemini call.
 export const maxDuration = 60
@@ -56,6 +57,60 @@ export async function GET(request: NextRequest) {
   // Manual override for testing a specific angle. Still behind the secret.
   const url = new URL(request.url)
   const overrideTemplate = url.searchParams.get('template')
+  const freeTopic = url.searchParams.get('topic')
+
+  // Free-text path — the same parser the dashboard form uses, reachable here so
+  // topics can be scripted and regression-tested without a browser session.
+  if (freeTopic) {
+    const supabase = createAdminClient()
+    const { data: job, error: jobError } = await supabase
+      .from('jobs')
+      .insert({
+        job_type: 'generate_ranking',
+        payload: { topic: freeTopic, source: 'cron-topic' },
+        status: 'running',
+        priority: JOB_PRIORITY.normal,
+        started_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+
+    if (jobError || !job) {
+      return NextResponse.json({ error: `Could not create job row: ${jobError?.message}` }, { status: 500 })
+    }
+
+    try {
+      const { resolved, queryDescription } = await resolveTopic(freeTopic)
+      const result = await generateRankingFromResolved(resolved)
+
+      await supabase.from('job_logs').insert({
+        job_id: job.id,
+        level: 'info',
+        message: `Generated draft "${result.title}" (${result.itemCount} items) with ${result.model}`,
+        metadata: { ...result, topic: freeTopic, queryDescription },
+      })
+      await supabase.from('jobs').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', job.id)
+
+      return NextResponse.json({ ok: true, jobId: job.id, topic: freeTopic, queryDescription, ...result })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      const unsupported = err instanceof UnsupportedTopicError
+
+      await supabase.from('job_logs').insert({
+        job_id: job.id,
+        level: 'error',
+        message: unsupported ? `Unsupported topic: ${message}` : message,
+        metadata: { topic: freeTopic, unsupported },
+      })
+      await supabase
+        .from('jobs')
+        .update({ status: 'failed', failed_reason: message, completed_at: new Date().toISOString() })
+        .eq('id', job.id)
+
+      // 422 for "that topic is not queryable" vs 500 for a genuine fault.
+      return NextResponse.json({ ok: false, unsupported, jobId: job.id, error: message }, { status: unsupported ? 422 : 500 })
+    }
+  }
 
   let template: TemplateId
   let params: TemplateParams

@@ -21,10 +21,35 @@ import { Type } from '@google/genai'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generateJson } from '@/lib/services/gemini'
 import { getTmdbMovieDetails, parseTmdbToInternalMovie, type TmdbDiscoverResult } from '@/lib/services/tmdb'
-import { TEMPLATES, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
+import { TEMPLATES, type ResolvedTemplate, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
 
 const MIN_BLURB_WORDS = 15
 const MAX_BLURB_WORDS = 60
+
+/** Simultaneous TMDB detail requests. Above ~4 the API starts resetting connections. */
+const DETAIL_CONCURRENCY = 4
+
+/** Ordered map with a ceiling on in-flight work. Preserves input order. */
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length)
+  let next = 0
+
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, async () => {
+      while (true) {
+        const index = next++
+        if (index >= items.length) return
+        results[index] = await fn(items[index], index)
+      }
+    })
+  )
+
+  return results
+}
 
 const SYSTEM_INSTRUCTION = `You write rankings for The Orange Pulp, a film publication with a dry, confident house voice.
 
@@ -210,6 +235,7 @@ export type GenerateRankingResult = {
   itemCount: number
 }
 
+/** Fixed-template entry point — what the weekly cron uses. */
 export async function generateRankingDraft(
   templateId: TemplateId,
   params: TemplateParams
@@ -217,22 +243,39 @@ export async function generateRankingDraft(
   const template = TEMPLATES[templateId]
   if (!template) throw new Error(`Unknown template "${templateId}".`)
 
-  const { title, angle, movies } = await template.resolve(params)
+  return generateRankingFromResolved(await template.resolve(params))
+}
+
+/**
+ * Core generator. Takes an already-resolved set of films — whichever way they
+ * were selected — and writes the draft.
+ *
+ * Both entry points converge here: the fixed templates the cron walks, and the
+ * free-text parser in `intent.ts`. Selection differs; everything after it
+ * (prose, faithfulness check, draft insert, rollback) is identical.
+ */
+export async function generateRankingFromResolved(
+  { title, angle, movies }: ResolvedTemplate
+): Promise<GenerateRankingResult> {
   const supabase = createAdminClient()
 
   // Upsert the films first: list_items.movie_id needs to point at real rows,
   // full details give the movie pages something to render, and the same fetch
   // supplies the director/country facts the prompt needs.
-  const enriched = await Promise.all(
-    movies.map(async (m): Promise<{ id: string | null; facts: MovieFacts }> => {
+  //
+  // Batched rather than one Promise.all over all 15: firing that many simultaneous
+  // connections at TMDB drew repeated ECONNRESETs, which is what surfaced as
+  // list_items rows with a null movie_id.
+  const enriched = await mapWithConcurrency(movies, DETAIL_CONCURRENCY,
+    async (m): Promise<{ id: string | null; facts: MovieFacts }> => {
       const details = await getTmdbMovieDetails(m.tmdb_id)
-      const parsed = details ? parseTmdbToInternalMovie(details) : null
+      const parsed = parseTmdbToInternalMovie(details)
       const facts: MovieFacts = {
         ...m,
         director: parsed?.director || null,
         countries: (details?.production_countries ?? []).map((c: any) => c.name).filter(Boolean),
       }
-      if (!parsed) return { id: null, facts }
+      if (!parsed) throw new Error(`TMDB returned an unusable record for "${m.title}" (${m.tmdb_id}).`)
 
       const year = parsed.release_date?.split('-')[0]
       const { data, error } = await supabase
@@ -259,12 +302,12 @@ export async function generateRankingDraft(
         .select('id')
         .single()
 
-      if (error) {
-        console.error(`Movie upsert failed for ${parsed.title}:`, error.message)
-        return { id: null, facts }
-      }
+      // A null movie_id renders as a card with no poster and no link, so treat a
+      // failed upsert as a failed run rather than shipping a broken entry.
+      if (error) throw new Error(`Movie upsert failed for "${parsed.title}": ${error.message}`)
+
       return { id: data.id, facts }
-    })
+    }
   )
 
   const movieIds = enriched.map(e => e.id)

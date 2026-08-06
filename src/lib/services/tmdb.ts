@@ -13,6 +13,53 @@ function getHeaders() {
   }
 }
 
+/**
+ * Fetch + parse, retrying transient failures, and THROWING when it ultimately
+ * fails.
+ *
+ * Callers that select which films appear in an article must use this rather than
+ * catching and returning `[]`. A swallowed ECONNRESET became the user-facing
+ * message "only 0 qualifying titles for Denis Villeneuve" — an infrastructure
+ * failure dressed up as an editorial fact about his filmography. Observed
+ * against a live TMDB throttle.
+ *
+ * Public listing pages (trending, now playing) still degrade gracefully; an empty
+ * carousel there is better than a broken page.
+ */
+async function tmdbFetchJson(path: string, revalidate = 3600, attempts = 4): Promise<any> {
+  let lastError: unknown
+
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      // Only the first attempt participates in the Next fetch cache. Retries must
+      // set `cache: 'no-store'`, because Next memoizes an identical cached fetch
+      // for the render — including its rejection — so a retry with the same
+      // options replays the same failure instead of hitting the network. Observed:
+      // 3/3 attempts failing in-route while a fresh process succeeded on attempt 2.
+      const res = await fetch(
+        `${TMDB_BASE_URL}${path}`,
+        attempt === 0
+          ? { headers: getHeaders(), next: { revalidate } }
+          : { headers: getHeaders(), cache: 'no-store' }
+      )
+      if (!res.ok) throw new Error(`TMDB ${res.status} ${res.statusText} for ${path.split('?')[0]}`)
+      return await res.json()
+    } catch (e) {
+      lastError = e
+      // Exponential-ish backoff, capped so the whole run stays inside the 60s
+      // serverless budget. TMDB resets connections under burst load rather than
+      // returning 429, so the first retry is often immediate-enough.
+      if (attempt < attempts - 1) await new Promise(r => setTimeout(r, 500 * 2 ** attempt))
+    }
+  }
+
+  const detail = lastError instanceof Error ? lastError.message : String(lastError)
+  const cause = (lastError as any)?.cause?.code ? ` [${(lastError as any).cause.code}]` : ''
+  // Full path, not just the endpoint: a query that fails reproducibly is almost
+  // always a malformed parameter, and the endpoint alone does not show that.
+  throw new Error(`TMDB request failed after ${attempts} attempts (${path}): ${detail}${cause}`)
+}
+
 export async function searchTmdbMovie(query: string) {
   try {
     const res = await fetch(`${TMDB_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&include_adult=false`, {
@@ -26,17 +73,18 @@ export async function searchTmdbMovie(query: string) {
   }
 }
 
+/**
+ * Full movie record. Retries and then throws.
+ *
+ * This used to swallow failures and return null. In the ranking generator that
+ * meant a transient ECONNRESET produced a `list_items` row with `movie_id: null`
+ * — a card with no poster and no link — while the run still reported success.
+ * Failing loudly is better: the run is cheap to repeat.
+ */
 export async function getTmdbMovieDetails(tmdbId: number | string) {
-  try {
-    const res = await fetch(`${TMDB_BASE_URL}/movie/${tmdbId}?append_to_response=credits,videos,release_dates,watch/providers,images&include_image_language=null,en`, {
-      headers: getHeaders()
-    })
-    const data = await res.json()
-    return data
-  } catch (e) {
-    console.error("TMDb Details failed:", e)
-    return null
-  }
+  return tmdbFetchJson(
+    `/movie/${tmdbId}?append_to_response=credits,videos,release_dates,watch/providers,images&include_image_language=null,en`
+  )
 }
 
 export async function getTmdbNowPlaying(page = 1) {
@@ -111,60 +159,50 @@ export async function discoverTmdbMovies(params: Record<string, string | number>
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
   })
 
-  try {
-    const res = await fetch(`${TMDB_BASE_URL}/discover/movie?${query}`, {
-      headers: getHeaders(),
-      next: { revalidate: 3600 },
-    })
-    const data = await res.json()
-    return ((data.results || []) as any[]).map((m): TmdbDiscoverResult => ({
-      tmdb_id: m.id,
-      title: m.title,
-      release_date: m.release_date || null,
-      release_year: m.release_date ? Number(m.release_date.slice(0, 4)) : null,
-      vote_average: m.vote_average ? Math.round(m.vote_average * 10) / 10 : null,
-      vote_count: m.vote_count ?? 0,
-      overview: m.overview || '',
-      poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
-    }))
-  } catch (e) {
-    console.error('TMDB discover failed:', e)
-    return []
-  }
+  // Deliberately not caught: an empty list here would be read downstream as
+  // "no films match that query" rather than "the request failed".
+  const data = await tmdbFetchJson(`/discover/movie?${query}`)
+  return ((data.results || []) as any[]).map((m): TmdbDiscoverResult => ({
+    tmdb_id: m.id,
+    title: m.title,
+    release_date: m.release_date || null,
+    release_year: m.release_date ? Number(m.release_date.slice(0, 4)) : null,
+    vote_average: m.vote_average ? Math.round(m.vote_average * 10) / 10 : null,
+    vote_count: m.vote_count ?? 0,
+    overview: m.overview || '',
+    poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+  }))
 }
 
 /** Genre name -> TMDB genre id, for templates parameterised by genre. */
 export async function getTmdbGenreMap(): Promise<Record<string, number>> {
-  try {
-    const res = await fetch(`${TMDB_BASE_URL}/genre/movie/list?language=en`, {
-      headers: getHeaders(),
-      next: { revalidate: 86400 },
-    })
-    const data = await res.json()
-    const map: Record<string, number> = {}
-    for (const g of data.genres || []) map[g.name.toLowerCase()] = g.id
-    return map
-  } catch (e) {
-    console.error('TMDB genre list failed:', e)
-    return {}
-  }
+  const data = await tmdbFetchJson('/genre/movie/list?language=en', 86400)
+  const map: Record<string, number> = {}
+  for (const g of data.genres || []) map[g.name.toLowerCase()] = g.id
+  return map
+}
+
+/**
+ * Streaming provider name -> TMDB provider id, for region-scoped availability
+ * queries ("netflix and chill" is a real query: with_watch_providers=8).
+ */
+export async function getTmdbWatchProviders(region = 'US'): Promise<Record<string, number>> {
+  const data = await tmdbFetchJson(`/watch/providers/movie?language=en-US&watch_region=${region}`, 86400)
+  const map: Record<string, number> = {}
+  for (const p of data.results || []) map[p.provider_name.toLowerCase()] = p.provider_id
+  return map
 }
 
 /** Best-match person, for the "top films by {director}" template. */
+/** Returns null only when TMDB genuinely has no such person — a failed request throws. */
 export async function searchTmdbPerson(query: string) {
-  try {
-    const res = await fetch(
-      `${TMDB_BASE_URL}/search/person?query=${encodeURIComponent(query)}&include_adult=false&language=en-US`,
-      { headers: getHeaders(), next: { revalidate: 86400 } }
-    )
-    const data = await res.json()
-    const best = (data.results || [])[0]
-    if (!best) return null
-    return { id: best.id as number, name: best.name as string }
-  } catch (e) {
-    console.error('TMDB person search failed:', e)
-    return null
-  }
+  const data = await tmdbFetchJson(
+    `/search/person?query=${encodeURIComponent(query)}&include_adult=false&language=en-US`,
+    86400
+  )
+  const best = (data.results || [])[0]
+  if (!best) return null
+  return { id: best.id as number, name: best.name as string }
 }
 
 /**
@@ -176,38 +214,29 @@ export async function searchTmdbPerson(query: string) {
  * assert direction.
  */
 export async function getTmdbPersonDirectedMovies(personId: number, minVotes = 150) {
-  try {
-    const res = await fetch(`${TMDB_BASE_URL}/person/${personId}/movie_credits?language=en-US`, {
-      headers: getHeaders(),
-      next: { revalidate: 86400 },
+  const data = await tmdbFetchJson(`/person/${personId}/movie_credits?language=en-US`, 86400)
+
+  const directed = ((data.crew || []) as any[]).filter(c => c.job === 'Director')
+
+  // A person can hold several crew jobs on one film, so de-duplicate by id.
+  const seen = new Set<number>()
+  return directed
+    .filter(m => {
+      if (seen.has(m.id) || (m.vote_count ?? 0) < minVotes) return false
+      seen.add(m.id)
+      return true
     })
-    const data = await res.json()
-
-    const directed = ((data.crew || []) as any[]).filter(c => c.job === 'Director')
-
-    // A person can hold several crew jobs on one film, so de-duplicate by id.
-    const seen = new Set<number>()
-    return directed
-      .filter(m => {
-        if (seen.has(m.id) || (m.vote_count ?? 0) < minVotes) return false
-        seen.add(m.id)
-        return true
-      })
-      .map((m): TmdbDiscoverResult => ({
-        tmdb_id: m.id,
-        title: m.title,
-        release_date: m.release_date || null,
-        release_year: m.release_date ? Number(m.release_date.slice(0, 4)) : null,
-        vote_average: m.vote_average ? Math.round(m.vote_average * 10) / 10 : null,
-        vote_count: m.vote_count ?? 0,
-        overview: m.overview || '',
-        poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
-      }))
-      .sort((a, b) => (b.vote_average ?? 0) - (a.vote_average ?? 0) || b.vote_count - a.vote_count)
-  } catch (e) {
-    console.error('TMDB person credits failed:', e)
-    return []
-  }
+    .map((m): TmdbDiscoverResult => ({
+      tmdb_id: m.id,
+      title: m.title,
+      release_date: m.release_date || null,
+      release_year: m.release_date ? Number(m.release_date.slice(0, 4)) : null,
+      vote_average: m.vote_average ? Math.round(m.vote_average * 10) / 10 : null,
+      vote_count: m.vote_count ?? 0,
+      overview: m.overview || '',
+      poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+    }))
+    .sort((a, b) => (b.vote_average ?? 0) - (a.vote_average ?? 0) || b.vote_count - a.vote_count)
 }
 
 export function parseTmdbToInternalMovie(tmdbData: any) {
