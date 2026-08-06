@@ -152,8 +152,8 @@ export default async function Homepage() {
         {editorsPicks.length > 0 && (
           <section className="py-14">
             <SectionHeader title="Editor's Picks" />
-            <div className="brutal-card bg-foreground p-0 overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-3 divide-y-[3px] md:divide-y-0 md:divide-x-[3px] divide-background/20">
+            <div className="brutal-card bg-on-media-surface p-0 overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-3 divide-y-[3px] md:divide-y-0 md:divide-x-[3px] divide-on-media/20">
                 {editorsPicks.map((article) => {
                   const image = (article as any).cover_image_url || (article as any).movies?.poster_url
                   return (
@@ -162,19 +162,24 @@ export default async function Homepage() {
                       href={`/${typeToRoute(article.type)}/${article.slug}`}
                       className="group relative overflow-hidden"
                     >
+                      {/* opacity-60, not 20: at 20% the poster was a ghost and the
+                          bg-foreground green it sits on dominated the card. The scrim
+                          below is what earns the text its contrast, so the image does
+                          not also have to be dimmed into the background to get it.
+                          A media surface stays behind it — image-less picks render on that. */}
                       <div className="absolute inset-0">
-                        {image && <img src={image} alt={article.title} className="w-full h-full object-cover opacity-20 group-hover:opacity-30 group-hover:scale-105 transition-all duration-300" />}
+                        {image && <img src={image} alt={article.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-70 group-hover:scale-105 transition-all duration-300" />}
                         <div className="absolute inset-0 img-scrim" />
                       </div>
                       <div className="relative p-7 min-h-[280px] flex flex-col justify-between">
-                        <span className="text-label font-black uppercase tracking-widest bg-primary text-primary-foreground px-2 py-1 border-[2px] border-background/30 self-start">
+                        <span className="text-label font-black uppercase tracking-widest bg-primary text-primary-foreground px-2 py-1 border-[2px] border-on-media/30 self-start">
                           {article.type}
                         </span>
                         <div>
-                          <h3 className="font-heading text-2xl font-black uppercase text-background leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-3">
+                          <h3 className="font-heading text-2xl font-black uppercase text-on-media leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-3">
                             {article.title}
                           </h3>
-                          <div className="text-label font-black uppercase tracking-widest text-background/50">
+                          <div className="text-label font-black uppercase tracking-widest text-on-media/75">
                             {article.authors?.name || 'Editorial'}
                           </div>
                         </div>
