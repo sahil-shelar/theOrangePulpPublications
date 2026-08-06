@@ -42,7 +42,7 @@ export type ResolvedTemplate = {
   signature: string
 }
 
-export type SortMode = 'rating' | 'popularity' | 'recent'
+export type SortMode = 'rating' | 'popularity' | 'recent' | 'revenue'
 
 /**
  * Canonical description of a query's constraints.

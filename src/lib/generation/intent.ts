@@ -38,6 +38,9 @@ const WATCH_REGION = 'US'
  * legitimate pool, so the floor has to come down with it.
  */
 function voteFloor(opts: { sort: ParsedIntent['sort']; hasPerson: boolean; hasProvider: boolean; hasYearBound: boolean }) {
+  // Only a rating sort can be gamed by a tiny vote count. Sorting by revenue,
+  // popularity or date already puts substantial films first, so a high floor
+  // there would just discard legitimate results.
   if (opts.sort !== 'rating') return 100
   // A director's filmography is small and every entry is legitimately theirs.
   if (opts.hasPerson) return 150
@@ -69,7 +72,7 @@ export type ParsedIntent = {
   year_from: number
   year_to: number
   count: number
-  sort: 'rating' | 'popularity' | 'recent'
+  sort: 'rating' | 'popularity' | 'recent' | 'revenue'
   part: number
 }
 
@@ -94,7 +97,7 @@ const INTENT_SCHEMA = {
     year_from: { type: Type.INTEGER, description: 'Earliest release year, or 0 for no lower bound.' },
     year_to: { type: Type.INTEGER, description: 'Latest release year, or 0 for no upper bound.' },
     count: { type: Type.INTEGER, description: `How many films, ${MIN_ITEMS}-${MAX_ITEMS}. Default 10.` },
-    sort: { type: Type.STRING, enum: ['rating', 'popularity', 'recent'], description: 'How to order the films.' },
+    sort: { type: Type.STRING, enum: ['rating', 'popularity', 'recent', 'revenue'], description: 'How to order the films. Use revenue for highest-grossing / biggest box office.' },
     part: {
       type: Type.INTEGER,
       description:
@@ -117,14 +120,20 @@ The query can only express these things:
   - streaming availability on one named service in the US
   - one director
   - a release year range
-  - ordering by audience rating, by popularity, or by most recent
+  - ordering by audience rating, by popularity, by most recent, or by box
+    office revenue (use this for "highest grossing", "biggest box office",
+    "biggest hits")
   - how many films
 
 Set supported = false when the topic depends on anything else. Things the
 database does NOT record, and which you must refuse rather than approximate:
-box office performance or flops, awards, critical vs audience divergence,
+whether a film flopped or lost money, awards, critical vs audience divergence,
 "underrated", "aged well", "hidden gems", mood or occasion with no genre reading,
 runtime suitability, content warnings, actor-led lists.
+
+Note the asymmetry on money: gross revenue IS recorded, so "highest grossing" is
+supported via sort = revenue. A flop is not — it needs budget compared against
+revenue plus context the database cannot settle.
 
 Judgement you SHOULD make: an occasion or vibe that has a fair genre reading is
 supported — translate it. "Netflix and chill" is Netflix availability plus
@@ -265,15 +274,23 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
   // A query with no constraints is an unfiltered sweep of "good films", which is
   // not an article. Enforced in code, not left to the model's own `supported`
   // flag — a model that approves everything would make that flag decoration.
-  if (genreIds.length === 0 && !providerId && !person && !yearFrom && !yearTo) {
+  //
+  // Exception: a revenue sort is self-defining. "The 10 highest grossing films of
+  // all time" needs no genre or period — the ordering IS the premise, and the
+  // answer is objective. Only the subjective sorts need narrowing, which is what
+  // keeps "weekend watch" (unconstrained + rating) refused.
+  const hasConstraint = genreIds.length > 0 || providerId || person || yearFrom || yearTo
+  if (!hasConstraint && intent.sort !== 'revenue') {
     throw new UnsupportedTopicError(
       'That topic does not narrow to anything queryable — no genre, streaming service, director or time period. Try naming one.'
     )
   }
+  if (!hasConstraint) described.unshift('all films')
 
   described.push(
     intent.sort === 'rating' ? 'ordered by audience score'
       : intent.sort === 'popularity' ? 'ordered by popularity'
+      : intent.sort === 'revenue' ? 'ordered by worldwide gross (TMDB-reported, not inflation-adjusted)'
       : 'newest first'
   )
 
@@ -335,6 +352,7 @@ const SORT_PARAM = {
   rating: 'vote_average.desc',
   popularity: 'popularity.desc',
   recent: 'primary_release_date.desc',
+  revenue: 'revenue.desc',
 } as const
 
 async function moviesByDiscover(
@@ -403,6 +421,10 @@ async function moviesByDirector(
 
   if (sort === 'recent') {
     films = films.slice().sort((a, b) => (b.release_year ?? 0) - (a.release_year ?? 0))
+  } else if (sort === 'revenue') {
+    // movie_credits does not carry revenue, so a director list cannot be ordered
+    // by gross. vote_count is the closest available proxy for reach.
+    films = films.slice().sort((a, b) => b.vote_count - a.vote_count)
   } else if (sort === 'popularity') {
     films = films.slice().sort((a, b) => b.vote_count - a.vote_count)
   }
