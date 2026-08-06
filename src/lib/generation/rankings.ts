@@ -243,6 +243,10 @@ export async function generateRankingDraft(
   const template = TEMPLATES[templateId]
   if (!template) throw new Error(`Unknown template "${templateId}".`)
 
+  // The template emits a signature in the same shape buildSignature gives the
+  // free-text parser, so a "part 2" typed into the dashboard can continue from a
+  // cron-generated list. Templates never exclude themselves — the weekly rotation
+  // repeating a slot has to stay predictable.
   return generateRankingFromResolved(await template.resolve(params))
 }
 
@@ -255,7 +259,7 @@ export async function generateRankingDraft(
  * (prose, faithfulness check, draft insert, rollback) is identical.
  */
 export async function generateRankingFromResolved(
-  { title, angle, movies }: ResolvedTemplate
+  { title, angle, movies, signature }: ResolvedTemplate
 ): Promise<GenerateRankingResult> {
   const supabase = createAdminClient()
 
@@ -267,7 +271,7 @@ export async function generateRankingFromResolved(
   // connections at TMDB drew repeated ECONNRESETs, which is what surfaced as
   // list_items rows with a null movie_id.
   const enriched = await mapWithConcurrency(movies, DETAIL_CONCURRENCY,
-    async (m): Promise<{ id: string | null; facts: MovieFacts }> => {
+    async (m): Promise<{ id: string | null; facts: MovieFacts; backdrop: string | null }> => {
       const details = await getTmdbMovieDetails(m.tmdb_id)
       const parsed = parseTmdbToInternalMovie(details)
       const facts: MovieFacts = {
@@ -275,6 +279,7 @@ export async function generateRankingFromResolved(
         director: parsed?.director || null,
         countries: (details?.production_countries ?? []).map((c: any) => c.name).filter(Boolean),
       }
+      const backdrop = parsed?.backdrop_url ?? null
       if (!parsed) throw new Error(`TMDB returned an unusable record for "${m.title}" (${m.tmdb_id}).`)
 
       const year = parsed.release_date?.split('-')[0]
@@ -306,7 +311,7 @@ export async function generateRankingFromResolved(
       // failed upsert as a failed run rather than shipping a broken entry.
       if (error) throw new Error(`Movie upsert failed for "${parsed.title}": ${error.message}`)
 
-      return { id: data.id, facts }
+      return { id: data.id, facts, backdrop }
     }
   )
 
@@ -335,9 +340,13 @@ export async function generateRankingFromResolved(
       excerpt: generated.intro,
       content: generated.intro,
       author_id: authorId,
-      cover_image_url: movies[0]?.poster_url ?? null,
+      // The hero renders at 55-70vh full-bleed, so a 2:3 poster gets cropped to a
+      // sliver. Prefer the top film's landscape backdrop and keep the poster as a
+      // fallback for titles that have none.
+      cover_image_url: enriched[0]?.backdrop ?? movies[0]?.poster_url ?? null,
       seo_title: (generated.headline || title).slice(0, 60),
       seo_description: generated.intro.slice(0, 155),
+      query_signature: signature ?? null,
     })
     .select('id, slug, title')
     .single()

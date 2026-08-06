@@ -27,6 +27,27 @@ export const getCachedArticleBySlug = cache(
   }
 )
 
+/**
+ * Fetch by id for the dashboard preview, regardless of status.
+ *
+ * By id rather than slug on purpose: a draft has a slug, and keying preview on
+ * slug would collide with the public article route and share its 60s
+ * `getCachedPublicArticleBySlug` cache. Uncached, and the caller must be
+ * authenticated — this returns unpublished content.
+ */
+export async function getArticleByIdForPreview(id: string): Promise<ArticleWithRelations | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('articles')
+    .select(ARTICLE_DETAIL_SELECT)
+    .order('rank', { referencedTable: 'list_items', ascending: true })
+    .order('rank', { referencedTable: 'spotlight_works', ascending: true })
+    .eq('id', id)
+    .single()
+  if (error) return null
+  return data as ArticleWithRelations | null
+}
+
 // Cross-request cache (60s) using public client — no cookies needed, safe for force-dynamic pages
 export const getCachedPublicArticleBySlug = unstable_cache(
   async (slug: string): Promise<ArticleWithRelations | null> => {

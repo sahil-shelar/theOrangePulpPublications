@@ -22,14 +22,41 @@ import {
   searchTmdbPerson,
   type TmdbDiscoverResult,
 } from '@/lib/services/tmdb'
-import type { ResolvedTemplate } from '@/lib/generation/templates'
+import { buildSignature, type ResolvedTemplate } from '@/lib/generation/templates'
 
 const MIN_ITEMS = 5
 const MAX_ITEMS = 15
 const WATCH_REGION = 'US'
 
-/** Floors on vote_count so a rating sort cannot surface 1-vote 10.0 entries. */
-const VOTE_FLOOR = { rating: 150, popularity: 50, recent: 50 } as const
+/**
+ * Floor on vote_count, scaled to how broad the query is.
+ *
+ * A flat low floor produced garbage: "10 best horror movies" with a floor of 150
+ * returned Succubus, La Leyenda de los Chaneques and Michael Jackson's Thriller
+ * ahead of Alien and The Shining, because an obscure title with 160 votes at 8.0
+ * outranks a canonical one at 7.9. The narrower the query, the smaller the
+ * legitimate pool, so the floor has to come down with it.
+ */
+function voteFloor(opts: { sort: ParsedIntent['sort']; hasPerson: boolean; hasProvider: boolean; hasYearBound: boolean }) {
+  if (opts.sort !== 'rating') return 100
+  // A director's filmography is small and every entry is legitimately theirs.
+  if (opts.hasPerson) return 150
+  // A provider or period genuinely narrows the pool.
+  if (opts.hasProvider || opts.hasYearBound) return 600
+  // Genre alone across all of cinema — only well-known films belong here.
+  return 3000
+}
+
+/**
+ * TMDB genre 10770 is "TV Movie"; excluding it keeps broadcast specials out of a
+ * movie ranking. The runtime floor drops shorts and music videos — it is what
+ * removes "Michael Jackson's Thriller" (14 min) and Doctor Who specials.
+ */
+const EXCLUDE_GENRES = 10770
+const MIN_RUNTIME = 60
+
+/** How many TMDB result pages to pull when earlier parts must be excluded. */
+const MAX_PAGES = 3
 
 export type ParsedIntent = {
   supported: boolean
@@ -43,6 +70,7 @@ export type ParsedIntent = {
   year_to: number
   count: number
   sort: 'rating' | 'popularity' | 'recent'
+  part: number
 }
 
 const INTENT_SCHEMA = {
@@ -67,9 +95,14 @@ const INTENT_SCHEMA = {
     year_to: { type: Type.INTEGER, description: 'Latest release year, or 0 for no upper bound.' },
     count: { type: Type.INTEGER, description: `How many films, ${MIN_ITEMS}-${MAX_ITEMS}. Default 10.` },
     sort: { type: Type.STRING, enum: ['rating', 'popularity', 'recent'], description: 'How to order the films.' },
+    part: {
+      type: Type.INTEGER,
+      description:
+        'Which instalment of a continuing list. 1 unless the topic asks for a follow-up ("part 2", "part two", "more", "another 10"), in which case 2 or the stated number.',
+    },
   },
-  required: ['supported', 'reason', 'headline', 'angle', 'genres', 'provider', 'person', 'year_from', 'year_to', 'count', 'sort'],
-  propertyOrdering: ['supported', 'reason', 'headline', 'angle', 'genres', 'provider', 'person', 'year_from', 'year_to', 'count', 'sort'],
+  required: ['supported', 'reason', 'headline', 'angle', 'genres', 'provider', 'person', 'year_from', 'year_to', 'count', 'sort', 'part'],
+  propertyOrdering: ['supported', 'reason', 'headline', 'angle', 'genres', 'provider', 'person', 'year_from', 'year_to', 'count', 'sort', 'part'],
 }
 
 const PARSER_INSTRUCTION = `You convert an editor's topic for a film ranking into a database query.
@@ -103,11 +136,19 @@ list of "good films" is not an article.
 
 headline: may keep the editor's framing, including a vibe phrase. It must not
 claim anything the query does not constrain — no "award-winning", no "critically
-acclaimed", no "streaming everywhere", no runtime claims.
+acclaimed", no runtime claims, and no reference to streaming unless a provider is
+actually set. (A part-2 run once produced "Streaming Horror: The Next Wave" for a
+query with no provider at all. Do not do that.)
 
 angle: state plainly what the query actually selects, so a human reviewing the
 draft can judge whether the framing was fair. Mention the service by name when
-one is used.`
+one is used.
+
+part: a follow-up request ("part 2", "another ten", "more horror") is the SAME
+query as the original, just a later instalment. Emit identical constraints and set
+part accordingly — do not add or change a genre, provider or year bound to make it
+look different. The films already used are excluded automatically, and that only
+works if the constraints match the earlier run exactly.`
 
 /** What the parser produced plus how it was resolved, for display to the editor. */
 export type ResolvedIntent = {
@@ -115,6 +156,10 @@ export type ResolvedIntent = {
   intent: ParsedIntent
   /** Human-readable account of the query that ran. */
   queryDescription: string
+  /** Canonical constraints, stored so later parts can exclude these films. */
+  querySignature: string
+  /** tmdb_ids skipped because an earlier part already used them. */
+  excludedCount: number
 }
 
 export class UnsupportedTopicError extends Error {}
@@ -122,6 +167,32 @@ export class UnsupportedTopicError extends Error {}
 function clampCount(count: number) {
   if (!Number.isFinite(count)) return 10
   return Math.min(Math.max(count, MIN_ITEMS), MAX_ITEMS)
+}
+
+/** tmdb_ids already featured in earlier articles built from the same query. */
+async function alreadyFeatured(signature: string): Promise<{ ids: Set<number>; articleCount: number }> {
+  const { createAdminClient } = await import('@/lib/supabase/admin')
+  const supabase = createAdminClient()
+
+  const { data: priorArticles } = await supabase
+    .from('articles')
+    .select('id')
+    .eq('query_signature', signature)
+
+  if (!priorArticles?.length) return { ids: new Set(), articleCount: 0 }
+
+  const { data: items } = await supabase
+    .from('list_items')
+    .select('movies(tmdb_id)')
+    .in('article_id', priorArticles.map(a => a.id))
+
+  const ids = new Set<number>()
+  for (const row of items ?? []) {
+    const tmdbId = (row as any).movies?.tmdb_id
+    if (typeof tmdbId === 'number') ids.add(tmdbId)
+  }
+
+  return { ids, articleCount: priorArticles.length }
 }
 
 export async function parseTopic(topic: string): Promise<ParsedIntent> {
@@ -206,13 +277,39 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
       : 'newest first'
   )
 
-  const movies = person
+  const querySignature = buildSignature({
+    genreIds, providerId, personId: person?.id ?? null, yearFrom, yearTo, sort: intent.sort,
+  })
+
+  // A follow-up instalment must not repeat part one. The query itself is
+  // deterministic, so without this "part 2" returns byte-identical films.
+  const part = Number.isFinite(intent.part) ? Math.max(1, Math.trunc(intent.part)) : 1
+  let excluded = new Set<number>()
+
+  if (part > 1) {
+    const prior = await alreadyFeatured(querySignature)
+    if (prior.articleCount === 0) {
+      throw new UnsupportedTopicError(
+        'No earlier part exists for this query, so there is nothing to continue from. Generate part one first.'
+      )
+    }
+    excluded = prior.ids
+    described.push(`excluding ${excluded.size} films from ${prior.articleCount} earlier part(s)`)
+  }
+
+  const pool = person
     ? await moviesByDirector(person.id, yearFrom, yearTo, intent.sort)
-    : await moviesByDiscover({ genreIds, providerId, yearFrom, yearTo, sort: intent.sort })
+    : await moviesByDiscover({ genreIds, providerId, yearFrom, yearTo, sort: intent.sort },
+        // Only page deeper when earlier parts have eaten into the top results.
+        excluded.size > 0 ? MAX_PAGES : 1)
+
+  const movies = pool.filter(m => !excluded.has(m.tmdb_id))
 
   if (movies.length < MIN_ITEMS) {
     throw new UnsupportedTopicError(
-      `Only ${movies.length} films match that query; a ranking needs at least ${MIN_ITEMS}. Try loosening it.`
+      excluded.size > 0
+        ? `Only ${movies.length} unused films are left for this query after excluding ${excluded.size} already featured; a ranking needs at least ${MIN_ITEMS}. Earlier parts have exhausted it.`
+        : `Only ${movies.length} films match that query; a ranking needs at least ${MIN_ITEMS}. Try loosening it.`
     )
   }
 
@@ -221,7 +318,10 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
   return {
     intent,
     queryDescription,
+    querySignature,
+    excludedCount: excluded.size,
     resolved: {
+      signature: querySignature,
       title: intent.headline,
       // The angle handed to the prose step states what the query selected, so the
       // blurb writer is anchored to the query rather than to the vibe phrase.
@@ -237,16 +337,26 @@ const SORT_PARAM = {
   recent: 'primary_release_date.desc',
 } as const
 
-async function moviesByDiscover(opts: {
-  genreIds: number[]
-  providerId: number | null
-  yearFrom: number | null
-  yearTo: number | null
-  sort: ParsedIntent['sort']
-}) {
+async function moviesByDiscover(
+  opts: {
+    genreIds: number[]
+    providerId: number | null
+    yearFrom: number | null
+    yearTo: number | null
+    sort: ParsedIntent['sort']
+  },
+  pages = 1
+) {
   const params: Record<string, string | number> = {
     sort_by: SORT_PARAM[opts.sort],
-    'vote_count.gte': VOTE_FLOOR[opts.sort],
+    'vote_count.gte': voteFloor({
+      sort: opts.sort,
+      hasPerson: false,
+      hasProvider: Boolean(opts.providerId),
+      hasYearBound: Boolean(opts.yearFrom || opts.yearTo),
+    }),
+    without_genres: EXCLUDE_GENRES,
+    'with_runtime.gte': MIN_RUNTIME,
   }
   if (opts.genreIds.length) params.with_genres = opts.genreIds.join(',')
   if (opts.providerId) {
@@ -256,7 +366,23 @@ async function moviesByDiscover(opts: {
   if (opts.yearFrom) params['primary_release_date.gte'] = `${opts.yearFrom}-01-01`
   if (opts.yearTo) params['primary_release_date.lte'] = `${opts.yearTo}-12-31`
 
-  return discoverTmdbMovies(params)
+  // Pages are concatenated and de-duplicated rather than requesting page N alone:
+  // `vote_average.desc` can reorder between calls as vote counts move, so "page 2"
+  // is not a stable window onto results 21-40.
+  const seen = new Set<number>()
+  const all: TmdbDiscoverResult[] = []
+
+  for (let page = 1; page <= pages; page++) {
+    const batch = await discoverTmdbMovies({ ...params, page })
+    if (batch.length === 0) break
+    for (const m of batch) {
+      if (seen.has(m.tmdb_id)) continue
+      seen.add(m.tmdb_id)
+      all.push(m)
+    }
+  }
+
+  return all
 }
 
 async function moviesByDirector(
@@ -267,7 +393,10 @@ async function moviesByDirector(
 ) {
   // job === 'Director' credits, not /discover&with_crew — a producer credit must
   // not land in a list headlined "directed by".
-  let films = await getTmdbPersonDirectedMovies(personId, VOTE_FLOOR.rating)
+  let films = await getTmdbPersonDirectedMovies(
+    personId,
+    voteFloor({ sort, hasPerson: true, hasProvider: false, hasYearBound: Boolean(yearFrom || yearTo) })
+  )
 
   if (yearFrom) films = films.filter(f => (f.release_year ?? 0) >= yearFrom)
   if (yearTo) films = films.filter(f => (f.release_year ?? 9999) <= yearTo)

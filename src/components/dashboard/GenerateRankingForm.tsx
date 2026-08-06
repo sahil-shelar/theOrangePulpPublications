@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Sparkles, Loader2, AlertTriangle, Check, Database } from 'lucide-react'
+import { Sparkles, Loader2, AlertTriangle, Check, Database, Eye } from 'lucide-react'
 import { generateRankingFromTopic, type GenerateRankingState } from '@/lib/actions/generate'
 
 // Topics that resolve cleanly, plus one that does not — the last chip is there so
@@ -125,23 +125,39 @@ export default function GenerateRankingForm() {
                 <dt className="text-label font-black uppercase tracking-widest text-muted-foreground">Run</dt>
                 <dd className="font-medium text-foreground">
                   {state.itemCount} films · {state.model} · {state.totalTokens.toLocaleString()} tokens
+                  {state.part > 1 && ` · part ${state.part}`}
                 </dd>
               </div>
+              {state.excludedCount > 0 && (
+                <div>
+                  <dt className="text-label font-black uppercase tracking-widest text-muted-foreground">Continuation</dt>
+                  <dd className="font-medium text-foreground">
+                    {state.excludedCount} films skipped because earlier parts already used them
+                  </dd>
+                </div>
+              )}
             </dl>
 
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
-                href={`/dashboard/articles/${state.articleId}/edit`}
+                href={`/preview/${state.articleId}`}
+                target="_blank"
                 className="inline-flex items-center gap-2 bg-primary text-primary-foreground border-[3px] border-foreground px-5 py-2.5 text-label font-black uppercase tracking-widest hover:-translate-y-0.5 transition-transform"
               >
-                Review draft
+                <Eye size={14} strokeWidth={2.5} /> Preview
+              </Link>
+              <Link
+                href={`/dashboard/articles/${state.articleId}/edit`}
+                className="inline-flex items-center gap-2 bg-background text-foreground border-[3px] border-foreground px-5 py-2.5 text-label font-black uppercase tracking-widest hover:bg-muted transition-colors"
+              >
+                Edit
               </Link>
               <button
                 type="button"
                 onClick={() => { setState(null); setTopic('') }}
                 className="inline-flex items-center gap-2 bg-background text-foreground border-[3px] border-foreground px-5 py-2.5 text-label font-black uppercase tracking-widest hover:bg-muted transition-colors"
               >
-                Generate another
+                New topic
               </button>
             </div>
 

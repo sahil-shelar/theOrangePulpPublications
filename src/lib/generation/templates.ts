@@ -38,6 +38,41 @@ export type ResolvedTemplate = {
   /** One-line framing handed to the model, derived from the query — not free text. */
   angle: string
   movies: TmdbDiscoverResult[]
+  /** Canonical constraints, so a later part can exclude these films. */
+  signature: string
+}
+
+export type SortMode = 'rating' | 'popularity' | 'recent'
+
+/**
+ * Canonical description of a query's constraints.
+ *
+ * Lives here rather than in intent.ts so BOTH entry points can produce the same
+ * shape — a fixed template and the free-text parser must agree, or a "part 2"
+ * typed into the dashboard could never continue from a cron-generated list.
+ *
+ * Deliberately excludes count and part number: "10 best horror movies" and
+ * "another five horror movies" are the same list continued.
+ *
+ * Canonicalised hard — genre ids sorted numerically, director as a stable TMDB id
+ * rather than a typed name — because the two halves of a part-1/part-2 pair come
+ * from two separate LLM calls and only match if normalisation removes the wobble.
+ */
+export function buildSignature(parts: {
+  genreIds: number[]
+  providerId?: number | null
+  personId?: number | null
+  yearFrom?: number | null
+  yearTo?: number | null
+  sort: SortMode
+}): string {
+  return [
+    `g=${[...parts.genreIds].sort((a, b) => a - b).join('|')}`,
+    `p=${parts.providerId ?? ''}`,
+    `d=${parts.personId ?? ''}`,
+    `y=${parts.yearFrom ?? ''}-${parts.yearTo ?? ''}`,
+    `s=${parts.sort}`,
+  ].join(';')
 }
 
 export type TemplateField = {
@@ -121,6 +156,7 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
         title: `The Best ${genre} Films of ${year}`,
         angle: `The ${count} highest-rated ${genre.toLowerCase()} films released in ${year}, ordered by audience score.`,
         movies: requireEnough(results, count, `${genre} ${year}`),
+        signature: buildSignature({ genreIds: [genreId], yearFrom: year, yearTo: year, sort: 'rating' }),
       }
     },
   },
@@ -153,6 +189,7 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
         title: `The Highest Rated ${genre} Films of the ${decade}s`,
         angle: `The ${count} best-scored ${genre.toLowerCase()} films released between ${decade} and ${decade + 9}, ordered by audience score.`,
         movies: requireEnough(results, count, `${genre} ${decade}s`),
+        signature: buildSignature({ genreIds: [genreId], yearFrom: decade, yearTo: decade + 9, sort: 'rating' }),
       }
     },
   },
@@ -182,6 +219,7 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
         // headline cannot carry a misspelling into a published article.
         angle: `${person.name}'s ${count} highest-rated films, ordered by audience score.`,
         movies: requireEnough(results, count, person.name),
+        signature: buildSignature({ genreIds: [], personId: person.id, sort: 'rating' }),
       }
     },
   },

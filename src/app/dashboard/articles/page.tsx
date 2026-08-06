@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { PlusCircle, Edit2, Eye } from 'lucide-react'
+import { PlusCircle, Edit2, Eye, ExternalLink } from 'lucide-react'
 import ArticleDeleteButton from '@/components/dashboard/ArticleDeleteButton'
 import { typeToRoute } from '@/lib/utils'
 
@@ -106,14 +106,27 @@ export default async function ArticlesPage({
                 <td className="p-3.5 font-bold text-sm text-foreground/70">{article.views_count ?? 0}</td>
                 <td className="p-3.5 text-right">
                   <div className="flex justify-end gap-1.5">
+                    {/* /preview/[id], not the public URL: the detail routes require
+                        status === 'published', so this button 404'd on every draft —
+                        the one case a preview is actually for. */}
                     <Link
-                      href={`/${typeToRoute(article.type)}/${article.slug}`}
+                      href={`/preview/${article.id}`}
                       target="_blank"
                       className="p-2 border-[2px] border-foreground hover:bg-primary transition-colors bg-background"
                       title="Preview"
                     >
                       <Eye size={16} />
                     </Link>
+                    {article.status === 'published' && (
+                      <Link
+                        href={`/${typeToRoute(article.type)}/${article.slug}`}
+                        target="_blank"
+                        className="p-2 border-[2px] border-foreground hover:bg-primary transition-colors bg-background"
+                        title="View live"
+                      >
+                        <ExternalLink size={16} />
+                      </Link>
+                    )}
                     <Link
                       href={`/dashboard/articles/${article.id}/edit`}
                       className="p-2 border-[2px] border-foreground hover:bg-primary transition-colors bg-background"

@@ -80,18 +80,18 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      const { resolved, queryDescription } = await resolveTopic(freeTopic)
+      const { resolved, queryDescription, querySignature, excludedCount } = await resolveTopic(freeTopic)
       const result = await generateRankingFromResolved(resolved)
 
       await supabase.from('job_logs').insert({
         job_id: job.id,
         level: 'info',
         message: `Generated draft "${result.title}" (${result.itemCount} items) with ${result.model}`,
-        metadata: { ...result, topic: freeTopic, queryDescription },
+        metadata: { ...result, topic: freeTopic, queryDescription, querySignature, excludedCount },
       })
       await supabase.from('jobs').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', job.id)
 
-      return NextResponse.json({ ok: true, jobId: job.id, topic: freeTopic, queryDescription, ...result })
+      return NextResponse.json({ ok: true, jobId: job.id, topic: freeTopic, queryDescription, excludedCount, ...result })
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       const unsupported = err instanceof UnsupportedTopicError

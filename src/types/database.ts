@@ -221,6 +221,7 @@ export type Database = {
           priority: string | null
           published_at: string | null
           pull_quote: string | null
+          query_signature: string | null
           rating: number | null
           reading_time: number | null
           revenue_generated: number | null
@@ -265,6 +266,7 @@ export type Database = {
           priority?: string | null
           published_at?: string | null
           pull_quote?: string | null
+          query_signature?: string | null
           rating?: number | null
           reading_time?: number | null
           revenue_generated?: number | null
@@ -309,6 +311,7 @@ export type Database = {
           priority?: string | null
           published_at?: string | null
           pull_quote?: string | null
+          query_signature?: string | null
           rating?: number | null
           reading_time?: number | null
           revenue_generated?: number | null

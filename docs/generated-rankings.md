@@ -111,6 +111,80 @@ constrain.
 
 Adding a fixed template means adding a query that provably supports its claim.
 
+## Part two, and not repeating yourself
+
+The query is deterministic, so re-running a topic returns identical films. "10
+best horror movies part 2" would have duplicated part one exactly.
+
+`articles.query_signature` stores the canonical constraints a ranking was built
+from — genres, provider, director, year range, ordering — deliberately **not** the
+count or the part number, so "10 best horror movies" and "another five horror
+movies" share a signature. The parser emits a `part` number; when it is 2 or more,
+every film used by earlier articles with the same signature is excluded.
+
+Canonicalisation is the fragile bit: the two halves of a part-1/part-2 pair come
+from two separate LLM calls, so genre ids are sorted numerically and the director
+is stored as a stable TMDB id rather than the typed name.
+
+`buildSignature` lives in `templates.ts` and is used by **both** entry points, so a
+fixed template and the free-text parser emit the same shape. Without that a "part
+2" typed into the dashboard could never continue from a cron-generated list.
+Verified end to end: a template-generated `best_genre_year horror 2015` and a
+free-text "best horror movies of 2015 part 2" both produced
+`g=27;p=;d=;y=2015-2015;s=rating`, exclusion fired on 6 films, zero overlap.
+
+Two guards:
+
+- `part >= 2` with no earlier article of that signature is **refused** ("generate
+  part one first") rather than silently producing a duplicate part one.
+- Pages 1..3 are fetched and concatenated, never `page=2` alone —
+  `vote_average.desc` reorders as vote counts move, so page 2 is not a stable
+  window onto results 21–40. If exclusion leaves fewer than 5 unused films, the run
+  fails saying earlier parts exhausted the query.
+
+## Vote-count floor scales with query breadth
+
+A flat floor of 150 produced garbage. "10 best horror movies" returned *Succubus*,
+*La Leyenda de los Chaneques* and *Michael Jackson's Thriller* above *Alien* and
+*The Shining*, because an obscure title with 160 votes at 8.0 outranks a canonical
+one at 7.9.
+
+| Query shape | Floor |
+|---|---|
+| director | 150 — their filmography is small and every entry is legitimately theirs |
+| provider or year bound | 600 |
+| genre alone, across all cinema | 3000 |
+| sorted by popularity or recency | 100 |
+
+Plus `without_genres=10770` (TV Movie) and `with_runtime.gte=60`, which is what
+removes broadcast specials, shorts and music videos. After both changes the same
+query returns Psycho, The Shining, Alien, The Thing, Rosemary's Baby, The Exorcist.
+
+The generated cover image uses the top film's **backdrop**, not its poster — the
+hero renders full-bleed at 55–70vh, where a 2:3 poster is cropped to a sliver.
+
+## Previewing before publishing
+
+`/preview/[id]` renders any article, published or not, using the same four detail
+views the public site uses.
+
+- Outside `/dashboard` on purpose: under the dashboard layout the sidebar changes
+  the available width, so the preview would not match the real page. Here it
+  inherits the same root layout, header, footer and theme.
+- Keyed on **id**, not slug: a preview keyed on slug would collide with the public
+  article route and share its 60s `getCachedPublicArticleBySlug` cache.
+- Gated in middleware alongside `/dashboard`, re-checked in the page, and
+  `Disallow: /preview/` in robots.txt — it serves unpublished content.
+- A sticky "PREVIEW — NOT LIVE" banner with the status, so a screenshot of the
+  middle of the page cannot be mistaken for the live site.
+- `ViewCounter` opts out via a `PreviewProvider` context, so previewing a draft
+  does not inflate its view count. A context rather than a `preview` prop threaded
+  through four views — only ViewCounter needs to know.
+
+The Eye button on `/dashboard/articles` used to point at the public URL, which
+404s for drafts; it now points here, and published rows get a separate "View live"
+link.
+
 ## TMDB reliability
 
 `tmdbFetchJson` retries (4 attempts, exponential backoff) and then **throws**.

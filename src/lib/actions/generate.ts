@@ -10,7 +10,7 @@ import { resolveTopic, UnsupportedTopicError } from '@/lib/generation/intent'
 const MAX_TOPIC_LENGTH = 200
 
 export type GenerateRankingState =
-  | { status: 'ok'; articleId: string; slug: string; title: string; itemCount: number; model: string; queryDescription: string; angle: string; totalTokens: number }
+  | { status: 'ok'; articleId: string; slug: string; title: string; itemCount: number; model: string; queryDescription: string; angle: string; totalTokens: number; excludedCount: number; part: number }
   /** The topic could not be turned into a query. Not an error the editor caused. */
   | { status: 'unsupported'; reason: string }
   | { status: 'error'; message: string }
@@ -61,11 +61,11 @@ export async function generateRankingFromTopic(topic: string): Promise<GenerateR
   }
 
   try {
-    const { resolved, queryDescription, intent } = await resolveTopic(trimmed)
+    const { resolved, queryDescription, querySignature, excludedCount, intent } = await resolveTopic(trimmed)
     const result = await generateRankingFromResolved(resolved)
 
     await finish('info', `Generated draft "${result.title}" (${result.itemCount} items) with ${result.model}`, {
-      ...result, topic: trimmed, queryDescription,
+      ...result, topic: trimmed, queryDescription, querySignature, excludedCount,
     })
 
     revalidatePath('/dashboard/articles')
@@ -79,6 +79,8 @@ export async function generateRankingFromTopic(topic: string): Promise<GenerateR
       itemCount: result.itemCount,
       model: result.model,
       queryDescription,
+      excludedCount,
+      part: intent.part,
       angle: intent.angle,
       totalTokens: result.usage.total,
     }
