@@ -265,6 +265,32 @@
     background-position: bottom center, top center;
     background-repeat: no-repeat, no-repeat;
   }
+
+  /* ── Backdrop fade ──
+     For imagery with NOTHING on top of it, which is why it is separate from
+     .img-scrim: no text to protect, so no tint is applied to the visible part
+     of the picture at all. Its only job is to dissolve the bottom edge into the
+     page instead of cutting off hard.
+
+     var(--background), not a fixed hex, precisely because it must follow the
+     theme -- it is pretending to be the page. That is the opposite of
+     .img-scrim, which is pinned dark because cream text sits on it.
+
+     Stays clear to 62% and then ramps steeply. The previous inline version was
+     linear from 50% to opaque, so the whole lower half carried a milky haze
+     while a 40% green tint sat over the upper half -- no part of the image was
+     clean. The poster overlaps the bottom edge by design, so the fade only has
+     to soften that edge, not bury it. */
+  .backdrop-fade {
+    background-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 62%,
+      color-mix(in srgb, var(--background) 35%, transparent) 78%,
+      color-mix(in srgb, var(--background) 80%, transparent) 91%,
+      var(--background) 100%
+    );
+  }
 }
 
 @layer base {

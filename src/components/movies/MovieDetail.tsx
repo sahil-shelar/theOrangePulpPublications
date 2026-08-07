@@ -56,8 +56,10 @@ export default function MovieDetail({
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
         ) : null}
-        {/* Backdrop fades into the page rather than cutting off hard. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/40 via-transparent to-background" />
+        {/* Fades into the page rather than cutting off hard. See .backdrop-fade:
+            the old inline gradient tinted the top 40% green and hazed everything
+            below 50% toward cream, leaving no part of the backdrop clean. */}
+        <div className="absolute inset-0 backdrop-fade" />
       </div>
 
       {/* ── Poster + Title row ── */}
