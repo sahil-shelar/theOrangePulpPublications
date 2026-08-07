@@ -26,6 +26,7 @@ import {
   type TmdbDiscoverResult,
 } from '@/lib/services/tmdb'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { currentDataOrigin } from '@/lib/data-origin'
 import { resolveAuthorId, slugify, uniqueSlug } from './drafts'
 
 /** How far back "new release" reaches. A weekly cron with a 10-day window
@@ -400,6 +401,8 @@ export async function generateSpotlightDraft(
       seo_title: (generated.headline || subject.name).slice(0, 60),
       seo_description: generated.dek.slice(0, 155),
       query_signature: spotlightSignature(subject.personId),
+      // Same rule as rankings: tagged with the environment that generated it.
+      origin: currentDataOrigin(),
     })
     .select('id, slug, title')
     .single()

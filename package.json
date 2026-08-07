@@ -13,6 +13,8 @@
     "type-check": "tsc --noEmit",
     "types:generate": "supabase gen types typescript --linked > src/types/database.ts",
     "seed": "NODE_OPTIONS='--require ./polyfill.js' tsx scripts/seed/index.ts",
+    "backfill:roles": "tsx scripts/backfill-roles.ts",
+    "backfill:origins": "tsx scripts/backfill-origins.ts",
     "test:unit": "NODE_OPTIONS='--require ./polyfill.js' jest",
     "test:watch": "NODE_OPTIONS='--require ./polyfill.js' jest --watch",
     "test:e2e": "cypress run",

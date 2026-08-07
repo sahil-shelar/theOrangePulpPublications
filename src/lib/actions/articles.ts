@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
 import { handleSupabaseError } from '@/utils/supabase-error'
 import { revalidatePath, updateTag } from 'next/cache'
+import { currentDataOrigin, isDataOrigin, type DataOrigin } from '@/lib/data-origin'
 
 type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 type ArticleUpdate = Database['public']['Tables']['articles']['Update']
@@ -24,13 +25,74 @@ export async function createArticle(data: ArticleInsert) {
 
   const { data: article, error } = await supabase
     .from('articles')
-    .insert(data)
+    .insert({
+      ...data,
+      // Set from the runtime, and NOT overridable by the caller — an article
+      // written against localhost stays local until someone promotes it. Placed
+      // after the spread deliberately: this must win over anything the form sent.
+      origin: articleOriginFor(user),
+    })
     .select()
     .single()
 
   if (error) return handleSupabaseError(error)
 
   revalidatePath('/')
+  updateTag('articles')
+  return { data: article }
+}
+
+/**
+ * Which environment tag a new article gets.
+ *
+ * Normally just the runtime's own origin. The exception is test accounts: signing
+ * in as a seeded/QA account ON production and writing an article would otherwise
+ * produce production content, which is the other half of what the separation is
+ * for. TEST_ACCOUNT_EMAILS is a comma-separated list; anything on it writes local
+ * rows wherever it is signed in.
+ */
+function articleOriginFor(user: { email?: string | null }): DataOrigin {
+  const testers = (process.env.TEST_ACCOUNT_EMAILS ?? '')
+    .split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean)
+
+  const email = user.email?.toLowerCase()
+  if (email && testers.includes(email)) return 'local'
+  return currentDataOrigin()
+}
+
+/**
+ * Promote an article to production — the "Push to prod" action.
+ *
+ * This is the ONLY way a local or seeded row becomes publicly visible on the
+ * deployed site, and it is deliberately a separate, explicit step rather than
+ * something publishing does implicitly: `status: 'published'` answers "is this
+ * finished", `origin` answers "which site is this for", and conflating them is
+ * how the seed data went live in the first place.
+ *
+ * Editor and above, matching who is allowed to publish.
+ */
+export async function setArticleOrigin(id: string, origin: DataOrigin) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+  if (!hasRole(user, 'editor')) {
+    return { error: 'Only editors and admins can change where an article is published.' }
+  }
+  if (!isDataOrigin(origin)) return { error: `"${origin}" is not a valid origin.` }
+
+  const { data: article, error } = await supabase
+    .from('articles')
+    .update({ origin })
+    .eq('id', id)
+    .select('id, slug, type, origin, status')
+    .single()
+
+  if (error) return handleSupabaseError(error)
+
+  revalidatePath('/')
+  revalidatePath('/dashboard/articles')
   updateTag('articles')
   return { data: article }
 }
@@ -45,9 +107,15 @@ export async function updateArticle(id: string, data: ArticleUpdate) {
     return { error: 'Writers cannot publish articles. Submit for review instead.' }
   }
 
+  // `origin` is not editable through the article form — moving a row between
+  // environments goes through setArticleOrigin, which checks the editor role and
+  // is an explicit, auditable action rather than a side effect of saving a draft.
+  const safe: ArticleUpdate = { ...data }
+  delete (safe as { origin?: unknown }).origin
+
   const { data: article, error } = await supabase
     .from('articles')
-    .update(data)
+    .update(safe)
     .eq('id', id)
     .select()
     .single()

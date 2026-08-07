@@ -1,12 +1,7 @@
 import { supabase } from '../seed/config';
-import { generateSlug, getRandomElement, getRandomDate } from '../seed/helpers';
+import { generateSlug, getRandomElement, getRandomDate, getDeterministicUuid } from '../seed/helpers';
+import { ARTICLE_SEED_PLAN } from '../seed/article-plan';
 import { generateTitle, generateContent, generateSeo, generateRating } from '../seed/ai';
-import crypto from 'crypto';
-
-function getDeterministicUuid(seed: string) {
-  const hash = crypto.createHash('sha256').update(seed).digest('hex');
-  return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(12, 16)}-${hash.slice(16, 20)}-${hash.slice(20, 32)}`;
-}
 
 export async function seedArticles() {
   console.log('Seeding articles...');
@@ -17,15 +12,10 @@ export async function seedArticles() {
   const { data: authors } = await supabase.from('authors').select('id');
   const { data: movies } = await supabase.from('movies').select('id');
 
-  // seedKey is used for deterministic UUIDs (preserves idempotency for previously seeded rows)
-  // type must be a valid DB ENUM: 'news' | 'review' | 'spotlight' | 'list'
-  const articleTypes = [
-    { type: 'review', count: 120, seedKey: 'review' },
-    { type: 'news', count: 120, seedKey: 'news' },
-    { type: 'spotlight', count: 40, seedKey: 'spotlight' },
-    { type: 'list', count: 40, seedKey: 'feature' },
-    { type: 'list', count: 30, seedKey: 'ranking' }
-  ];
+  // Defined in ../seed/article-plan so backfill-origins.ts can recompute exactly
+  // these ids. Do not inline it back — the two drifting apart would leave seeded
+  // articles classified as production data and live on the real site.
+  const articleTypes = ARTICLE_SEED_PLAN;
 
   const articlesToUpsert = [];
   const articleTagsToInsert = [];
@@ -62,6 +52,10 @@ export async function seedArticles() {
         rating,
         type: type,
         status: 'published',
+        // Seed rows are never visible on production, whatever their status. This
+        // is what keeps 350 demo articles with no cover image off the live site;
+        // they still render locally, which is what they are for.
+        origin: 'seed',
         author_id: author?.id || null,
         category_id: category?.id || null,
         movie_id: movie?.id || null,

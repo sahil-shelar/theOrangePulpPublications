@@ -3,12 +3,13 @@ import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { createPublicClient } from '@/lib/supabase/public'
 import MovieDetail from '@/components/movies/MovieDetail'
+import { visibleDataOrigins } from '@/lib/data-origin'
 
 const getMovieBySlug = cache(async (slug: string) => {
   const supabase = createPublicClient()
   const { data } = await supabase
     .from('movies')
-    .select('*, articles(id, title, slug, type, status)')
+    .select('*, articles(id, title, slug, type, status, origin)')
     .eq('slug', slug)
     .single()
   return data ?? null
@@ -27,7 +28,10 @@ export default async function PublicMoviePage({ params }: { params: Promise<{ sl
   if (!movie) notFound()
 
   const metadata = movie.metadata || {}
-  const relatedArticles = (movie.articles ?? []).filter((a: any) => a.status === 'published')
+  // Filtered in JS because the query selects from `movies`; origin has to ride
+  // along with status or a local article stays linked from a live movie page.
+  const visible = visibleDataOrigins()
+  const relatedArticles = (movie.articles ?? []).filter((a: any) => a.status === 'published' && visible.includes(a.origin))
 
   return (
     <MovieDetail

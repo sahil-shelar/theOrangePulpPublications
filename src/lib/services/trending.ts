@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache'
 import { createPublicClient } from '@/lib/supabase/public'
 import { ArticleWithRelations } from '@/types/models'
+import { dataOriginCacheKey, visibleDataOrigins } from '@/lib/data-origin'
 
 // unstable_cache key includes args so each (limit, type) combo gets its own cache entry
 const _getTrendingContent = unstable_cache(
@@ -10,6 +11,7 @@ const _getTrendingContent = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
       .eq('status', 'published')
+    .in('origin', visibleDataOrigins())
       .order('views_count', { ascending: false })
       .order('published_at', { ascending: false })
       .limit(limit)
@@ -17,7 +19,7 @@ const _getTrendingContent = unstable_cache(
     const { data } = await query
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['trending-content'],
+  ['trending-content', dataOriginCacheKey()],
   { revalidate: 300, tags: ['articles'] }
 )
 export function getTrendingContent(limit = 10, type?: 'review' | 'news' | 'list' | 'spotlight') {
@@ -45,12 +47,13 @@ export const getEditorsPicks = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
       .eq('status', 'published')
+    .in('origin', visibleDataOrigins())
       .eq('is_featured', true)
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['editors-picks'],
+  ['editors-picks', dataOriginCacheKey()],
   { revalidate: 300, tags: ['articles'] }
 )
 
@@ -60,6 +63,7 @@ export async function getHiddenGems(limit = 4) {
     .from('articles')
     .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
     .eq('status', 'published')
+    .in('origin', visibleDataOrigins())
     .eq('type', 'spotlight')
     .order('views_count', { ascending: true })
     .limit(limit)

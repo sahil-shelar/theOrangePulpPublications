@@ -1,5 +1,6 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { ArticleWithRelations } from '@/types/models'
+import { visibleDataOrigins } from '@/lib/data-origin'
 
 // Only the columns the recommendation sidebar renders plus the ones scored
 // below. Notably excludes `content` — selecting * pulled 40 full markdown
@@ -20,6 +21,7 @@ export async function getRecommendedArticles(
     .from('articles')
     .select(CANDIDATE_COLUMNS)
     .eq('status', 'published')
+    .in('origin', visibleDataOrigins())
     .neq('id', sourceArticleId)
     .limit(40)
 

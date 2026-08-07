@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { PlusCircle, Edit2, Eye, ExternalLink } from 'lucide-react'
 import ArticleDeleteButton from '@/components/dashboard/ArticleDeleteButton'
+import ArticleOriginControl from '@/components/dashboard/ArticleOriginControl'
 import { typeToRoute } from '@/lib/utils'
 
 export default async function ArticlesPage({
@@ -75,13 +76,16 @@ export default async function ArticlesPage({
 
       {/* Table */}
       <div className="brutal-card overflow-hidden overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[700px]">
+        <table className="w-full text-left border-collapse min-w-[820px]">
           <thead>
             <tr className="bg-foreground text-background text-label font-black uppercase tracking-widest">
               <th className="p-3.5">Title</th>
               <th className="p-3.5">Type</th>
               <th className="p-3.5">Category</th>
               <th className="p-3.5">Status</th>
+              {/* Where, not whether: an article can be published and still not
+                  on the live site because it was written locally. */}
+              <th className="p-3.5">Where</th>
               <th className="p-3.5">Views</th>
               <th className="p-3.5 text-right">Actions</th>
             </tr>
@@ -89,7 +93,7 @@ export default async function ArticlesPage({
           <tbody>
             {(!articles || articles.length === 0) ? (
               <tr>
-                <td colSpan={6} className="p-10 text-center font-bold text-muted-foreground uppercase tracking-widest text-xs">
+                <td colSpan={7} className="p-10 text-center font-bold text-muted-foreground uppercase tracking-widest text-xs">
                   No articles found
                 </td>
               </tr>
@@ -102,6 +106,9 @@ export default async function ArticlesPage({
                   <span className={`text-label font-black uppercase tracking-widest px-2 py-1 border-[2px] border-foreground ${article.status === 'published' ? 'bg-primary' : 'bg-muted'}`}>
                     {article.status}
                   </span>
+                </td>
+                <td className="p-3.5">
+                  <ArticleOriginControl id={article.id} origin={article.origin ?? 'production'} />
                 </td>
                 <td className="p-3.5 font-bold text-sm text-foreground/70">{article.views_count ?? 0}</td>
                 <td className="p-3.5 text-right">

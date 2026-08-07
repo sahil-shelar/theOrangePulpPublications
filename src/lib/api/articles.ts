@@ -5,6 +5,7 @@ import { ArticleWithRelations } from '@/types/models'
 import type { Database } from '@/types/database'
 import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
+import { dataOriginCacheKey, visibleDataOrigins } from '@/lib/data-origin'
 
 type ArticleType = Database['public']['Enums']['article_type']
 
@@ -12,6 +13,10 @@ const ARTICLE_DETAIL_SELECT =
   '*, categories(*), authors(*), movies(*), list_items(*, movies(*)), spotlight_works(*, movies(*))'
 
 // Deduplicates within a single render (generateMetadata + page both call this — only 1 DB hit)
+//
+// Origin-filtered like the listings: a detail page is reachable by typing the
+// URL, so filtering only the lists would leave every local article addressable
+// on production.
 export const getCachedArticleBySlug = cache(
   async (slug: string): Promise<ArticleWithRelations | null> => {
     const supabase = await createClient()
@@ -21,6 +26,7 @@ export const getCachedArticleBySlug = cache(
       .order('rank', { referencedTable: 'list_items', ascending: true })
       .order('rank', { referencedTable: 'spotlight_works', ascending: true })
       .eq('slug', slug)
+      .in('origin', visibleDataOrigins())
       .single()
     if (error && error.code !== 'PGRST116') return null
     return data as ArticleWithRelations | null
@@ -34,6 +40,9 @@ export const getCachedArticleBySlug = cache(
  * slug would collide with the public article route and share its 60s
  * `getCachedPublicArticleBySlug` cache. Uncached, and the caller must be
  * authenticated — this returns unpublished content.
+ *
+ * NOT origin-filtered, deliberately: previewing a local draft from the dashboard
+ * is the entire point, and the route is already behind auth.
  */
 export async function getArticleByIdForPreview(id: string): Promise<ArticleWithRelations | null> {
   const supabase = await createClient()
@@ -58,10 +67,11 @@ export const getCachedPublicArticleBySlug = unstable_cache(
       .order('rank', { referencedTable: 'list_items', ascending: true })
       .order('rank', { referencedTable: 'spotlight_works', ascending: true })
       .eq('slug', slug)
+      .in('origin', visibleDataOrigins())
       .single()
     return (data ?? null) as ArticleWithRelations | null
   },
-  ['public-article-by-slug'],
+  ['public-article-by-slug', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -73,10 +83,11 @@ export const getPublishedSlugs = unstable_cache(
       .from('articles')
       .select('slug')
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('type', type)
     return data ?? []
   },
-  ['published-slugs'],
+  ['published-slugs', dataOriginCacheKey()],
   { revalidate: 300 }
 )
 
@@ -88,11 +99,12 @@ export const getCachedLatestArticles = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['latest-articles'],
+  ['latest-articles', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -103,12 +115,13 @@ export const getCachedReviews = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(*)')
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('type', 'review')
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['reviews'],
+  ['reviews', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -119,12 +132,13 @@ export const getCachedNews = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('type', 'news')
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['news'],
+  ['news', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -135,12 +149,13 @@ export const getCachedSpotlight = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('type', 'spotlight')
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['spotlight'],
+  ['spotlight', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -151,12 +166,13 @@ export const getCachedLists = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('type', 'list')
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['lists'],
+  ['lists', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -175,6 +191,7 @@ export const getPagedArticlesByType = unstable_cache(
       .from('articles')
       .select('*, categories(*), authors(*), movies(*)', { count: 'exact' })
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('type', type)
       .order('published_at', { ascending: false })
       .range(from, from + pageSize - 1)
@@ -188,7 +205,7 @@ export const getPagedArticlesByType = unstable_cache(
       totalPages: Math.max(1, Math.ceil(total / pageSize)),
     }
   },
-  ['paged-articles-by-type'],
+  ['paged-articles-by-type', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -198,6 +215,7 @@ export async function getLatestArticles(limit = 10): Promise<ArticleWithRelation
     .from('articles')
     .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
     .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
     .order('published_at', { ascending: false })
     .limit(limit)
 
@@ -215,12 +233,13 @@ export const getArticlesByCategory = unstable_cache(
       .from('articles')
       .select(`*, categories(name,slug), authors(name,slug), movies(poster_url,backdrop_url)`)
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('category_id', categoryId)
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['articles-by-category'],
+  ['articles-by-category', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -231,12 +250,13 @@ export const getArticlesByAuthor = unstable_cache(
       .from('articles')
       .select(`*, categories(name,slug), authors(name,slug), movies(poster_url,backdrop_url)`)
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .eq('author_id', authorId)
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []) as ArticleWithRelations[]
   },
-  ['articles-by-author'],
+  ['articles-by-author', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -248,11 +268,16 @@ export const getArticlesByTag = unstable_cache(
       .select(`article_id, articles(*, categories(name,slug), authors(name,slug), movies(poster_url,backdrop_url))`)
       .eq('tag_id', tagId)
       .limit(limit)
+    // Filtered in JS, not SQL: the query selects from article_tags, so `.in()`
+    // would apply to the join table rather than to the embedded article. Origin
+    // has to ride along in the same predicate as status, or a local article
+    // stays reachable through any tag it carries.
+    const visible = visibleDataOrigins()
     return (data ?? [])
       .map((t: any) => t.articles)
-      .filter((a: any) => a && a.status === 'published') as ArticleWithRelations[]
+      .filter((a: any) => a && a.status === 'published' && visible.includes(a.origin)) as ArticleWithRelations[]
   },
-  ['articles-by-tag'],
+  ['articles-by-tag', dataOriginCacheKey()],
   { revalidate: 60, tags: ['articles'] }
 )
 
@@ -292,6 +317,7 @@ export async function searchArticles(query: string, limit = 10): Promise<Article
       .from('articles')
       .select(SEARCH_COLUMNS)
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .textSearch('search_vector', tsQuery)
       .order('published_at', { ascending: false })
       .limit(limit),
@@ -299,6 +325,7 @@ export async function searchArticles(query: string, limit = 10): Promise<Article
       .from('articles')
       .select(SEARCH_COLUMNS)
       .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
       .ilike('title', `%${query.trim()}%`)
       .order('published_at', { ascending: false })
       .limit(limit),
@@ -327,6 +354,7 @@ export async function getFeaturedArticle(): Promise<ArticleWithRelations | null>
     .from('articles')
     .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
     .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
     .eq('is_featured', true)
     .order('published_at', { ascending: false })
     .limit(1)
@@ -339,6 +367,8 @@ export async function getFeaturedArticle(): Promise<ArticleWithRelations | null>
   return data as ArticleWithRelations | null
 }
 
+/** Raw fetch by slug, unfiltered by status OR origin. Not for public pages —
+ *  use getCachedPublicArticleBySlug, which applies both. */
 export async function getArticleBySlug(slug: string): Promise<ArticleWithRelations | null> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -354,6 +384,8 @@ export async function getArticleBySlug(slug: string): Promise<ArticleWithRelatio
   return data as ArticleWithRelations | null
 }
 
+/** Dashboard edit form. Deliberately unfiltered — an editor must be able to open
+ *  a local or seeded row to look at it. */
 export async function getArticleById(id: string): Promise<ArticleWithRelations | null> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -377,6 +409,7 @@ export async function getReviews(limit = 10): Promise<ArticleWithRelations[]> {
     .from('articles')
     .select('*, categories(*), authors(*), movies(*)')
     .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
     .eq('type', 'review')
     .order('published_at', { ascending: false })
     .limit(limit)
@@ -394,6 +427,7 @@ export async function getNews(limit = 10): Promise<ArticleWithRelations[]> {
     .from('articles')
     .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
     .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
     .eq('type', 'news')
     .order('published_at', { ascending: false })
     .limit(limit)
@@ -411,6 +445,7 @@ export async function getSpotlight(limit = 10): Promise<ArticleWithRelations[]> 
     .from('articles')
     .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
     .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
     .eq('type', 'spotlight')
     .order('published_at', { ascending: false })
     .limit(limit)
@@ -428,6 +463,7 @@ export async function getLists(limit = 10): Promise<ArticleWithRelations[]> {
     .from('articles')
     .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
     .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
     .eq('type', 'list')
     .order('published_at', { ascending: false })
     .limit(limit)
@@ -445,6 +481,7 @@ export async function getRelatedArticles(articleId: string, categoryId?: string,
     .from('articles')
     .select('*, categories(*), authors(*), movies(poster_url, backdrop_url)')
     .eq('status', 'published')
+      .in('origin', visibleDataOrigins())
     .neq('id', articleId)
     .order('published_at', { ascending: false })
     .limit(limit)

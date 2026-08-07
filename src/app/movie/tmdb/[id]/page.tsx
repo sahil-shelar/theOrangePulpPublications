@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getTmdbMovieDetails, parseTmdbToInternalMovie } from '@/lib/services/tmdb'
 import { createPublicClient } from '@/lib/supabase/public'
 import MovieDetail from '@/components/movies/MovieDetail'
+import { visibleDataOrigins } from '@/lib/data-origin'
 
 export const revalidate = 3600
 
@@ -10,10 +11,12 @@ async function getRelatedArticles(tmdbId: number) {
   const supabase = createPublicClient()
   const { data } = await supabase
     .from('movies')
-    .select('articles(id, title, slug, type, status)')
+    .select('articles(id, title, slug, type, status, origin)')
     .eq('tmdb_id', tmdbId)
     .single()
-  return (data?.articles as any[])?.filter((a: any) => a.status === 'published') ?? []
+  // Same JS-side filter as the slug route: the query selects from `movies`.
+  const visible = visibleDataOrigins()
+  return (data?.articles as any[])?.filter((a: any) => a.status === 'published' && visible.includes(a.origin)) ?? []
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {

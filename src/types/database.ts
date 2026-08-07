@@ -7,6 +7,11 @@
 //
 // `supabase gen types` overwrites this file wholesale, so this header has to be
 // re-applied after every regeneration — it was lost once already.
+//
+// HAND-EDITED, once: `articles.origin` was added ahead of its migration
+// (20260808000000_article_data_origin.sql) being applied, so the app could be
+// type-checked and built before the schema change lands. Regenerating after the
+// migration produces the same field and makes this note obsolete.
 
 export type Json =
   | string
@@ -225,6 +230,7 @@ export type Database = {
           published_at: string | null
           pull_quote: string | null
           query_signature: string | null
+          origin: string
           rating: number | null
           reading_time: number | null
           revenue_generated: number | null
@@ -272,6 +278,7 @@ export type Database = {
           published_at?: string | null
           pull_quote?: string | null
           query_signature?: string | null
+          origin?: string
           rating?: number | null
           reading_time?: number | null
           revenue_generated?: number | null
@@ -319,6 +326,7 @@ export type Database = {
           published_at?: string | null
           pull_quote?: string | null
           query_signature?: string | null
+          origin?: string
           rating?: number | null
           reading_time?: number | null
           revenue_generated?: number | null
