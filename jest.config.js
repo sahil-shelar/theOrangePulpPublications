@@ -15,5 +15,23 @@ const customJestConfig = {
   testMatch: ['<rootDir>/__tests__/**/*.test.{ts,tsx}'],
 }
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig)
+// @google/genai and its dependency tree ship ESM only. node_modules is not
+// transformed by default, so importing anything that reaches gemini.ts — which
+// is most of src/lib/generation — died with "Cannot use import statement outside
+// a module" before a single assertion ran. That is a large part of why the
+// pipeline had no tests.
+//
+// This cannot go in customJestConfig: next/jest sets transformIgnorePatterns
+// itself and its value wins, so the override has to be applied to the resolved
+// config after next/jest has built it. Hence the async function export rather
+// than the usual one-liner.
+const ESM_DEPS = ['@google/genai', 'p-retry', 'retry', 'is-network-error']
+
+module.exports = async () => {
+  const config = await createJestConfig(customJestConfig)()
+  config.transformIgnorePatterns = [
+    `/node_modules/(?!(${ESM_DEPS.join('|')})/)`,
+    ...(config.transformIgnorePatterns ?? []).filter(p => !p.startsWith('/node_modules/')),
+  ]
+  return config
+}
