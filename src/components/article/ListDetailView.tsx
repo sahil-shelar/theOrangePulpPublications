@@ -123,24 +123,26 @@ export default async function ListDetailView({ article }: { article: ArticleWith
 
       {/* ── Standfirst ──
           A bordered panel rather than a bare paragraph: a naked wide measure sat
-          oddly against a page built from thick borders and offset shadows, so the
-          intro now speaks the same language as everything around it.
+          oddly on a page built from thick borders, offset shadows and pastel
+          fills. Spans the full container so its edges line up with the ranked
+          card row below, which is also max-w-6xl.
 
-          Uppercase works here where it failed full-bleed. Unbounded, five lines of
-          caps read as a wall and fought the h1; inside a dark panel at a smaller
-          size it reads as a designed block instead.
+          Uppercase works here where it failed full-bleed. Unbounded, the excerpt
+          became a wall of caps that fought the h1; bounded by a filled panel it
+          reads as a designed block.
 
-          bg-on-media-surface / text-on-media, not foreground / background: those
-          two flip with the theme, which would turn this into a cream panel with
-          cream-adjacent text in dark mode. Same reason the Editor's Picks cards
-          use them. The pink offset shadow is the brand's, not a new colour. */}
+          bg-primary, not bg-muted or bg-card: those flip with the theme, and a
+          panel whose text is pinned dark needs a fill that is light in BOTH.
+          primary/secondary/accent are the only three that qualify -- @layer base
+          already forces dark text on them for exactly this reason. The kicker
+          inverts to the fixed dark surface so it reads on the pastel. */}
       {standfirst && (
         <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10">
-          <div className="max-w-4xl bg-on-media-surface border-[3px] border-on-media/20 shadow-[6px_6px_0_0_var(--primary)] px-6 py-6 sm:px-8 sm:py-7">
-            <span className="inline-block bg-primary text-primary-foreground border-[2px] border-foreground text-label font-black uppercase tracking-widest px-2.5 py-1 mb-4">
+          <div className="bg-primary border-[3px] border-foreground shadow-[6px_6px_0_0_var(--shadow-color)] px-6 py-6 sm:px-8 sm:py-7">
+            <span className="inline-block bg-on-media-surface text-on-media text-label font-black uppercase tracking-widest px-2.5 py-1 mb-4">
               The Premise
             </span>
-            <p className="font-heading text-on-media uppercase font-black text-lg sm:text-xl leading-[1.32] tracking-[0.005em]">
+            <p className="font-heading text-primary-foreground uppercase font-black text-lg sm:text-xl leading-[1.32]">
               {standfirst}
             </p>
           </div>
