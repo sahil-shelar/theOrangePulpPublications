@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 
 const ROLE_RANK: Record<string, number> = { admin: 3, editor: 2, writer: 1 }
 const hasRole = (user: any, minRole: string) =>
-  (ROLE_RANK[user?.user_metadata?.role ?? 'writer'] ?? 1) >= (ROLE_RANK[minRole] ?? 1)
+  (ROLE_RANK[user?.app_metadata?.role ?? 'writer'] ?? 1) >= (ROLE_RANK[minRole] ?? 1)
 
 export async function createMovie(formData: FormData) {
   const supabase = await createClient()

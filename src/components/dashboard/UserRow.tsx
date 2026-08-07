@@ -10,11 +10,13 @@ type User = {
   created_at?: string
   email_confirmed_at?: string | null
   banned_until?: string | null
-  user_metadata?: { role?: string }
+  /* Role lives in app_metadata, which only the service-role admin API can write.
+     user_metadata is client-writable — a user could set their own role there. */
+  app_metadata?: { role?: string }
 }
 
 export default function UserRow({ u, isYou }: { u: User; isYou: boolean }) {
-  const role = u.user_metadata?.role || 'writer'
+  const role = u.app_metadata?.role || 'writer'
   const isBanned = !!u.banned_until
   const pending = !u.email_confirmed_at
   const [busy, setBusy] = useState(false)

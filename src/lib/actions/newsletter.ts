@@ -61,7 +61,7 @@ function buildEmailHtml(subject: string, content: string, siteUrl: string, subsc
 async function requireAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.user_metadata?.role !== 'admin') throw new Error('Forbidden: Admin only')
+  if (!user || user.app_metadata?.role !== 'admin') throw new Error('Forbidden: Admin only')
   return user
 }
 

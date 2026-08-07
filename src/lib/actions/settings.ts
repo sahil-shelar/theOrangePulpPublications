@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache'
 export async function updateSiteSettings(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.user_metadata?.role !== 'admin') {
+  if (!user || user.app_metadata?.role !== 'admin') {
     throw new Error("Forbidden: Only Admins can update settings")
   }
 

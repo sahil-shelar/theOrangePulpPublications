@@ -27,7 +27,7 @@ export async function deleteMediaAction(id: string, fileName: string, bucket: st
   if (!user) return { error: 'Unauthorized' }
   
   // Future: Check if Admin or if uploader is the current user.
-  if (user.user_metadata?.role !== 'admin') {
+  if (user.app_metadata?.role !== 'admin') {
     // Only admins can delete for now until user mapping is finalized
     return { error: 'Forbidden: Only Admins can delete media' }
   }

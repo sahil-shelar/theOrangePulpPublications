@@ -9,7 +9,7 @@ export const metadata = { title: 'Users — Dashboard' }
 
 export default async function UsersDashboardPage() {
   const user = await getCurrentUser()
-  if (!user || user.user_metadata?.role !== 'admin') redirect('/dashboard')
+  if (!user || user.app_metadata?.role !== 'admin') redirect('/dashboard')
 
   const { users = [], error: listError } = await listUsers()
 

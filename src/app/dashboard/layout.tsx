@@ -16,14 +16,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="hidden md:flex">
         <DashboardSidebar
           userEmail={user?.email}
-          userRole={user?.user_metadata?.role}
+          userRole={user?.app_metadata?.role}
         />
       </div>
 
       {/* Mobile slide-over nav */}
       <DashboardMobileHeader
         userEmail={user?.email}
-        userRole={user?.user_metadata?.role}
+        userRole={user?.app_metadata?.role}
       />
 
       {/* Main — extra top padding on mobile to clear the fixed mobile header */}
