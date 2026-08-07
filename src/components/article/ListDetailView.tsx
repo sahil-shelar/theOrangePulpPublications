@@ -94,7 +94,12 @@ export default async function ListDetailView({ article }: { article: ArticleWith
             )}
           </div>
 
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-on-media leading-[0.95] max-w-4xl">
+          {/* No max-w cap: at max-w-4xl the title broke at 896px while the meta
+              divider directly beneath it ran the full container width, so the
+              headline read as inset from a rule it was supposed to sit on. Now
+              both span max-w-6xl, matching the standfirst panel and card row
+              further down the page. */}
+          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-on-media leading-[0.95]">
             {article.title}
           </h1>
 
