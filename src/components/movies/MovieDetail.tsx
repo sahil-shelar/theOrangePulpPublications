@@ -134,10 +134,12 @@ export default function MovieDetail({
                   outrank it, so it has to be the pinned one. Was foreground/75,
                   which sat lighter than the sidebar panels beside it. */}
               <div className="border-[3px] border-foreground bg-secondary shadow-hard-lg p-6 sm:p-8">
-                <p className="text-base sm:text-lg font-medium leading-relaxed text-primary-foreground
-                              first-letter:font-heading first-letter:font-black first-letter:text-6xl
-                              first-letter:float-left first-letter:leading-[0.82]
-                              first-letter:mr-3 first-letter:mt-1">
+                {/* Drop cap removed with the switch to caps. It worked on
+                    mixed-case prose because the initial contrasted in case as
+                    well as size; set in caps there is no case contrast left, so
+                    the oversized letter detaches and the next word reads as a
+                    typo. Matches the list standfirst instead. */}
+                <p className="font-heading uppercase font-black text-base sm:text-lg leading-[1.35] text-primary-foreground">
                   {synopsis}
                 </p>
               </div>
