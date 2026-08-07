@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { Play, Check } from 'lucide-react'
 import { triggerRunner } from '@/lib/actions/jobs'
 
+// Labelled "Queue Job", not "Trigger Runner". It inserts one pending `jobs` row
+// and nothing more — no runner exists to drain the queue (see the header of
+// src/lib/jobs/engine.ts), so the old label promised work that never happened.
 export default function TriggerRunnerButton() {
   const [state, setState] = useState<'idle' | 'loading' | 'done'>('idle')
 
@@ -27,7 +30,7 @@ export default function TriggerRunnerButton() {
       {state === 'loading' && <span className="animate-spin border-2 border-foreground border-t-transparent rounded-full w-4 h-4" />}
       {state === 'done' && <Check size={16} />}
       {state === 'idle' && <Play size={16} />}
-      {state === 'loading' ? 'Queuing…' : state === 'done' ? 'Queued!' : 'Trigger Runner'}
+      {state === 'loading' ? 'Queuing…' : state === 'done' ? 'Queued' : 'Queue Job'}
     </button>
   )
 }

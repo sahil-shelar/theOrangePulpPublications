@@ -48,7 +48,16 @@ export async function logJob(jobId: string, level: 'info' | 'warning' | 'error',
 }
 
 // ---------------------------------------------------------------------------
-// JOB RUNNER: (Intended to be called by a cron endpoint or Edge Function)
+// JOB RUNNER
+//
+// NOTHING CALLS processJobs. There is no /api/cron/process route in this repo
+// and no entry in vercel.json's crons block for one, so rows inserted by
+// dispatchJob or by the dashboard's "Queue Job" button sit at `pending`
+// indefinitely. Adding that route is what turns this queue on.
+//
+// The two generation pipelines do NOT go through here: /api/cron/generate and
+// the generateRankingFromTopic server action write their own `jobs` rows and run
+// the work inline, which is why generated drafts appear despite the above.
 // ---------------------------------------------------------------------------
 
 export async function processJobs(limit = 10) {
@@ -100,28 +109,42 @@ export async function processJobs(limit = 10) {
   return pendingJobs.length
 }
 
+/**
+ * Centralised router for background processes.
+ *
+ * Every branch here is still a stub. That is fine in itself — what was not fine
+ * is that the stubs returned normally, so processJobs marked the job
+ * `completed`. The jobs dashboard then showed a green tick for a TMDB sync that
+ * never fetched anything and a trending recalculation that never touched a
+ * score, which is worse than showing nothing: it is a wrong answer to "did this
+ * run?".
+ *
+ * Unimplemented work now throws. The job lands in `failed` with the reason in
+ * `failed_reason`, which is the truth until an executor is written. Implementing
+ * one means replacing its throw with the real work — nothing else changes.
+ */
+class JobNotImplementedError extends Error {
+  constructor(type: JobType, note: string) {
+    super(`No executor bound for "${type}". ${note}`)
+    this.name = 'JobNotImplementedError'
+  }
+}
+
 async function executeJobLogic(type: JobType, payload: any) {
-  // Centralized Router for background processes
   switch (type) {
     case 'publish_article':
-      console.log('Publishing article', payload.article_id)
-      break;
+      throw new JobNotImplementedError(type, `Would publish article ${payload?.article_id}.`)
     case 'recalculate_trending':
-      console.log('Recalculating trending scores across all entities...')
-      // Logic: Update the `trending_score` column natively in DB based on math algorithm.
-      // E.g., Score = (Views * 0.5) + (Shares * 1.2) / HoursSincePublished
-      break;
+      // Intended: update the `trending_score` column in the database, e.g.
+      // (views * 0.5) + (shares * 1.2) / hoursSincePublished.
+      throw new JobNotImplementedError(type, 'Trending scores are not recalculated by any job yet.')
     case 'recalculate_recommendations':
-      console.log('Pre-computing recommendation graphs for cache...')
-      break;
+      throw new JobNotImplementedError(type, 'Recommendation graphs are computed on read, not precomputed.')
     case 'tmdb_sync':
-      console.log('Executing TMDb Sync Pipeline...')
-      // 1. Fetch movies requiring sync (last updated > 7 days)
-      // 2. Map over getTmdbMovieDetails
-      // 3. Update movie metadata
-      break;
+      // Intended: select movies not synced in 7 days, map over
+      // getTmdbMovieDetails, update metadata.
+      throw new JobNotImplementedError(type, 'TMDB sync is not wired up.')
     default:
-      console.log(`[JobEngine] No executor bound for ${type}`)
-      break;
+      throw new JobNotImplementedError(type, 'This job type has no handler at all.')
   }
 }
