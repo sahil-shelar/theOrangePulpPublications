@@ -48,7 +48,13 @@ export default function MovieDetail({
     <div className="w-full bg-background min-h-screen">
 
       {/* ── Backdrop ── */}
-      <div className="relative w-full h-[42vh] md:h-[55vh] bg-foreground overflow-hidden">
+      {/* Hard bottom edge, matching every other hero on the site. This used to
+          fade into the page instead, but any fade long enough to read as a fade
+          also lays a pale wash over the lower third of the artwork -- which is
+          the whole problem it was meant to solve. A brutalist cut keeps the
+          image intact end to end, and the poster straddling the border reads as
+          deliberate rather than as something emerging from mush. */}
+      <div className="relative w-full h-[42vh] md:h-[55vh] bg-foreground overflow-hidden border-b-[4px] border-foreground">
         {backdrop_url ? (
           <img
             src={backdrop_url}
@@ -56,10 +62,6 @@ export default function MovieDetail({
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
         ) : null}
-        {/* Fades into the page rather than cutting off hard. See .backdrop-fade:
-            the old inline gradient tinted the top 40% green and hazed everything
-            below 50% toward cream, leaving no part of the backdrop clean. */}
-        <div className="absolute inset-0 backdrop-fade" />
       </div>
 
       {/* ── Poster + Title row ── */}
