@@ -109,23 +109,28 @@ export default async function ListDetailView({ article }: { article: ArticleWith
         <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-2">
           {/* The excerpt is not rendered in the hero: the generator writes it as
               the opening line of content too, so it read twice on every ranking.
-              This block is now its only home, which is why it carries the lead
-              styling rather than sitting at body weight.
+              This block is now its only home, which is why the opening paragraph
+              carries the lead styling rather than sitting at body weight.
+
+              The lead runs to max-w-5xl while body copy stays at max-w-2xl. At a
+              shared 2xl the standfirst broke into five short lines against a wide
+              empty column, which read as cramped. Wide measure suits four lines of
+              display type; it would not suit running body text, hence the split.
+
+              Mixed case, not uppercase: at this size five lines of caps became a
+              wall and competed with the h1 directly above it. Jost still does the
+              work of separating this from body copy.
 
               foreground/70 was the readability complaint -- at that alpha the
-              intro sat lighter than the ranked-item blurbs below it. Full
-              foreground for body, and the first paragraph steps up to Jost,
-              which is the display face and holds up at standfirst size where
-              Inter just looks like large body copy. */}
-          <div className="prose prose-base max-w-2xl
+              intro sat lighter than the ranked-item blurbs below it. */}
+          <div className="prose prose-base max-w-5xl
                           prose-p:font-medium prose-p:text-foreground prose-p:leading-relaxed
                           prose-em:text-muted-foreground prose-strong:font-black
+                          [&>p:not(:first-of-type)]:max-w-2xl
                           [&>p:first-of-type]:font-heading
-                          [&>p:first-of-type]:text-xl sm:[&>p:first-of-type]:text-2xl
+                          [&>p:first-of-type]:text-2xl sm:[&>p:first-of-type]:text-3xl
                           [&>p:first-of-type]:font-medium [&>p:first-of-type]:leading-snug
-                          [&>p:first-of-type]:text-foreground
-                          [&>p:first-of-type]:border-l-[5px] [&>p:first-of-type]:border-primary
-                          [&>p:first-of-type]:pl-5 [&>p:first-of-type]:not-italic">
+                          [&>p:first-of-type]:text-foreground [&>p:first-of-type]:not-italic">
             <ReactMarkdown>{article.content}</ReactMarkdown>
           </div>
         </div>
