@@ -131,14 +131,14 @@ export default async function ListDetailView({ article }: { article: ArticleWith
           became a wall of caps that fought the h1; bounded by a filled panel it
           reads as a designed block.
 
-          bg-primary, not bg-muted or bg-card: those flip with the theme, and a
+          bg-secondary, not bg-muted or bg-card: those flip with the theme, and a
           panel whose text is pinned dark needs a fill that is light in BOTH.
           primary/secondary/accent are the only three that qualify -- @layer base
           already forces dark text on them for exactly this reason. The kicker
           inverts to the fixed dark surface so it reads on the pastel. */}
       {standfirst && (
         <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10">
-          <div className="bg-primary border-[3px] border-foreground shadow-[6px_6px_0_0_var(--shadow-color)] px-6 py-6 sm:px-8 sm:py-7">
+          <div className="bg-secondary border-[3px] border-foreground shadow-[6px_6px_0_0_var(--shadow-color)] px-6 py-6 sm:px-8 sm:py-7">
             <span className="inline-block bg-on-media-surface text-on-media text-label font-black uppercase tracking-widest px-2.5 py-1 mb-4">
               The Premise
             </span>
