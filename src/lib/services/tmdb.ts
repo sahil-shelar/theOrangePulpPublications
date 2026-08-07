@@ -26,7 +26,7 @@ function getHeaders() {
  * Public listing pages (trending, now playing) still degrade gracefully; an empty
  * carousel there is better than a broken page.
  */
-async function tmdbFetchJson(path: string, revalidate = 3600, attempts = 4): Promise<any> {
+async function tmdbFetchJson(path: string, revalidate = 3600, attempts = 5): Promise<any> {
   let lastError: unknown
 
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -46,10 +46,22 @@ async function tmdbFetchJson(path: string, revalidate = 3600, attempts = 4): Pro
       return await res.json()
     } catch (e) {
       lastError = e
-      // Exponential-ish backoff, capped so the whole run stays inside the 60s
-      // serverless budget. TMDB resets connections under burst load rather than
-      // returning 429, so the first retry is often immediate-enough.
-      if (attempt < attempts - 1) await new Promise(r => setTimeout(r, 500 * 2 ** attempt))
+      // Backoff is capped so the whole run stays inside the 60s serverless
+      // budget: 300/700/1500/3000ms is ~5.5s worst case, up from ~3.5s.
+      //
+      // Widened because the failures are not throttling. Measured against a
+      // live TMDB endpoint, roughly half of sequential single requests failed
+      // at TLS connect (curl rc=35) in well under a second -- no payload, no
+      // 429, no concurrency involved. Losses that arrive in bursts can take
+      // every attempt inside a narrow window, so the window matters more than
+      // the attempt count.
+      //
+      // Jitter so the concurrent detail fetches in the generation pipeline do
+      // not retry in lockstep and rebuild the burst they are recovering from.
+      if (attempt < attempts - 1) {
+        const backoff = Math.min(300 * 2 ** attempt, 3000) + Math.random() * 250
+        await new Promise(r => setTimeout(r, backoff))
+      }
     }
   }
 
