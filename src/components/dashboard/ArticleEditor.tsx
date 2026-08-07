@@ -13,10 +13,6 @@ import SpotlightWorksEditor, { SpotlightWorkDraft, emptySpotlightWork } from '@/
 import { typeToRoute } from '@/lib/utils'
 import { STORAGE_BUCKETS } from '@/lib/api/storage'
 import AIAssistantPanel from './AIAssistantPanel'
-import sampleNews from '@/lib/sample-data/news.json'
-import sampleReview from '@/lib/sample-data/review.json'
-import sampleList from '@/lib/sample-data/list.json'
-import sampleSpotlight from '@/lib/sample-data/spotlight.json'
 
 type ArticleType = 'news' | 'review' | 'spotlight' | 'list'
 
@@ -44,51 +40,57 @@ const VERDICTS = [
   { value: 'skip', label: 'Skip' },
 ]
 
-const SAMPLE_BY_TYPE: Record<ArticleType, any> = {
-  news: sampleNews,
-  review: sampleReview,
-  list: sampleList,
-  spotlight: sampleSpotlight,
-}
+// A fresh form starts EMPTY.
+//
+// It used to seed every field from src/lib/sample-data/*.json so writers could
+// see the expected structure. Those were default *values*, not hints: a new
+// spotlight opened pre-filled with the subject "Denis Villeneuve", a body
+// paragraph about his career, notable works carrying claims like "Earned a Best
+// Cinematography Oscar for Roger Deakins", and a `pull_quote` reading "Cinema is
+// meant to be seen big, loud, together." — which renders at 4xl inside quotation
+// marks directly under whichever real person's name the editor typed.
+//
+// Saving without clearing a field published a fabricated quote attributed to a
+// named individual, which is exactly what the generation pipeline refuses to
+// write (see the header of src/lib/generation/rankings.ts). Every input already
+// carries a `placeholder`, so the structural hint survives without any of it
+// being submittable.
 
 export default function ArticleEditor({ type, initialData, categories, authors, movies, tags }: EditorProps) {
   const router = useRouter()
   const isEditing = !!initialData
-  // Reference sample data on a fresh (non-edit) form so writers can see the
-  // expected structure per type instead of a blank page. Not used once editing.
-  const sample = !isEditing ? SAMPLE_BY_TYPE[type] : null
 
   const [formData, setFormData] = useState({
-    title: initialData?.title || sample?.title || '',
-    slug: initialData?.slug || sample?.slug || '',
-    excerpt: initialData?.excerpt || sample?.excerpt || '',
-    content: initialData?.content || sample?.content || '',
+    title: initialData?.title || '',
+    slug: initialData?.slug || '',
+    excerpt: initialData?.excerpt || '',
+    content: initialData?.content || '',
     cover_image_url: initialData?.cover_image_url || '',
     status: initialData?.status || 'draft',
     category_id: initialData?.category_id || (categories[0]?.id ?? ''),
     author_id: initialData?.author_id || (authors[0]?.id ?? ''),
     movie_id: initialData?.movie_id || '',
     is_featured: initialData?.is_featured || false,
-    seo_title: initialData?.seo_title || sample?.seo_title || '',
-    seo_description: initialData?.seo_description || sample?.seo_description || '',
+    seo_title: initialData?.seo_title || '',
+    seo_description: initialData?.seo_description || '',
     og_image_url: initialData?.og_image_url || '',
     workflow_status: initialData?.workflow_status || 'idea',
     assignee_id: initialData?.assignee_id || '',
     priority: initialData?.priority || 'medium',
     // Review
-    rating: initialData?.rating != null ? String(initialData.rating) : (sample?.rating ?? ''),
-    imdb_score: initialData?.imdb_score != null ? String(initialData.imdb_score) : (sample?.imdb_score ?? ''),
-    rt_score: initialData?.rt_score != null ? String(initialData.rt_score) : (sample?.rt_score ?? ''),
-    verdict: initialData?.verdict || sample?.verdict || '',
+    rating: initialData?.rating != null ? String(initialData.rating) : '',
+    imdb_score: initialData?.imdb_score != null ? String(initialData.imdb_score) : '',
+    rt_score: initialData?.rt_score != null ? String(initialData.rt_score) : '',
+    verdict: initialData?.verdict || '',
     // News
-    subheadline: initialData?.subheadline || sample?.subheadline || '',
-    source_name: initialData?.source_name || sample?.source_name || '',
-    source_url: initialData?.source_url || sample?.source_url || '',
+    subheadline: initialData?.subheadline || '',
+    source_name: initialData?.source_name || '',
+    source_url: initialData?.source_url || '',
     // Spotlight
-    subject_name: initialData?.subject_name || sample?.subject_name || '',
-    subject_role: initialData?.subject_role || sample?.subject_role || '',
+    subject_name: initialData?.subject_name || '',
+    subject_role: initialData?.subject_role || '',
     subject_photo_url: initialData?.subject_photo_url || '',
-    pull_quote: initialData?.pull_quote || sample?.pull_quote || '',
+    pull_quote: initialData?.pull_quote || '',
   })
 
   const [listItems, setListItems] = useState<ListItemDraft[]>(() => {
@@ -104,7 +106,6 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
           item_rating: r.item_rating != null ? String(r.item_rating) : '',
         }))
     }
-    if (sample?.items?.length) return sample.items.map((i: any) => ({ ...i, custom_title: i.custom_title || '', blurb: i.blurb || '', item_rating: i.item_rating ?? '' }))
     return [emptyListItem()]
   })
 
@@ -120,7 +121,6 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
           note: r.note || '',
         }))
     }
-    if (sample?.works?.length) return sample.works.map((w: any) => ({ ...w, custom_title: w.custom_title || '', note: w.note || '' }))
     return [emptySpotlightWork()]
   })
 
@@ -305,12 +305,6 @@ export default function ArticleEditor({ type, initialData, categories, authors, 
         {error && (
           <div className="brutal-card bg-red-500 text-white p-4 font-bold border-[3px] border-foreground">
             {error}
-          </div>
-        )}
-
-        {sample && (
-          <div className="border-[3px] border-foreground bg-secondary text-secondary-foreground p-4 text-xs font-black uppercase tracking-widest">
-            Reference sample data loaded for the {TYPE_LABEL[type]} template — replace every field with your own before publishing.
           </div>
         )}
 
