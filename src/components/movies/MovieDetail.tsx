@@ -120,12 +120,21 @@ export default function MovieDetail({
                   cards and a bordered Trailer button, so it read as unstyled.
                   Same border + hard shadow language as those.
 
-                  bg-card / text-card-foreground is the theme-correct pair -- both
-                  flip together (white/green then green/cream), so the panel keeps
-                  its contrast either way. Was foreground/75, which sat lighter
-                  than the sidebar panels beside it. */}
-              <div className="brutal-panel shadow-hard-lg p-6 sm:p-8">
-                <p className="text-base sm:text-lg font-medium leading-relaxed text-card-foreground
+                  Border set explicitly instead of via brutal-panel: that utility
+                  applies bg-card from inside @layer utilities, so it beats a
+                  bg-secondary utility on source order regardless of class order.
+                  The override silently kept the card fill, which in dark mode put
+                  dark text on the dark card -- invisible.
+
+                  text-primary-foreground, NOT text-card-foreground: the pastels
+                  are light in BOTH themes while card-foreground flips to cream,
+                  so the theme-following token that was correct on a white panel
+                  becomes cream-on-lime here. @layer base already forces this
+                  colour on .bg-secondary, but an explicit text-* utility would
+                  outrank it, so it has to be the pinned one. Was foreground/75,
+                  which sat lighter than the sidebar panels beside it. */}
+              <div className="border-[3px] border-foreground bg-secondary shadow-hard-lg p-6 sm:p-8">
+                <p className="text-base sm:text-lg font-medium leading-relaxed text-primary-foreground
                               first-letter:font-heading first-letter:font-black first-letter:text-6xl
                               first-letter:float-left first-letter:leading-[0.82]
                               first-letter:mr-3 first-letter:mt-1">
