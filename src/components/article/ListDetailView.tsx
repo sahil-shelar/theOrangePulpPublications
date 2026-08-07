@@ -45,9 +45,17 @@ export default async function ListDetailView({ article }: { article: ArticleWith
       <ReaderControls />
 
       {/* Cinematic hero */}
-      <div className="relative w-full h-[55vh] md:h-[70vh] overflow-hidden border-b-[4px] border-foreground">
+            {/* object-top, and a height floor for very short windows.
+          A wide viewport makes this box ~2.5:1 while covers are 16:9, so
+          object-cover discards ~35% of the height. Centred, that ate the top of
+          the frame -- where key art puts faces and logos -- and left a magnified
+          middle band. Anchoring to the top keeps the subject and degrades safely
+          on a plain landscape still, which is why SpotlightDetailView already
+          does this for portraits. The floor only bites on very short windows;
+          at normal ones the vh height already exceeds it. */}
+      <div className="relative w-full h-[55vh] md:h-[70vh] min-h-[380px] md:min-h-[460px] overflow-hidden border-b-[4px] border-foreground">
         {article.cover_image_url ? (
-          <Image src={article.cover_image_url} alt={article.title} fill priority sizes="100vw" className="object-cover" />
+          <Image src={article.cover_image_url} alt={article.title} fill priority sizes="100vw" className="object-cover object-top" />
         ) : (
           <div className="absolute inset-0 bg-foreground" />
         )}
