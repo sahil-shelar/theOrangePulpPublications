@@ -1,21 +1,25 @@
 import Link from "next/link";
 import { NewsletterForm } from "./NewsletterForm";
+import { NAV_FALLBACK, type NavLink } from "@/lib/chrome-content";
 
-const EXPLORE = [
-  { href: "/reviews",  label: "Reviews" },
-  { href: "/news",     label: "News" },
-  { href: "/spotlight",label: "Spotlight" },
-  { href: "/lists",    label: "Rankings" },
-];
+// Links and the copyright line come from the root layout, which reads them
+// server-side. Defaults match what this file used to hardcode, so a footer with
+// no links is not a state this component can reach — see lib/api/chrome.ts on
+// why an empty result means "not configured" rather than "configured empty".
+export function Footer({
+  explore = NAV_FALLBACK.footer_explore,
+  company = NAV_FALLBACK.footer_company,
+  siteName = "The Orange Pulp",
+  copyrightNotice = "All rights reserved.",
+}: {
+  explore?: NavLink[];
+  company?: NavLink[];
+  siteName?: string;
+  copyrightNotice?: string;
+}) {
+  const exploreLinks = explore.length > 0 ? explore : NAV_FALLBACK.footer_explore;
+  const companyLinks = company.length > 0 ? company : NAV_FALLBACK.footer_company;
 
-const COMPANY = [
-  { href: "/about",   label: "About" },
-  { href: "/contact", label: "Contact" },
-  { href: "/privacy", label: "Privacy Policy" },
-  { href: "/terms",   label: "Terms" },
-];
-
-export function Footer() {
   return (
     <footer className="bg-foreground text-background border-t-[4px] border-foreground">
 
@@ -68,7 +72,7 @@ export function Footer() {
         <div>
           <h4 className="text-label font-black uppercase tracking-[0.2em] text-background/40 mb-4">Explore</h4>
           <ul className="space-y-3">
-            {EXPLORE.map(({ href, label }) => (
+            {exploreLinks.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
@@ -85,7 +89,7 @@ export function Footer() {
         <div>
           <h4 className="text-label font-black uppercase tracking-[0.2em] text-background/40 mb-4">Company</h4>
           <ul className="space-y-3">
-            {COMPANY.map(({ href, label }) => (
+            {companyLinks.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
@@ -103,7 +107,7 @@ export function Footer() {
       <div className="border-t-[2px] border-background/10">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-label font-bold uppercase tracking-widest text-background/35">
-            © {new Date().getFullYear()} The Orange Pulp. All rights reserved.
+            © {new Date().getFullYear()} {siteName}. {copyrightNotice}
           </p>
           <p className="text-label font-bold uppercase tracking-widest text-background/35">
             Made for film lovers.

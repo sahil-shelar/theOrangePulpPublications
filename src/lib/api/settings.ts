@@ -6,6 +6,8 @@ export type SiteSettings = {
   maintenance_mode: boolean
   social_links: { twitter: string; facebook: string; instagram: string }
   feature_flags: Record<string, boolean>
+  /** Trailing clause after the year and site name in the footer. */
+  copyright_notice: string
 }
 
 export const SITE_SETTINGS_DEFAULTS: SiteSettings = {
@@ -14,6 +16,7 @@ export const SITE_SETTINGS_DEFAULTS: SiteSettings = {
   maintenance_mode: false,
   social_links: { twitter: '', facebook: '', instagram: '' },
   feature_flags: {},
+  copyright_notice: 'All rights reserved.',
 }
 
 // site_settings is a key/value table (key TEXT UNIQUE, value JSONB) — not a
@@ -38,5 +41,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     maintenance_mode: pick('maintenance_mode'),
     social_links: pick('social_links'),
     feature_flags: pick('feature_flags'),
+    copyright_notice: pick('copyright_notice'),
   }
 }

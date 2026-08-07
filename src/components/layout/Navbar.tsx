@@ -5,17 +5,19 @@ import { Search, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import SearchModal from "./SearchModal";
+import { NAV_FALLBACK, type NavLink } from "@/lib/chrome-content";
 
-const NAV_LINKS = [
-  { href: "/reviews",   label: "Reviews" },
-  { href: "/news",      label: "News" },
-  { href: "/spotlight", label: "Spotlight" },
-  { href: "/lists",     label: "Rankings" },
-];
-
-export function Navbar() {
+// Links arrive as a prop from the root layout, which is a server component and
+// can read the database. This stays a client component because of the mobile
+// menu and search modal state, so it cannot fetch for itself.
+//
+// The default is the same list this file used to hardcode: rendering a header
+// with no links would be a worse failure than rendering slightly stale ones, and
+// a missing table returns empty rather than throwing (see lib/api/chrome.ts).
+export function Navbar({ links = NAV_FALLBACK.header }: { links?: NavLink[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const navLinks = links.length > 0 ? links : NAV_FALLBACK.header;
 
   return (
     <>
@@ -35,7 +37,7 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1 flex-1 justify-center">
-          {NAV_LINKS.map(({ href, label }) => (
+          {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
@@ -82,7 +84,7 @@ export function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-background border-t-[3px] border-foreground">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-0 divide-y-[2px] divide-foreground/10">
-            {NAV_LINKS.map(({ href, label }) => (
+            {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}

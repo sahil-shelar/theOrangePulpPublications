@@ -2,6 +2,7 @@
 import { getTrendingContent, getTrendingMovies, getEditorsPicks } from '@/lib/services/trending'
 import { getTmdbTrendingWeek } from '@/lib/services/tmdb'
 import { getCachedLatestArticles } from '@/lib/api/articles'
+import { getHomeSections, sectionByKey, type HomeSection } from '@/lib/api/chrome'
 import ArticleCard from '@/components/article/ArticleCard'
 import HeroArticle from '@/components/article/HeroArticle'
 import MovieCarousel from '@/components/movies/MovieCarousel'
@@ -9,13 +10,19 @@ import Link from 'next/link'
 import { ArrowRight, Star, Newspaper, Sparkles, Trophy } from 'lucide-react'
 import { typeToRoute } from '@/lib/utils'
 
+// Icon components cannot be stored in a database, so home_sections holds the
+// NAME and this maps it back. Unknown names fall through to Star rather than
+// rendering nothing — a promo card with no icon still works, a crash does not.
+const PROMO_ICONS: Record<string, typeof Star> = { Star, Newspaper, Sparkles, Trophy }
+
 // Matches the listing pages — the homepage is the main entry point, so it
 // should not be an hour staler than /reviews.
 export const revalidate = 60
 
 export default async function Homepage() {
-  const [latestArticles, trendingArticles, editorialMovies, editorsPicks, tmdbTrending] = await Promise.all([
+  const [latestArticles, homeSections, trendingArticles, editorialMovies, editorsPicks, tmdbTrending] = await Promise.all([
     getCachedLatestArticles(7),
+    getHomeSections(),
     getTrendingContent(6),
     getTrendingMovies(12),
     getEditorsPicks(3),
@@ -47,7 +54,7 @@ export default async function Homepage() {
         {/* ── Most Talked This Week (TMDB) ── */}
         {tmdbTrending.length > 0 && (
           <section className="py-12 border-b-[3px] border-foreground">
-            <SectionHeader title="Most Talked This Week" />
+            <SectionHeader section={sectionByKey(homeSections, 'most_talked')} />
             <MovieCarousel movies={tmdbTrending} />
           </section>
         )}
@@ -55,7 +62,7 @@ export default async function Homepage() {
         {/* ── Latest ── */}
         {latestGrid.length > 0 && (
           <section className="py-14 border-b-[3px] border-foreground">
-            <SectionHeader title="The Latest" />
+            <SectionHeader section={sectionByKey(homeSections, 'latest')} />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {latestGrid.map(a => <ArticleCard key={a.id} article={a} />)}
             </div>
@@ -70,10 +77,19 @@ export default async function Homepage() {
         {/* ── Section Promo Row ── */}
         <section className="py-14 border-b-[3px] border-foreground">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <SectionPromo href="/reviews"   color="bg-primary"    label="Reviews"  desc="Critical Takes"  icon={<Star size={20}/>} />
-            <SectionPromo href="/news"      color="bg-secondary"  label="News"     desc="Latest Stories"  icon={<Newspaper size={20}/>} />
-            <SectionPromo href="/spotlight" color="bg-accent"     label="Spotlight" desc="Deep Dives"     icon={<Sparkles size={20}/>} />
-            <SectionPromo href="/lists"     color="bg-muted"      label="Rankings" desc="Best Of Lists"   icon={<Trophy size={20}/>} />
+            {homeSections.filter(sec => sec.kind === 'promo').map(sec => {
+              const Icon = PROMO_ICONS[sec.icon ?? ''] ?? Star
+              return (
+                <SectionPromo
+                  key={sec.section_key}
+                  href={sec.href ?? '/'}
+                  color={sec.accent ?? undefined}
+                  label={sec.heading}
+                  desc={sec.description ?? ''}
+                  icon={<Icon size={20} />}
+                />
+              )
+            })}
           </div>
         </section>
 
@@ -82,7 +98,7 @@ export default async function Homepage() {
 
           {trendingArticles.length > 0 && (
             <div className="lg:col-span-7">
-              <SectionHeader title="Trending" />
+              <SectionHeader section={sectionByKey(homeSections, 'trending')} />
               <div className="divide-y-[3px] divide-foreground border-y-[3px] border-foreground">
                 {trendingArticles.map((art, i) => (
                   <Link
@@ -118,7 +134,7 @@ export default async function Homepage() {
 
           {editorialMovieSlides.length > 0 && (
             <div className="lg:col-span-5">
-              <SectionHeader title="On Our Radar" href="/reviews" />
+              <SectionHeader section={sectionByKey(homeSections, 'on_our_radar')} />
               <div className="grid grid-cols-3 gap-3">
                 {editorialMovieSlides.slice(0, 6).map((m: any, i: number) => (
                   <Link
@@ -151,7 +167,7 @@ export default async function Homepage() {
         {/* ── Editor's Picks ── */}
         {editorsPicks.length > 0 && (
           <section className="py-14">
-            <SectionHeader title="Editor's Picks" />
+            <SectionHeader section={sectionByKey(homeSections, 'editors_picks')} />
             <div className="brutal-card bg-on-media-surface p-0 overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y-[3px] md:divide-y-0 md:divide-x-[3px] divide-on-media/20">
                 {editorsPicks.map((article) => {
@@ -197,7 +213,11 @@ export default async function Homepage() {
   )
 }
 
-function SectionHeader({ title, href }: { title: string; href?: string }) {
+function SectionHeader({ section }: { section: HomeSection | null }) {
+  // Null only happens if a key is removed from both the table and the fallback
+  // list. Rendering nothing beats rendering an empty heading above real content.
+  if (!section) return null
+  const { heading: title, href } = section
   return (
     <div className="flex items-center justify-between mb-6">
       <h2 className="font-heading text-3xl md:text-4xl font-black uppercase tracking-tighter text-foreground">

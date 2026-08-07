@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { getNavLinks } from "@/lib/api/chrome";
+import { getSiteSettings } from "@/lib/api/settings";
 import AutoAds from "@/components/ads/AutoAds";
 import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
@@ -25,11 +27,15 @@ export const metadata: Metadata = {
   description: "Premium movie reviews, news, spotlights and rankings.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Both are cached (5 min / request-deduped), so this does not add a database
+  // round trip per page render.
+  const [nav, settings] = await Promise.all([getNavLinks(), getSiteSettings()]);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -58,11 +64,19 @@ export default function RootLayout({
             speed={200}
           />
           <AutoAds />
-          <Navbar />
+          {/* Chrome content is read once here rather than in each component:
+              Navbar is a client component (mobile menu, search modal) and cannot
+              fetch, and reading in both would double the query on every page. */}
+          <Navbar links={nav.header} />
           <main id="main-content" className="flex-1">
             {children}
           </main>
-          <Footer />
+          <Footer
+            explore={nav.footer_explore}
+            company={nav.footer_company}
+            siteName={settings.site_name}
+            copyrightNotice={settings.copyright_notice}
+          />
         </ThemeProvider>
         <Analytics />
       </body>

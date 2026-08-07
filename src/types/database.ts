@@ -1,17 +1,14 @@
 // Generated from the live schema — do not hand-edit.
-// Regenerate with: npx supabase gen types typescript --linked > src/types/database.ts
+// Regenerate with: npm run types:generate  (supabase gen types typescript --linked)
 //
 // The previous hand-maintained version had drifted: six editorial-workflow
 // columns added in July never reached it, and the files that consume these
 // types had @ts-nocheck so nothing complained.
 //
 // `supabase gen types` overwrites this file wholesale, so this header has to be
-// re-applied after every regeneration — it was lost once already.
-//
-// HAND-EDITED, once: `articles.origin` was added ahead of its migration
-// (20260808000000_article_data_origin.sql) being applied, so the app could be
-// type-checked and built before the schema change lands. Regenerating after the
-// migration produces the same field and makes this note obsolete.
+// re-applied after every regeneration — it was lost once already, and again on
+// 2026-08-09. Regenerate only after the migration is applied, or the new tables
+// come back missing.
 
 export type Json =
   | string
@@ -226,11 +223,11 @@ export type Database = {
           last_indexed_at: string | null
           movie_id: string | null
           og_image_url: string | null
+          origin: string
           priority: string | null
           published_at: string | null
           pull_quote: string | null
           query_signature: string | null
-          origin: string
           rating: number | null
           reading_time: number | null
           revenue_generated: number | null
@@ -274,11 +271,11 @@ export type Database = {
           last_indexed_at?: string | null
           movie_id?: string | null
           og_image_url?: string | null
+          origin: string
           priority?: string | null
           published_at?: string | null
           pull_quote?: string | null
           query_signature?: string | null
-          origin?: string
           rating?: number | null
           reading_time?: number | null
           revenue_generated?: number | null
@@ -322,11 +319,11 @@ export type Database = {
           last_indexed_at?: string | null
           movie_id?: string | null
           og_image_url?: string | null
+          origin?: string
           priority?: string | null
           published_at?: string | null
           pull_quote?: string | null
           query_signature?: string | null
-          origin?: string
           rating?: number | null
           reading_time?: number | null
           revenue_generated?: number | null
@@ -494,6 +491,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      home_sections: {
+        Row: {
+          accent: string | null
+          created_at: string
+          description: string | null
+          heading: string
+          href: string | null
+          icon: string | null
+          id: string
+          is_visible: boolean
+          kind: string
+          section_key: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          accent?: string | null
+          created_at?: string
+          description?: string | null
+          heading: string
+          href?: string | null
+          icon?: string | null
+          id?: string
+          is_visible?: boolean
+          kind: string
+          section_key: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          accent?: string | null
+          created_at?: string
+          description?: string | null
+          heading?: string
+          href?: string | null
+          icon?: string | null
+          id?: string
+          is_visible?: boolean
+          kind?: string
+          section_key?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       job_logs: {
         Row: {
@@ -832,6 +874,39 @@ export type Database = {
           title?: string
           tmdb_id?: number | null
           trailer_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nav_links: {
+        Row: {
+          created_at: string
+          href: string
+          id: string
+          is_visible: boolean
+          label: string
+          location: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          href: string
+          id?: string
+          is_visible?: boolean
+          label: string
+          location: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          href?: string
+          id?: string
+          is_visible?: boolean
+          label?: string
+          location?: string
+          sort_order?: number
           updated_at?: string
         }
         Relationships: []
