@@ -4,6 +4,9 @@
 // The previous hand-maintained version had drifted: six editorial-workflow
 // columns added in July never reached it, and the files that consume these
 // types had @ts-nocheck so nothing complained.
+//
+// `supabase gen types` overwrites this file wholesale, so this header has to be
+// re-applied after every regeneration — it was lost once already.
 
 export type Json =
   | string
@@ -237,6 +240,8 @@ export type Database = {
           source_url: string | null
           status: Database["public"]["Enums"]["article_status"]
           subheadline: string | null
+          subject_birthday: string | null
+          subject_birthplace: string | null
           subject_name: string | null
           subject_photo_url: string | null
           subject_role: string | null
@@ -282,6 +287,8 @@ export type Database = {
           source_url?: string | null
           status?: Database["public"]["Enums"]["article_status"]
           subheadline?: string | null
+          subject_birthday?: string | null
+          subject_birthplace?: string | null
           subject_name?: string | null
           subject_photo_url?: string | null
           subject_role?: string | null
@@ -327,6 +334,8 @@ export type Database = {
           source_url?: string | null
           status?: Database["public"]["Enums"]["article_status"]
           subheadline?: string | null
+          subject_birthday?: string | null
+          subject_birthplace?: string | null
           subject_name?: string | null
           subject_photo_url?: string | null
           subject_role?: string | null

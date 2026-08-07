@@ -20,6 +20,7 @@ import { generateJson } from '@/lib/services/gemini'
 import {
   discoverTmdbMovies,
   getTmdbMovieDetails,
+  getTmdbPersonDetails,
   getTmdbPersonDirectedMovies,
   parseTmdbToInternalMovie,
   type TmdbDiscoverResult,
@@ -141,6 +142,10 @@ type Subject = {
   personId: number
   name: string
   profilePath: string | null
+  /* Structured fields only, rendered as data in the subject panel. The prompt
+     never sees them, and TMDB's free-text biography is never fetched. */
+  birthday: string | null
+  placeOfBirth: string | null
   /** The film whose release triggered this piece. Always rank 1. */
   trigger: TmdbDiscoverResult
   priorWorks: TmdbDiscoverResult[]
@@ -273,10 +278,17 @@ async function pickSubject(
       continue
     }
 
+    // One extra fetch, only for the candidate that already cleared every bar.
+    // Failing here must not lose the subject: these fields are decorative in the
+    // panel, so a null person record degrades to name + role.
+    const person = await getTmdbPersonDetails(director.id).catch(() => null)
+
     return {
       personId: director.id,
       name: director.name,
       profilePath: director.profile_path,
+      birthday: person?.birthday ?? null,
+      placeOfBirth: person?.place_of_birth ?? null,
       trigger: film,
       priorWorks,
     }
@@ -295,6 +307,7 @@ export type GenerateSpotlightResult = {
   slug: string
   title: string
   subjectName: string
+  hasBio: boolean
   model: string
   usage: { input: number; output: number; thoughts: number; total: number }
   workCount: number
@@ -379,6 +392,8 @@ export async function generateSpotlightDraft(
       subject_name: subject.name,
       subject_role: 'Director',
       subject_photo_url: `https://image.tmdb.org/t/p/w500${subject.profilePath}`,
+      subject_birthday: subject.birthday,
+      subject_birthplace: subject.placeOfBirth,
       // The hero prefers subject_photo_url and falls back to this, so a
       // landscape backdrop is the right fallback for a full-bleed block.
       cover_image_url: triggerBackdrop ?? subject.trigger.poster_url ?? null,
@@ -416,6 +431,7 @@ export async function generateSpotlightDraft(
     slug: article.slug,
     title: article.title,
     subjectName: subject.name,
+    hasBio: Boolean(subject.birthday || subject.placeOfBirth),
     model,
     usage,
     workCount: generated.works.length,

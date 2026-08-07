@@ -218,6 +218,29 @@ export async function searchTmdbPerson(query: string) {
 }
 
 /**
+ * Structured person fields — NOT the biography.
+ *
+ * `biography` is deliberately absent from the return type. It is user-contributed
+ * free text, so anything generated from it asserts unverifiable claims about a
+ * real person; the spotlight pipeline renders the typed fields below as data
+ * instead. Adding biography here would quietly make it available to a prompt.
+ */
+export async function getTmdbPersonDetails(personId: number) {
+  const data = await tmdbFetchJson(`/person/${personId}?language=en-US`, 86400)
+  if (!data?.id) return null
+  return {
+    id: data.id as number,
+    name: data.name as string,
+    profile_path: (data.profile_path ?? null) as string | null,
+    known_for_department: (data.known_for_department ?? null) as string | null,
+    // Frequently null on TMDB, including for working directors. Callers must
+    // render without them rather than treating them as guaranteed.
+    birthday: (data.birthday ?? null) as string | null,
+    place_of_birth: (data.place_of_birth ?? null) as string | null,
+  }
+}
+
+/**
  * Films a person actually DIRECTED, best-scored first.
  *
  * Not /discover&with_crew: that matches any crew role, so a prolific producer

@@ -42,9 +42,38 @@ export default async function SpotlightDetailView({ article }: { article: Articl
 
   const subjectName = (article as any).subject_name || article.title;
   const subjectRole = (article as any).subject_role;
-  const portrait = (article as any).subject_photo_url || article.cover_image_url;
   const pullQuote = (article as any).pull_quote;
   const works = article.spotlight_works ?? [];
+
+  // Only a real subject photo goes in the portrait card. cover_image_url is NOT
+  // an acceptable fallback here: it is a film backdrop, and a landscape still
+  // stretched into a 2:3 card is not a portrait of anyone.
+  const portrait = (article as any).subject_photo_url as string | null;
+
+  const birthday = (article as any).subject_birthday as string | null;
+  const birthplace = (article as any).subject_birthplace as string | null;
+
+  // Career span comes from the works already on the page rather than another
+  // field, so it is always consistent with what is rendered below.
+  const workYears = works
+    .map((w: any) => w.movies?.release_year)
+    .filter((y: any): y is number => typeof y === "number");
+  const activeFrom = workYears.length ? Math.min(...workYears) : null;
+
+  const facts: { label: string; value: string }[] = [
+    subjectRole ? { label: "Role", value: subjectRole } : null,
+    birthday
+      ? {
+          label: "Born",
+          value: new Date(birthday).toLocaleDateString("en-US", {
+            month: "long", day: "numeric", year: "numeric", timeZone: "UTC",
+          }),
+        }
+      : null,
+    birthplace ? { label: "From", value: birthplace } : null,
+    activeFrom ? { label: "On record since", value: String(activeFrom) } : null,
+    works.length ? { label: "Works listed", value: String(works.length) } : null,
+  ].filter(Boolean) as { label: string; value: string }[];
 
   const schema = {
     "@context": "https://schema.org",
@@ -67,41 +96,78 @@ export default async function SpotlightDetailView({ article }: { article: Articl
       <ViewCounter articleId={article.id} />
       <ReaderControls />
 
-      {/* ── Magazine hero: full-bleed portrait + name overlay ── */}
-      <div className="relative w-full h-[46vh] md:h-[62vh] overflow-hidden border-b-[4px] border-foreground">
-        {portrait ? (
-          <Image src={portrait} alt={subjectName} fill priority sizes="100vw" className="object-cover object-top" />
-        ) : (
-          <div className="absolute inset-0 bg-foreground" />
-        )}
-        <div className="absolute inset-0 img-scrim" />
+      {/* ── Subject header: portrait beside name and facts ──
+          NOT a full-bleed portrait. A subject photo is 2:3 (500x750 from TMDB)
+          and this block was ~2.7:1 at a normal window, so object-cover showed
+          about a quarter of the image height magnified 3x — the reason a
+          director's face rendered as an unrecognisable dark blur. A contained
+          card lets the portrait keep its own aspect.
 
-        <Link href="/spotlight" prefetch={false} className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-on-media/70 hover:text-on-media text-label font-black uppercase tracking-widest transition-colors">
-          <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
-        </Link>
+          Also not the MovieDetail backdrop treatment: putting the new release's
+          backdrop full-bleed behind the subject makes the film the subject, and
+          this piece is about the person. cover_image_url still earns its keep on
+          listing cards; it just does not belong here. */}
+      <div className="bg-muted border-b-[4px] border-foreground">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 py-8 md:py-12">
+          <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-label font-black uppercase tracking-widest transition-colors mb-6">
+            <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
+          </Link>
 
-        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-10 max-w-6xl mx-auto">
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-foreground">
-              Spotlight
-            </span>
-            {subjectRole && (
-              <span className="text-label font-black uppercase tracking-widest text-on-media/80 px-3 py-1.5 border-[2px] border-on-media/20">
-                {subjectRole}
-              </span>
+          <div className="flex flex-col sm:flex-row gap-6 md:gap-10">
+            {/* Portrait is omitted rather than substituted when absent — the one
+                hand-written spotlight has no subject_photo_url and must not get a
+                broken or misleading card. */}
+            {portrait && (
+              <div className="w-40 sm:w-48 md:w-56 shrink-0">
+                <div className="relative aspect-[2/3] border-[3px] border-foreground shadow-hard-lg overflow-hidden bg-card">
+                  <Image src={portrait} alt={subjectName} fill priority sizes="224px" className="object-cover" />
+                </div>
+              </div>
             )}
-          </div>
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-on-media leading-[0.95] max-w-4xl">
-            {subjectName}
-          </h1>
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-on-media/20">
-            <span className="font-black uppercase tracking-widest text-label text-on-media/80">
-              {article.authors?.name || "Editorial Team"}
-            </span>
-            <span className="text-on-media/30 text-label">·</span>
-            <span className="text-label font-bold uppercase tracking-widest text-on-media/80">
-              {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
-            </span>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-foreground">
+                  Spotlight
+                </span>
+                {subjectRole && (
+                  <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground text-foreground">
+                    {subjectRole}
+                  </span>
+                )}
+              </div>
+
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl font-black uppercase text-foreground leading-[0.95]">
+                {subjectName}
+              </h1>
+
+              {/* Structured data, never generated prose. TMDB leaves birthday and
+                  place_of_birth null for many working directors, so this list is
+                  built from whatever is present and disappears entirely when
+                  nothing is — which is the common case, not the edge case. */}
+              {facts.length > 0 && (
+                <dl className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 border-t-[2px] border-foreground/15 pt-4 max-w-xl">
+                  {facts.map(fact => (
+                    <div key={fact.label} className="flex items-baseline gap-2">
+                      <dt className="text-label font-black uppercase tracking-widest text-muted-foreground shrink-0">
+                        {fact.label}
+                      </dt>
+                      <dd className="text-meta font-bold text-foreground min-w-0">{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-5 pt-4 border-t-[2px] border-foreground/15">
+                <span className="font-black uppercase tracking-widest text-label text-muted-foreground">
+                  {article.authors?.name || "Editorial Team"}
+                </span>
+                <span className="text-muted-foreground text-label">·</span>
+                <span className="text-label font-bold uppercase tracking-widest text-muted-foreground">
+                  {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
