@@ -163,11 +163,24 @@ export type TmdbDiscoverResult = {
  * surfaces obscure titles with a handful of votes sitting at 10.0, which are
  * both bad rankings and the titles a model is most likely to fabricate about.
  */
+/** TMDB genre 10770 is "TV Movie" — broadcast specials, not cinema releases. */
+const EXCLUDE_TV_MOVIE_GENRE = 10770
+
+/** Drops shorts and music videos. This is what removes "Michael Jackson's
+ *  Thriller" (14 min) and Doctor Who specials from a movie ranking. */
+const MIN_FEATURE_RUNTIME = 60
+
 export async function discoverTmdbMovies(params: Record<string, string | number>) {
   const query = new URLSearchParams({
     include_adult: 'false',
     include_video: 'false',
     language: 'en-US',
+    // Applied centrally, not per caller. These two guards lived only in
+    // intent.ts's free-text path, so the fixed templates — the ones the weekly
+    // cron actually runs — could surface TV movies and 14-minute shorts in a
+    // ranking of films. Callers can still override by passing the same keys.
+    without_genres: String(EXCLUDE_TV_MOVIE_GENRE),
+    'with_runtime.gte': String(MIN_FEATURE_RUNTIME),
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
   })
 
@@ -205,16 +218,104 @@ export async function getTmdbWatchProviders(region = 'US'): Promise<Record<strin
   return map
 }
 
-/** Best-match person, for the "top films by {director}" template. */
-/** Returns null only when TMDB genuinely has no such person — a failed request throws. */
-export async function searchTmdbPerson(query: string) {
+/** Strip case, accents and punctuation so "Iñárritu" matches "Inarritu". */
+function normaliseName(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Rank a /search/person hit against what was actually typed.
+ *
+ * TMDB's result order is NOT usable as-is, and not popularity-ordered either.
+ * Measured 2026-08-08: `?query=Anderson` returns "Dion Anderson" (Acting,
+ * popularity 1) ahead of "Gillian Anderson" (Acting, popularity 5). Taking
+ * results[0] meant "top films by Anderson" resolved to a bit-part actor, which
+ * surfaces either as a confidently wrong article headlined "The 10 Best Films
+ * Directed by Dion Anderson" or as "TMDB returned only 0 qualifying titles" —
+ * an infrastructure accident dressed up as a fact about a filmography, which is
+ * the exact failure tmdbFetchJson was rewritten to stop producing.
+ *
+ * Name match dominates, because the editor typed a name and meant it. Department
+ * is the tiebreaker that separates the several same-named people TMDB holds, and
+ * popularity only breaks ties below that.
+ */
+function scorePerson(person: any, query: string, preferDepartment: string | null): number {
+  const wanted = normaliseName(query)
+  const name = normaliseName(person.name ?? '')
+  const wantedWords = wanted.split(' ').filter(Boolean)
+  const nameWords = name.split(' ').filter(Boolean)
+
+  // A one-word query is a surname or a mononym, and is therefore ambiguous by
+  // construction: "Nolan" describes Christopher Nolan just as truthfully as it
+  // describes a bit-part actor whose entire credited name is "Nolan". Letting an
+  // exact string match dominate there picked the actor (measured 2026-08-08), so
+  // single-token queries score name matches nearly flat and let department and
+  // popularity decide. A multi-word query is specific — somebody typed a full
+  // name — so there an exact match should win outright.
+  const specific = wantedWords.length > 1
+
+  let score = 0
+  if (name === wanted) score += specific ? 1000 : 300
+  else if (wantedWords.every(w => nameWords.includes(w))) score += specific ? 600 : 250
+  else if (wantedWords.every(w => name.includes(w))) score += specific ? 300 : 150
+
+  if (preferDepartment && person.known_for_department === preferDepartment) score += 300
+
+  // Bounded, so a very popular actor cannot outrank a correctly-named director,
+  // but present, because it is the only signal separating same-named people who
+  // share a department.
+  score += Math.min(Number(person.popularity) || 0, 100)
+
+  return score
+}
+
+/**
+ * Best-match person, for the "top films by {director}" template and the
+ * free-text parser's director branch.
+ *
+ * Both callers want a DIRECTOR, so Directing is preferred by default — a
+ * same-named actor should not win a query that will be headlined "directed by".
+ * Pass `preferDepartment: null` for a neutral search.
+ *
+ * Returns null only when TMDB genuinely has no such person; a failed request
+ * throws. `alternatives` carries the runners-up so a caller can say who else it
+ * considered rather than silently committing to one interpretation.
+ */
+export async function searchTmdbPerson(
+  query: string,
+  opts: { preferDepartment?: string | null } = {}
+) {
+  const preferDepartment = opts.preferDepartment === undefined ? 'Directing' : opts.preferDepartment
+
   const data = await tmdbFetchJson(
     `/search/person?query=${encodeURIComponent(query)}&include_adult=false&language=en-US`,
     86400
   )
-  const best = (data.results || [])[0]
-  if (!best) return null
-  return { id: best.id as number, name: best.name as string }
+
+  const results = (data.results || []) as any[]
+  if (results.length === 0) return null
+
+  const ranked = results
+    .map(person => ({ person, score: scorePerson(person, query, preferDepartment) }))
+    .sort((a, b) => b.score - a.score)
+
+  const best = ranked[0].person
+  return {
+    id: best.id as number,
+    name: best.name as string,
+    knownForDepartment: (best.known_for_department ?? null) as string | null,
+    alternatives: ranked.slice(1, 4).map(r => ({
+      id: r.person.id as number,
+      name: r.person.name as string,
+      knownForDepartment: (r.person.known_for_department ?? null) as string | null,
+    })),
+  }
 }
 
 /**

@@ -235,6 +235,8 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
       const count = clampCount(params.count)
       if (!params.person) throw new Error('Director name is required.')
 
+      // Ranked, not results[0]: TMDB's person search is not ordered usefully —
+      // "Anderson" used to resolve to a bit-part actor. See searchTmdbPerson.
       const person = await searchTmdbPerson(params.person)
       if (!person) throw new Error(`No TMDB person found for "${params.person}".`)
 
@@ -242,6 +244,18 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
       // getTmdbPersonDirectedMovies. A producer credit must not land in a list
       // headlined "directed by".
       const results = await getTmdbPersonDirectedMovies(person.id, MIN_VOTES.director)
+
+      // Name the alternatives when there is nothing to build from. "Only 0
+      // qualifying titles for Coppola" leaves an editor guessing whether the
+      // filmography is thin or the wrong Coppola was picked.
+      if (results.length === 0 && person.alternatives.length > 0) {
+        throw new Error(
+          `"${params.person}" resolved to ${person.name} (${person.knownForDepartment ?? 'unknown department'}), ` +
+          `who has no directed features above ${MIN_VOTES.director} votes. ` +
+          `Did you mean ${person.alternatives.map(a => a.name).join(', ')}? Try the full name.`
+        )
+      }
+
       // The number in the headline is the number of films in the list. Asking
       // for 15 and getting 8 used to publish "The 15 Best Films Directed by X"
       // over eight rows.

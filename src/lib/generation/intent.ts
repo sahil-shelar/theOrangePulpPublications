@@ -50,13 +50,9 @@ function voteFloor(opts: { sort: ParsedIntent['sort']; hasPerson: boolean; hasPr
   return 3000
 }
 
-/**
- * TMDB genre 10770 is "TV Movie"; excluding it keeps broadcast specials out of a
- * movie ranking. The runtime floor drops shorts and music videos — it is what
- * removes "Michael Jackson's Thriller" (14 min) and Doctor Who specials.
- */
-const EXCLUDE_GENRES = 10770
-const MIN_RUNTIME = 60
+// The TV-movie exclusion and the 60-minute feature floor used to live here.
+// They now default inside discoverTmdbMovies, so the fixed templates and the
+// weekly cron get the same guards this path always had.
 
 /** How many TMDB result pages to pull when earlier parts must be excluded. */
 const MAX_PAGES = 3
@@ -263,11 +259,22 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
   }
 
   // --- director ---
-  let person: { id: number; name: string } | null = null
+  let person: Awaited<ReturnType<typeof searchTmdbPerson>> = null
   if (intent.person.trim()) {
     person = await searchTmdbPerson(intent.person)
     if (!person) {
       throw new UnsupportedTopicError(`No TMDB person found for "${intent.person}".`)
+    }
+
+    // A surname is ambiguous — TMDB holds several Andersons and several
+    // Coppolas. Say who was picked and who else matched, so an editor reviewing
+    // the draft can tell "wrong person" from "wrong films" instead of having to
+    // infer it from a filmography that looks off.
+    if (person.alternatives.length > 0) {
+      described.push(
+        `resolved "${intent.person}" to ${person.name}` +
+        ` (also matched: ${person.alternatives.map(a => a.name).join(', ')})`
+      )
     }
 
     // A director query is served from movie_credits, which carries no revenue
@@ -409,8 +416,6 @@ async function moviesByDiscover(
       hasProvider: Boolean(opts.providerId),
       hasYearBound: Boolean(opts.yearFrom || opts.yearTo),
     }),
-    without_genres: EXCLUDE_GENRES,
-    'with_runtime.gte': MIN_RUNTIME,
   }
   if (opts.genreIds.length) params.with_genres = opts.genreIds.join(',')
   if (opts.providerId) {
