@@ -9,8 +9,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { JOB_PRIORITY } from '@/lib/jobs/types'
-import { generateRankingDraft, generateRankingFromResolved } from '@/lib/generation/rankings'
-import { isTemplateId, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
+import { generateRankingFromResolved } from '@/lib/generation/rankings'
+import { isTemplateId, TEMPLATES, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
 import { resolveTopic, UnsupportedTopicError } from '@/lib/generation/intent'
 import { generateSpotlightDraft, NoSpotlightSubjectError } from '@/lib/generation/spotlights'
 
@@ -247,7 +247,49 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await generateRankingDraft(template, params)
+    // Resolve the films first so the signature is known BEFORE the Gemini call,
+    // then check whether this exact query has already produced an article.
+    //
+    // The rotation is four slots keyed on the ISO week, so slot N recurs every
+    // four weeks with identical parameters and used to spend a full model call
+    // reproducing a draft that already existed. query_signature has no
+    // uniqueness constraint, so nothing downstream would have caught it — the
+    // same reason the spotlight path checks before generating rather than after.
+    //
+    // Skipping is a normal outcome, not a fault: logged at info, job completed,
+    // HTTP 200. `?force=1` bypasses it for testing a specific angle by hand.
+    const resolved = await TEMPLATES[template].resolve(params)
+    const force = url.searchParams.get('force') === '1'
+
+    if (!force && resolved.signature) {
+      const { data: existing } = await supabase
+        .from('articles')
+        .select('id, slug, title')
+        .eq('query_signature', resolved.signature)
+        .limit(1)
+        .maybeSingle()
+
+      if (existing) {
+        const message = `Skipped: "${resolved.title}" matches an existing article (${existing.slug}) with the same query signature.`
+        await supabase.from('job_logs').insert({
+          job_id: job.id,
+          level: 'info',
+          message,
+          metadata: { skipped: true, template, params, signature: resolved.signature, existingId: existing.id },
+        })
+        await supabase
+          .from('jobs')
+          .update({ status: 'completed', completed_at: new Date().toISOString() })
+          .eq('id', job.id)
+
+        return NextResponse.json({
+          ok: true, skipped: true, jobId: job.id,
+          reason: message, existingId: existing.id, existingSlug: existing.slug,
+        })
+      }
+    }
+
+    const result = await generateRankingFromResolved(resolved)
 
     await supabase.from('job_logs').insert({
       job_id: job.id,

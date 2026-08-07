@@ -132,7 +132,15 @@ async function resolveGenreId(genre?: string) {
   return id
 }
 
-/** Fewer results than asked for means the ranking would be padded — reject. */
+/**
+ * Fewer results than asked for means the ranking would be padded — reject.
+ *
+ * Note this deliberately accepts a SHORT list: asking for 15 and getting 8 is a
+ * fine article, so the floor is MIN_ITEMS rather than the requested count. That
+ * makes `selected.length` — not `count` — the only honest number to put in a
+ * headline. A template that wrote "The 15 Best Films Directed by X" over eight
+ * rows was claiming seven films it did not have.
+ */
 function requireEnough(movies: TmdbDiscoverResult[], count: number, what: string) {
   const floor = Math.min(count, MIN_ITEMS)
   if (movies.length < floor) {
@@ -170,10 +178,13 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
       })
 
       const genre = titleCase(params.genre!.trim())
+      // Count comes from what TMDB actually returned, not from what was asked
+      // for — see requireEnough.
+      const movies = requireEnough(results, count, `${genre} ${year}`)
       return {
         title: `The Best ${genre} Films of ${year}`,
-        angle: `The ${count} highest-rated ${genre.toLowerCase()} films released in ${year}, ordered by audience score.`,
-        movies: requireEnough(results, count, `${genre} ${year}`),
+        angle: `The ${movies.length} highest-rated ${genre.toLowerCase()} films released in ${year}, ordered by audience score.`,
+        movies,
         signature: buildSignature({ genreIds: [genreId], yearFrom: year, yearTo: year, sort: 'rating' }),
       }
     },
@@ -203,10 +214,11 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
       })
 
       const genre = titleCase(params.genre!.trim())
+      const movies = requireEnough(results, count, `${genre} ${decade}s`)
       return {
         title: `The Highest Rated ${genre} Films of the ${decade}s`,
-        angle: `The ${count} best-scored ${genre.toLowerCase()} films released between ${decade} and ${decade + 9}, ordered by audience score.`,
-        movies: requireEnough(results, count, `${genre} ${decade}s`),
+        angle: `The ${movies.length} best-scored ${genre.toLowerCase()} films released between ${decade} and ${decade + 9}, ordered by audience score.`,
+        movies,
         signature: buildSignature({ genreIds: [genreId], yearFrom: decade, yearTo: decade + 9, sort: 'rating' }),
       }
     },
@@ -230,13 +242,17 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
       // getTmdbPersonDirectedMovies. A producer credit must not land in a list
       // headlined "directed by".
       const results = await getTmdbPersonDirectedMovies(person.id, MIN_VOTES.director)
+      // The number in the headline is the number of films in the list. Asking
+      // for 15 and getting 8 used to publish "The 15 Best Films Directed by X"
+      // over eight rows.
+      const movies = requireEnough(results, count, person.name)
 
       return {
-        title: `The ${count} Best Films Directed by ${person.name}`,
+        title: `The ${movies.length} Best Films Directed by ${person.name}`,
         // TMDB's name is used rather than the editor's typed string so the
         // headline cannot carry a misspelling into a published article.
-        angle: `${person.name}'s ${count} highest-rated films, ordered by audience score.`,
-        movies: requireEnough(results, count, person.name),
+        angle: `${person.name}'s ${movies.length} highest-rated films, ordered by audience score.`,
+        movies,
         signature: buildSignature({ genreIds: [], personId: person.id, sort: 'rating' }),
       }
     },

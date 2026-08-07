@@ -22,6 +22,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { generateJson } from '@/lib/services/gemini'
 import { getTmdbMovieDetails, parseTmdbToInternalMovie, type TmdbDiscoverResult } from '@/lib/services/tmdb'
 import { TEMPLATES, type ResolvedTemplate, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
+import { currentDataOrigin } from '@/lib/data-origin'
 import { resolveAuthorId, slugify, uniqueSlug } from './drafts'
 
 const MIN_BLURB_WORDS = 15
@@ -214,7 +215,20 @@ export type GenerateRankingResult = {
   itemCount: number
 }
 
-/** Fixed-template entry point — what the weekly cron uses. */
+/**
+ * Fixed-template entry point: resolve a template and write the draft in one call.
+ *
+ * The weekly cron does NOT use this. It calls `TEMPLATES[id].resolve()` itself so
+ * it can check `query_signature` against existing articles before paying for a
+ * Gemini call — the rotation repeats a slot every four weeks, and the column has
+ * no uniqueness constraint, so nothing downstream would catch the duplicate.
+ * Anything that does not need that check can use this.
+ *
+ * The template emits a signature in the same shape buildSignature gives the
+ * free-text parser, so a "part 2" typed into the dashboard can continue from a
+ * cron-generated list. Templates never exclude their own earlier films — the
+ * weekly rotation repeating a slot has to stay predictable.
+ */
 export async function generateRankingDraft(
   templateId: TemplateId,
   params: TemplateParams
@@ -222,10 +236,6 @@ export async function generateRankingDraft(
   const template = TEMPLATES[templateId]
   if (!template) throw new Error(`Unknown template "${templateId}".`)
 
-  // The template emits a signature in the same shape buildSignature gives the
-  // free-text parser, so a "part 2" typed into the dashboard can continue from a
-  // cron-generated list. Templates never exclude themselves — the weekly rotation
-  // repeating a slot has to stay predictable.
   return generateRankingFromResolved(await template.resolve(params))
 }
 
@@ -326,6 +336,9 @@ export async function generateRankingFromResolved(
       seo_title: (generated.headline || title).slice(0, 60),
       seo_description: generated.intro.slice(0, 155),
       query_signature: signature ?? null,
+      // A draft generated from localhost stays local; the weekly cron runs on
+      // production and writes production rows. See src/lib/data-origin.ts.
+      origin: currentDataOrigin(),
     })
     .select('id, slug, title')
     .single()

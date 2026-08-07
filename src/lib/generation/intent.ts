@@ -135,6 +135,11 @@ Note the asymmetry on money: gross revenue IS recorded, so "highest grossing" is
 supported via sort = revenue. A flop is not — it needs budget compared against
 revenue plus context the database cannot settle.
 
+One exception to that: revenue is NOT recorded against a single director's
+credits. "The highest grossing Spielberg films" is not supported — set supported
+= false and say the box-office figures are not available per director. Ranking by
+revenue across a genre, a period or a streaming service is fine.
+
 Judgement you SHOULD make: an occasion or vibe that has a fair genre reading is
 supported — translate it. "Netflix and chill" is Netflix availability plus
 romance and comedy. "Halloween night" is horror. Say what you did in the angle.
@@ -264,6 +269,19 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
     if (!person) {
       throw new UnsupportedTopicError(`No TMDB person found for "${intent.person}".`)
     }
+
+    // A director query is served from movie_credits, which carries no revenue
+    // field — so "the highest grossing Spielberg films" cannot be answered, only
+    // approximated by vote count. The model would still emit a headline claiming
+    // box office, so this is refused rather than silently reordered. Same
+    // asymmetry the parser instruction already draws for flops: the data either
+    // settles the claim or it does not.
+    if (intent.sort === 'revenue') {
+      throw new UnsupportedTopicError(
+        `TMDB's credits for ${person.name} do not carry box-office figures, so a "highest grossing" list of one director's films cannot be built. Try ordering by audience score instead, or drop the director and rank by revenue across a genre or period.`
+      )
+    }
+
     described.push(`directed by ${person.name}`)
   }
 
@@ -287,9 +305,17 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
   }
   if (!hasConstraint) described.unshift('all films')
 
+  // Describe the ordering that ACTUALLY ran, not the one that was asked for.
+  //
+  // This string is not cosmetic: it flows into queryDescription, then into the
+  // angle handed to the prose model (see the return below), so a wrong one tells
+  // the writer — and the reviewing editor — that the list was ranked on
+  // something it was not. `revenue` + a director is refused above; `popularity`
+  // still degrades to a vote_count sort in moviesByDirector, so say so.
   described.push(
     intent.sort === 'rating' ? 'ordered by audience score'
-      : intent.sort === 'popularity' ? 'ordered by popularity'
+      : intent.sort === 'popularity'
+        ? person ? 'ordered by vote count (TMDB credits carry no popularity score)' : 'ordered by popularity'
       : intent.sort === 'revenue' ? 'ordered by worldwide gross (TMDB-reported, not inflation-adjusted)'
       : 'newest first'
   )
@@ -330,6 +356,16 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
     )
   }
 
+  const selected = movies.slice(0, count)
+
+  // The parser's headline is written from the requested count ("The 10 Best
+  // Horror Films"), but a query can legitimately return fewer than that and
+  // still make an article. Tell the prose step how many films it actually has so
+  // the headline it polishes matches the list underneath it.
+  if (selected.length < count) {
+    described.push(`${selected.length} films available, not the ${count} requested`)
+  }
+
   const queryDescription = described.join(' · ')
 
   return {
@@ -342,8 +378,8 @@ export async function resolveTopic(topic: string): Promise<ResolvedIntent> {
       title: intent.headline,
       // The angle handed to the prose step states what the query selected, so the
       // blurb writer is anchored to the query rather than to the vibe phrase.
-      angle: `${intent.angle} (Query: ${queryDescription}.)`,
-      movies: movies.slice(0, count),
+      angle: `${intent.angle} (Query: ${queryDescription}. The list has exactly ${selected.length} films — any number in the headline must be ${selected.length}.)`,
+      movies: selected,
     },
   }
 }
@@ -421,14 +457,15 @@ async function moviesByDirector(
 
   if (sort === 'recent') {
     films = films.slice().sort((a, b) => (b.release_year ?? 0) - (a.release_year ?? 0))
-  } else if (sort === 'revenue') {
-    // movie_credits does not carry revenue, so a director list cannot be ordered
-    // by gross. vote_count is the closest available proxy for reach.
-    films = films.slice().sort((a, b) => b.vote_count - a.vote_count)
   } else if (sort === 'popularity') {
+    // movie_credits carries no popularity score; vote_count is the closest proxy
+    // for reach. resolveTopic says so in the query description rather than
+    // letting the list claim an ordering it does not have.
     films = films.slice().sort((a, b) => b.vote_count - a.vote_count)
   }
   // 'rating' is already the order getTmdbPersonDirectedMovies returns.
+  // 'revenue' never reaches here — resolveTopic refuses director + revenue,
+  // because movie_credits carries no revenue and the headline would claim one.
 
   return films as TmdbDiscoverResult[]
 }
