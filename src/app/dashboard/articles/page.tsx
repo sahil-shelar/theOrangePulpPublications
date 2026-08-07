@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { PlusCircle, Edit2, Eye, ExternalLink } from 'lucide-react'
+import { PlusCircle, Edit2, Eye, ExternalLink, Wand2 } from 'lucide-react'
 import ArticleDeleteButton from '@/components/dashboard/ArticleDeleteButton'
 import ArticleOriginControl from '@/components/dashboard/ArticleOriginControl'
 import { typeToRoute } from '@/lib/utils'
@@ -35,9 +35,16 @@ export default async function ArticlesPage({
           <p className="text-label font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Content</p>
           <h1 className="font-heading text-4xl font-black uppercase tracking-tighter text-foreground">Articles</h1>
         </div>
-        <Link href="/dashboard/articles/new" className="brutal-button px-5 py-3 text-xs flex items-center gap-2 bg-primary">
-          <PlusCircle size={16} /> New Article
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          {/* Generation was only reachable by typing /dashboard/articles/generate
+              into the address bar — nothing in the dashboard linked to it. */}
+          <Link href="/dashboard/ai" className="brutal-button px-5 py-3 text-xs flex items-center gap-2 bg-secondary">
+            <Wand2 size={16} /> Generate
+          </Link>
+          <Link href="/dashboard/articles/new" className="brutal-button px-5 py-3 text-xs flex items-center gap-2 bg-primary">
+            <PlusCircle size={16} /> New Article
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}

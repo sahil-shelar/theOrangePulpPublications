@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { Sparkles, TrendingUp, AlertTriangle, Check, X, Zap, FileText, Search } from 'lucide-react'
+import { Sparkles, TrendingUp, AlertTriangle, Check, X, Zap, FileText, Search, ListOrdered } from 'lucide-react'
+import GenerateRankingForm from '@/components/dashboard/GenerateRankingForm'
+import GenerateSpotlightForm from '@/components/dashboard/GenerateSpotlightForm'
 
 export const revalidate = 0
 
@@ -58,6 +60,35 @@ export default async function AIOperationsCenter() {
           </div>
         </div>
       )}
+
+      {/* ── Generation ──
+          Lives here, at the top, because this is the page an editor opens
+          looking for "the AI thing". /dashboard/articles/generate had the
+          ranking form and was linked from nowhere at all — reachable only by
+          typing the URL — so in practice the feature did not exist. That route
+          still works and is not redirected; this is the discoverable home for
+          it, and the spotlight generator had no UI anywhere before now. */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <section aria-labelledby="gen-ranking">
+          <div className="flex items-center gap-2 border-b-[3px] border-foreground pb-3 mb-5">
+            <ListOrdered size={18} strokeWidth={2.5} />
+            <h2 id="gen-ranking" className="font-heading text-2xl font-black uppercase tracking-tight text-foreground">
+              Generate a Ranking
+            </h2>
+          </div>
+          <GenerateRankingForm />
+        </section>
+
+        <section aria-labelledby="gen-spotlight">
+          <div className="flex items-center gap-2 border-b-[3px] border-foreground pb-3 mb-5">
+            <Sparkles size={18} strokeWidth={2.5} />
+            <h2 id="gen-spotlight" className="font-heading text-2xl font-black uppercase tracking-tight text-foreground">
+              Generate a Spotlight
+            </h2>
+          </div>
+          <GenerateSpotlightForm />
+        </section>
+      </div>
 
       {/* Stats row — always visible */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

@@ -25,6 +25,17 @@ export default function GenerateRankingPage() {
           </h1>
         </div>
 
+        {/* Kept as a working URL rather than redirected — it may be bookmarked.
+            The discoverable home for generation is the AI Center, which carries
+            this form plus the spotlight generator. */}
+        <p className="text-meta font-medium text-muted-foreground mb-6">
+          Also available in the{' '}
+          <Link href="/dashboard/ai" className="font-black underline decoration-primary decoration-2 underline-offset-2 hover:decoration-foreground">
+            AI Center
+          </Link>
+          , alongside spotlight generation.
+        </p>
+
         <GenerateRankingForm />
       </div>
     </div>
