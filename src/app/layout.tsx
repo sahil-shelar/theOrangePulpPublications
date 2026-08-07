@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { getNavLinks } from "@/lib/api/chrome";
-import { getSiteSettings } from "@/lib/api/settings";
+import { getPublicSiteSettings } from "@/lib/api/settings";
 import AutoAds from "@/components/ads/AutoAds";
 import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
@@ -32,9 +32,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Both are cached (5 min / request-deduped), so this does not add a database
-  // round trip per page render.
-  const [nav, settings] = await Promise.all([getNavLinks(), getSiteSettings()]);
+  // Both use the anon client, NOT the cookie-backed one. Reading cookies here
+  // is a dynamic API and would opt every route beneath this layout out of static
+  // and ISR rendering — the whole site would server-render per request.
+  const [nav, settings] = await Promise.all([getNavLinks(), getPublicSiteSettings()]);
 
   return (
     <html lang="en" suppressHydrationWarning>
