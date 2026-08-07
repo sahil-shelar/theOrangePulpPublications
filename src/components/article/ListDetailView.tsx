@@ -33,6 +33,23 @@ export default async function ListDetailView({ article }: { article: ArticleWith
 
   const items = (article.list_items ?? []).slice().sort((a: any, b: any) => a.rank - b.rank);
 
+  // The generator writes the excerpt verbatim as content's opening paragraph, so
+  // rendering both printed the same sentence twice. The excerpt becomes the
+  // standfirst and that duplicate paragraph is dropped from the body. Compared
+  // on normalised whitespace/case, and only when it is genuinely the first
+  // paragraph -- a hand-written article whose intro merely resembles its excerpt
+  // keeps both.
+  const standfirst = (article.excerpt ?? "").trim();
+  const body = ((): string => {
+    const content = (article.content ?? "").trim();
+    if (!standfirst || !content) return content;
+    const norm = (t: string) => t.replace(/\s+/g, " ").trim().toLowerCase();
+    const paragraphs = content.split(/\n{2,}/);
+    return norm(paragraphs[0]) === norm(standfirst)
+      ? paragraphs.slice(1).join("\n\n").trim()
+      : content;
+  })();
+
   // Which figure the cards lead with follows how the list was ordered: a
   // highest-grossing ranking should show the money it was ranked on. Null for
   // hand-made rankings, which keeps them on the existing rating-only display.
@@ -104,34 +121,38 @@ export default async function ListDetailView({ article }: { article: ArticleWith
         </div>
       </div>
 
-      {/* Intro prose */}
-      {article.content && (
-        <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-2">
-          {/* The excerpt is not rendered in the hero: the generator writes it as
-              the opening line of content too, so it read twice on every ranking.
-              This block is now its only home, which is why the opening paragraph
-              carries the lead styling rather than sitting at body weight.
+      {/* ── Standfirst ──
+          A bordered panel rather than a bare paragraph: a naked wide measure sat
+          oddly against a page built from thick borders and offset shadows, so the
+          intro now speaks the same language as everything around it.
 
-              The lead runs to max-w-5xl while body copy stays at max-w-2xl. At a
-              shared 2xl the standfirst broke into five short lines against a wide
-              empty column, which read as cramped. Wide measure suits four lines of
-              display type; it would not suit running body text, hence the split.
+          Uppercase works here where it failed full-bleed. Unbounded, five lines of
+          caps read as a wall and fought the h1; inside a dark panel at a smaller
+          size it reads as a designed block instead.
 
-              Mixed case, not uppercase: at this size five lines of caps became a
-              wall and competed with the h1 directly above it. Jost still does the
-              work of separating this from body copy.
+          bg-on-media-surface / text-on-media, not foreground / background: those
+          two flip with the theme, which would turn this into a cream panel with
+          cream-adjacent text in dark mode. Same reason the Editor's Picks cards
+          use them. The pink offset shadow is the brand's, not a new colour. */}
+      {standfirst && (
+        <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10">
+          <div className="max-w-4xl bg-on-media-surface border-[3px] border-on-media/20 shadow-[6px_6px_0_0_var(--primary)] px-6 py-6 sm:px-8 sm:py-7">
+            <span className="inline-block bg-primary text-primary-foreground border-[2px] border-foreground text-label font-black uppercase tracking-widest px-2.5 py-1 mb-4">
+              The Premise
+            </span>
+            <p className="font-heading text-on-media uppercase font-black text-lg sm:text-xl leading-[1.32] tracking-[0.005em]">
+              {standfirst}
+            </p>
+          </div>
+        </div>
+      )}
 
-              foreground/70 was the readability complaint -- at that alpha the
-              intro sat lighter than the ranked-item blurbs below it. */}
-          <div className="prose prose-base max-w-5xl
-                          prose-p:font-medium prose-p:text-foreground prose-p:leading-relaxed
-                          prose-em:text-muted-foreground prose-strong:font-black
-                          [&>p:not(:first-of-type)]:max-w-2xl
-                          [&>p:first-of-type]:font-heading
-                          [&>p:first-of-type]:text-2xl sm:[&>p:first-of-type]:text-3xl
-                          [&>p:first-of-type]:font-medium [&>p:first-of-type]:leading-snug
-                          [&>p:first-of-type]:text-foreground [&>p:first-of-type]:not-italic">
-            <ReactMarkdown>{article.content}</ReactMarkdown>
+      {/* Remaining prose. Usually empty on a generated ranking, whose content is
+          just the standfirst -- hence the guard, so an empty block adds no padding. */}
+      {body && (
+        <div className="max-w-6xl mx-auto px-6 md:px-10 pt-8 pb-2">
+          <div className="prose prose-base max-w-2xl prose-p:font-medium prose-p:text-foreground prose-p:leading-relaxed prose-em:text-muted-foreground prose-strong:font-black">
+            <ReactMarkdown>{body}</ReactMarkdown>
           </div>
         </div>
       )}
