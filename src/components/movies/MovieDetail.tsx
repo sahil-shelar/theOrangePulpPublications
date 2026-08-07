@@ -115,7 +115,23 @@ export default function MovieDetail({
           {synopsis && (
             <section>
               <h2 className="font-heading text-2xl font-black uppercase text-foreground mb-3 border-b-[3px] border-foreground pb-2">Synopsis</h2>
-              <p className="text-base font-medium text-foreground/75 leading-relaxed">{synopsis}</p>
+              {/* Panelled rather than bare: this was the only section in the column
+                  without a surface of its own, next to a Cast grid of bordered
+                  cards and a bordered Trailer button, so it read as unstyled.
+                  Same border + hard shadow language as those.
+
+                  bg-card / text-card-foreground is the theme-correct pair -- both
+                  flip together (white/green then green/cream), so the panel keeps
+                  its contrast either way. Was foreground/75, which sat lighter
+                  than the sidebar panels beside it. */}
+              <div className="brutal-panel shadow-hard-lg p-6 sm:p-8">
+                <p className="text-base sm:text-lg font-medium leading-relaxed text-card-foreground
+                              first-letter:font-heading first-letter:font-black first-letter:text-6xl
+                              first-letter:float-left first-letter:leading-[0.82]
+                              first-letter:mr-3 first-letter:mt-1">
+                  {synopsis}
+                </p>
+              </div>
             </section>
           )}
 
