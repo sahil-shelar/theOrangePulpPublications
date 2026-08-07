@@ -184,6 +184,27 @@ export default async function SpotlightDetailView({ article }: { article: Articl
       {/* ── Body + sidebar ── */}
       <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 pb-12 md:pb-16">
         <div className="lg:col-span-8">
+          {/* The dek was generated on every spotlight and rendered nowhere — the
+              generator writes it to `excerpt`, which this view never read, so the
+              framing sentence explaining why this subject now was invisible.
+
+              Same panel as the list standfirst: bg-secondary with pinned dark
+              text, because the pastels are light in BOTH themes while
+              foreground/card-foreground flip, and a theme-following token here
+              would put dark text on a dark panel. Border set explicitly rather
+              than via brutal-panel, which applies bg-card from @layer utilities
+              and would beat the fill on source order. */}
+          {article.excerpt && (
+            <div className="border-[3px] border-foreground bg-secondary shadow-hard-lg px-6 py-6 sm:px-8 sm:py-7 mb-10">
+              <span className="inline-block bg-on-media-surface text-on-media text-label font-black uppercase tracking-widest px-2.5 py-1 mb-4">
+                The Occasion
+              </span>
+              <p className="font-heading uppercase font-black text-base sm:text-lg leading-[1.35] text-primary-foreground">
+                {article.excerpt}
+              </p>
+            </div>
+          )}
+
           {article.content && (
             <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
               <ReactMarkdown>{article.content}</ReactMarkdown>
