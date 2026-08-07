@@ -81,12 +81,6 @@ export default async function ListDetailView({ article }: { article: ArticleWith
             {article.title}
           </h1>
 
-          {article.excerpt && (
-            <p className="mt-3 text-sm sm:text-base font-medium text-on-media/80 leading-snug max-w-2xl italic">
-              {article.excerpt}
-            </p>
-          )}
-
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-on-media/20">
             <div className="w-7 h-7 shrink-0 border-[2px] border-on-media/40 overflow-hidden">
               {article.authors?.avatar_url ? (
@@ -113,7 +107,25 @@ export default async function ListDetailView({ article }: { article: ArticleWith
       {/* Intro prose */}
       {article.content && (
         <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-2">
-          <div className="prose prose-base prose-p:font-medium prose-p:text-foreground/70 prose-em:text-muted-foreground prose-strong:font-black max-w-2xl">
+          {/* The excerpt is not rendered in the hero: the generator writes it as
+              the opening line of content too, so it read twice on every ranking.
+              This block is now its only home, which is why it carries the lead
+              styling rather than sitting at body weight.
+
+              foreground/70 was the readability complaint -- at that alpha the
+              intro sat lighter than the ranked-item blurbs below it. Full
+              foreground for body, and the first paragraph steps up to Jost,
+              which is the display face and holds up at standfirst size where
+              Inter just looks like large body copy. */}
+          <div className="prose prose-base max-w-2xl
+                          prose-p:font-medium prose-p:text-foreground prose-p:leading-relaxed
+                          prose-em:text-muted-foreground prose-strong:font-black
+                          [&>p:first-of-type]:font-heading
+                          [&>p:first-of-type]:text-xl sm:[&>p:first-of-type]:text-2xl
+                          [&>p:first-of-type]:font-medium [&>p:first-of-type]:leading-snug
+                          [&>p:first-of-type]:text-foreground
+                          [&>p:first-of-type]:border-l-[5px] [&>p:first-of-type]:border-primary
+                          [&>p:first-of-type]:pl-5 [&>p:first-of-type]:not-italic">
             <ReactMarkdown>{article.content}</ReactMarkdown>
           </div>
         </div>
