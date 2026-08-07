@@ -168,7 +168,14 @@
 
   /* ── Card: interactive surface. Lifts off the page, presses on hover. ──
      Uses --card (not --background) so cards read as a distinct layer in
-     both themes. Pass an explicit bg-* utility to override the fill. */
+     both themes.
+
+     You CANNOT override the fill with a bg-* utility. This block is emitted
+     after Tailwind's generated utilities inside the same `utilities` layer, so
+     `.brutal-card` and `.bg-secondary` have equal specificity and source order
+     decides — bg-card wins no matter which order the classes appear in on the
+     element. To get a different fill, hand-roll the border instead:
+     `border-[3px] border-foreground bg-secondary shadow-hard-lg`. */
   .brutal-card {
     @apply border-[3px] border-foreground bg-card;
     box-shadow: var(--shadow-lg);
@@ -187,7 +194,8 @@
 
   /* ── Panel: static surface. Same language, no lift, no hover. ──
      For sidebars, inset blocks and anything not clickable — so those stop
-     hand-rolling `border-[3px] border-foreground` with ad-hoc fills. */
+     hand-rolling `border-[3px] border-foreground` with ad-hoc fills.
+     Same fill caveat as .brutal-card above: bg-card is not overridable. */
   .brutal-panel {
     @apply border-[3px] border-foreground bg-card;
   }

@@ -1,3 +1,14 @@
+-- MISNAMED. This is NOT a second initial schema.
+--
+-- The real one is 20260718000000_initial_schema.sql, which creates the enums and
+-- every base table. This file is a same-day follow-up: extra `movies` columns
+-- and the `jobs` / `job_logs` tables. Reading the directory chronologically, two
+-- files called "initial_schema" suggests a duplicate or a rewrite; it is neither.
+--
+-- The filename is deliberately left alone — it is already applied, and Supabase
+-- keys migration history on it, so renaming would make this look unapplied and
+-- re-run it.
+
 -- Add missing columns to movies
 ALTER TABLE movies 
   ADD COLUMN IF NOT EXISTS runtime INTEGER,
