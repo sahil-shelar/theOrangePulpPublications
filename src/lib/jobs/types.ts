@@ -28,6 +28,7 @@ export type JobType =
   | 'analytics_aggregation'
   | 'rss_import'
   | 'generate_ranking'
+  | 'generate_spotlight'
 
 export interface Job {
   id: string

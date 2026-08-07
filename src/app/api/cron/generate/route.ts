@@ -1,4 +1,4 @@
-// Scheduled Rankings generation.
+// Scheduled generation: Rankings by default, Spotlights via ?type=spotlight.
 //
 // AUTH IS NOT OPTIONAL HERE. Without it, anyone who finds this URL can trigger
 // unlimited generation against the Gemini key and fill the dashboard with
@@ -12,6 +12,7 @@ import { JOB_PRIORITY } from '@/lib/jobs/types'
 import { generateRankingDraft, generateRankingFromResolved } from '@/lib/generation/rankings'
 import { isTemplateId, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
 import { resolveTopic, UnsupportedTopicError } from '@/lib/generation/intent'
+import { generateSpotlightDraft, NoSpotlightSubjectError } from '@/lib/generation/spotlights'
 
 // A run does ~10 TMDB detail fetches plus one Gemini call.
 export const maxDuration = 60
@@ -56,6 +57,73 @@ export async function GET(request: NextRequest) {
 
   // Manual override for testing a specific angle. Still behind the secret.
   const url = new URL(request.url)
+  const kind = url.searchParams.get('type')
+
+  // ── Spotlight ──
+  // Shares this route rather than getting its own so it inherits the CRON_SECRET
+  // check above; vercel.json points a second schedule at the same path.
+  if (kind === 'spotlight') {
+    const supabase = createAdminClient()
+    const windowRaw = url.searchParams.get('windowDays')
+    const windowDays = windowRaw ? Number(windowRaw) : undefined
+    if (windowRaw && !Number.isInteger(windowDays)) {
+      return NextResponse.json({ error: `"windowDays" must be an integer, got "${windowRaw}".` }, { status: 400 })
+    }
+
+    const { data: job, error: jobError } = await supabase
+      .from('jobs')
+      .insert({
+        job_type: 'generate_spotlight',
+        payload: { windowDays: windowDays ?? null },
+        status: 'running',
+        priority: JOB_PRIORITY.normal,
+        started_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+
+    if (jobError || !job) {
+      return NextResponse.json({ error: `Could not create job row: ${jobError?.message}` }, { status: 500 })
+    }
+
+    try {
+      const result = await generateSpotlightDraft(windowDays ? { windowDays } : {})
+
+      await supabase.from('job_logs').insert({
+        job_id: job.id,
+        level: 'info',
+        message: `Generated spotlight "${result.title}" on ${result.subjectName} (${result.workCount} works) with ${result.model}`,
+        metadata: { ...result },
+      })
+      await supabase.from('jobs').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', job.id)
+
+      return NextResponse.json({ ok: true, jobId: job.id, ...result })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      // "Nobody qualified this week" is a normal outcome, not a fault, so it is
+      // logged at info and reported 422 — the same split the topic parser uses.
+      // Marking it failed would make a quiet week look like a broken cron.
+      const noSubject = err instanceof NoSpotlightSubjectError
+
+      await supabase.from('job_logs').insert({
+        job_id: job.id,
+        level: noSubject ? 'info' : 'error',
+        message: noSubject ? `No spotlight subject: ${message}` : message,
+        metadata: { noSubject },
+      })
+      await supabase
+        .from('jobs')
+        .update(
+          noSubject
+            ? { status: 'completed', completed_at: new Date().toISOString() }
+            : { status: 'failed', failed_reason: message, completed_at: new Date().toISOString() }
+        )
+        .eq('id', job.id)
+
+      return NextResponse.json({ ok: false, noSubject, jobId: job.id, error: message }, { status: noSubject ? 422 : 500 })
+    }
+  }
+
   const overrideTemplate = url.searchParams.get('template')
   const freeTopic = url.searchParams.get('topic')
 

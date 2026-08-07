@@ -22,6 +22,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { generateJson } from '@/lib/services/gemini'
 import { getTmdbMovieDetails, parseTmdbToInternalMovie, type TmdbDiscoverResult } from '@/lib/services/tmdb'
 import { TEMPLATES, type ResolvedTemplate, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
+import { resolveAuthorId, slugify, uniqueSlug } from './drafts'
 
 const MIN_BLURB_WORDS = 15
 const MAX_BLURB_WORDS = 60
@@ -152,9 +153,6 @@ Films, already in final ranked order — do not reorder:
 ${lines.join('\n\n')}`
 }
 
-const slugify = (s: string) =>
-  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80)
-
 /**
  * TMDB scores out of 10; `list_items.item_rating` is documented out of 5 and the
  * detail view renders it as `{rating}/5` over five stars. Writing vote_average
@@ -166,25 +164,6 @@ const slugify = (s: string) =>
 function toFiveScale(voteAverage: number | null | undefined): number | null {
   if (voteAverage == null) return null
   return Math.round((voteAverage / 2) * 10) / 10
-}
-
-/** Resolve the author generated drafts are attributed to. */
-async function resolveAuthorId(supabase: ReturnType<typeof createAdminClient>) {
-  if (process.env.GENERATED_AUTHOR_ID) return process.env.GENERATED_AUTHOR_ID
-
-  const { data } = await supabase.from('authors').select('id, name').limit(50)
-  if (!data?.length) return null
-  const editorial = data.find(a => /editorial|orange pulp|staff/i.test(a.name ?? ''))
-  return (editorial ?? data[0]).id
-}
-
-async function uniqueSlug(supabase: ReturnType<typeof createAdminClient>, base: string) {
-  for (let suffix = 0; suffix < 20; suffix++) {
-    const candidate = suffix === 0 ? base : `${base}-${suffix + 1}`
-    const { data } = await supabase.from('articles').select('id').eq('slug', candidate).maybeSingle()
-    if (!data) return candidate
-  }
-  throw new Error(`Could not find a free slug for "${base}".`)
 }
 
 /**
