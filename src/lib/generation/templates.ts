@@ -75,6 +75,24 @@ export function buildSignature(parts: {
   ].join(';')
 }
 
+/**
+ * Reads the sort mode back out of a stored signature.
+ *
+ * The signature is already the only persisted record of how a ranking was
+ * ordered, so the detail page can tell a revenue list from a rating one
+ * without a second column. Returns null for hand-made rankings and for any
+ * draft written before signatures existed — callers must treat that as
+ * "unknown", not as a default mode.
+ */
+export function readSignatureSort(signature: string | null | undefined): SortMode | null {
+  if (!signature) return null
+  const match = /(?:^|;)s=([a-z]+)/.exec(signature)
+  const mode = match?.[1]
+  return mode === 'rating' || mode === 'popularity' || mode === 'recent' || mode === 'revenue'
+    ? mode
+    : null
+}
+
 export type TemplateField = {
   name: keyof TemplateParams
   label: string

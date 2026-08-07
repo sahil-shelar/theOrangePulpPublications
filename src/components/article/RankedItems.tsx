@@ -24,7 +24,16 @@ type Item = {
   blurb?: string | null
   custom_title?: string | null
   item_rating?: number | null
-  movies?: { title?: string | null; poster_url?: string | null; release_year?: number | null; slug?: string | null } | null
+  movies?: {
+    title?: string | null
+    poster_url?: string | null
+    release_year?: number | null
+    slug?: string | null
+    /* Raw TMDB detail payload, already persisted by the generator. budget and
+       revenue live here rather than in columns because the upsert has always
+       stored them, which means existing rankings show the figures too. */
+    metadata?: { budget?: number | null; revenue?: number | null } | null
+  } | null
 }
 
 function itemFields(item: Item) {
@@ -35,7 +44,43 @@ function itemFields(item: Item) {
     year: item.movies?.release_year ?? null,
     href: item.movies?.slug ? `/movie/${item.movies.slug}` : null,
     rating: item.item_rating ?? null,
+    // TMDB sends 0, not null, for figures it does not have — very common for
+    // non-US productions. Treated as missing so a card never reads "$0".
+    budget: money(item.movies?.metadata?.budget),
+    gross: money(item.movies?.metadata?.revenue),
   }
+}
+
+function money(value: number | null | undefined): number | null {
+  return typeof value === 'number' && value > 0 ? value : null
+}
+
+/** Compact so two figures fit a card: $2.9B, $237M. */
+function usd(value: number): string {
+  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`
+  if (value >= 1_000_000) return `$${Math.round(value / 1_000_000)}M`
+  if (value >= 1_000) return `$${Math.round(value / 1_000)}K`
+  return `$${value}`
+}
+
+/* Figures are TMDB-reported and not inflation-adjusted, so the labels stay
+   descriptive rather than claiming to be an authoritative box-office table. */
+function Money({ budget, gross, className = '' }: { budget: number | null; gross: number | null; className?: string }) {
+  if (!budget && !gross) return null
+  return (
+    <div className={`flex flex-wrap items-baseline gap-x-3 gap-y-1 tabular-nums ${className}`}>
+      {gross != null && (
+        <span className="text-label font-black uppercase tracking-widest text-foreground">
+          <span className="text-muted-foreground">Worldwide</span> {usd(gross)}
+        </span>
+      )}
+      {budget != null && (
+        <span className="text-label font-black uppercase tracking-widest text-foreground/70">
+          <span className="text-muted-foreground">Budget</span> {usd(budget)}
+        </span>
+      )}
+    </div>
+  )
 }
 
 /** item_rating is documented out of 5; the generator divides TMDB's /10 score. */
@@ -56,7 +101,12 @@ function Stars({ rating }: { rating: number }) {
   )
 }
 
-export default function RankedItems({ items }: { items: Item[] }) {
+export default function RankedItems({ items, sortMode = null }: { items: Item[]; sortMode?: string | null }) {
+  // Money is additive, shown only where it is the thing the list was ranked on.
+  // Gating on revenue rather than on "not rating" keeps popularity- and
+  // recent-sorted rankings, and hand-made ones with no signature, unchanged.
+  const showMoney = sortMode === 'revenue'
+
   const [view, setView] = useState<RankedView>(DEFAULT_VIEW)
 
   // Read after mount: localStorage is unavailable during SSR, so a user who
@@ -116,7 +166,7 @@ export default function RankedItems({ items }: { items: Item[] }) {
         // the prose is what the list view is for.
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {items.map(item => {
-            const { title, poster, year, href, rating } = itemFields(item)
+            const { title, poster, year, href, rating, budget, gross } = itemFields(item)
             const Wrapper: any = href ? Link : 'div'
 
             return (
@@ -158,9 +208,18 @@ export default function RankedItems({ items }: { items: Item[] }) {
                   <h3 className="font-heading text-base sm:text-xl font-black uppercase leading-tight text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                     {title}
                   </h3>
-                  {year && (
-                    <div className="text-label font-black uppercase tracking-widest text-muted-foreground pt-1 border-t-[2px] border-foreground/10 mt-auto">
-                      {year}
+                  {/* Year and money share ONE mt-auto footer. Giving each its own
+                      would push only the last one down and open a gap between
+                      them, and a card with neither would lose its bottom row and
+                      its divider entirely. */}
+                  {(year || (showMoney && (budget || gross))) && (
+                    <div className="mt-auto flex flex-col gap-1 pt-1 border-t-[2px] border-foreground/10">
+                      {year && (
+                        <div className="text-label font-black uppercase tracking-widest text-muted-foreground">
+                          {year}
+                        </div>
+                      )}
+                      {showMoney && <Money budget={budget} gross={gross} />}
                     </div>
                   )}
                 </div>
@@ -171,7 +230,7 @@ export default function RankedItems({ items }: { items: Item[] }) {
       ) : (
         <div className="divide-y-[3px] divide-foreground border-y-[3px] border-foreground">
           {items.map(item => {
-            const { title, poster, year, href, rating } = itemFields(item)
+            const { title, poster, year, href, rating, budget, gross } = itemFields(item)
             const Wrapper: any = href ? Link : 'div'
 
             return (
@@ -205,6 +264,8 @@ export default function RankedItems({ items }: { items: Item[] }) {
                   </div>
 
                   {rating != null && <div className="mt-1.5"><Stars rating={rating} /></div>}
+
+                  {showMoney && <Money budget={budget} gross={gross} className="mt-1.5" />}
 
                   {item.blurb && (
                     <p className="text-base font-medium text-foreground/80 mt-2 leading-relaxed max-w-[60ch]">{item.blurb}</p>

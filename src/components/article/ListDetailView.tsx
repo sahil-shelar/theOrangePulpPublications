@@ -11,6 +11,7 @@ import CommentsSection from "./CommentsSection";
 import ShareButtons from "./ShareButtons";
 import SidebarNewsletter from "./SidebarNewsletter";
 import RankedItems from "./RankedItems";
+import { readSignatureSort } from "@/lib/generation/templates";
 import { getRecommendedArticles } from "@/lib/services/recommendations";
 import { createClient } from "@/lib/supabase/server";
 import { ArrowLeft } from "lucide-react";
@@ -31,6 +32,11 @@ export default async function ListDetailView({ article }: { article: ArticleWith
   ]);
 
   const items = (article.list_items ?? []).slice().sort((a: any, b: any) => a.rank - b.rank);
+
+  // Which figure the cards lead with follows how the list was ordered: a
+  // highest-grossing ranking should show the money it was ranked on. Null for
+  // hand-made rankings, which keeps them on the existing rating-only display.
+  const sortMode = readSignatureSort(article.query_signature);
 
   return (
     <div className="w-full bg-background min-h-screen">
@@ -106,7 +112,7 @@ export default async function ListDetailView({ article }: { article: ArticleWith
       )}
 
       {/* Ranked items — layout switch lives in the client component */}
-      <RankedItems items={items} />
+      <RankedItems items={items} sortMode={sortMode} />
 
       {/* Tags + share + comments + sidebar */}
       <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 py-10 md:py-14">
