@@ -152,24 +152,33 @@ export default async function SpotlightDetailView({ article }: { article: Articl
           detail column IS taller, the extra height is taken off the bottom of
           the frame — a headshot survives losing its chest, not its head.
 
-          SURFACE: on-media-surface, and the choice is load-bearing rather than
-          decorative. Two previous attempts failed for opposite reasons —
-          bg-muted is one step off the page in light and IDENTICAL to it in dark
-          (both #0E2419), so the band read as accidental empty space; bg-card is
-          pure #FFFFFF, a stark white slab against a cream page in a palette
-          that has no white in it anywhere else. --on-media-surface (#12301F) is
-          the token globals.css already defines for exactly this: a panel that
-          must stay dark in BOTH themes, which is why it does not flip and why
-          the same markup works in light and dark with no dark: variants. The
-          portrait then reads as a print photo mounted on a dark board.
+          SURFACE: warm sand #E5DCCA, PINNED in both themes. Three earlier
+          attempts each failed for a different reason — bg-muted is one step off
+          the page in light and IDENTICAL to it in dark (both #0E2419), so the
+          band vanished; bg-card is pure #FFFFFF, a stark slab in a palette with
+          no white anywhere else; on-media-surface (#12301F) read as heavy and
+          near-black against an otherwise airy page.
 
-          Everything inside therefore uses on-media/*, NOT foreground or
-          card-foreground — those flip to dark green in light mode and would be
-          invisible here. That is the trap this codebase has hit before. */}
+          Written as a literal rather than bg-muted even though light-mode
+          --muted is the same value, because --muted FLIPS to #1F4A34 in dark
+          and this band must not. Pinning it is the whole point: one set of
+          markup, no dark: variants, and the band cannot disappear into the page
+          in either theme.
+
+          Consequence that drives every class below: the band is pinned LIGHT,
+          so everything on it must be pinned DARK. That means primary-foreground
+          (#173D2A in both themes), NOT foreground or card-foreground — those
+          flip to cream in dark mode and would be invisible on sand. This is the
+          exact trap globals.css documents, just in the opposite direction from
+          the usual one.
+
+          Known trade-off, accepted deliberately: in LIGHT mode sand sits one
+          step off the cream page, so the 4px bottom border is doing real work
+          as the separator rather than being decoration. */}
       {isPersonSpotlight ? (
-        <div className="bg-on-media-surface border-b-[4px] border-foreground">
+        <div className="bg-[#E5DCCA] border-b-[4px] border-primary-foreground">
           <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 md:py-16">
-            <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-on-media/60 hover:text-on-media text-label font-black uppercase tracking-widest transition-colors mb-8">
+            <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-primary-foreground/60 hover:text-primary-foreground text-label font-black uppercase tracking-widest transition-colors mb-8">
               <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
             </Link>
 
@@ -179,11 +188,11 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                   must not get a broken or misleading card. */}
               {portrait && (
                 <div className="w-52 sm:w-64 md:w-72 lg:w-80 shrink-0 mx-auto md:mx-0">
-                  {/* Cream border, and no offset shadow: --shadow-color is
-                      --foreground, which is dark green in light mode and would
-                      cast an invisible shadow onto this dark board. The border
-                      is what separates the photo from the surface here. */}
-                  <div className="relative aspect-[2/3] md:h-full md:aspect-auto md:min-h-[26rem] border-[3px] border-on-media/85 overflow-hidden bg-on-media/10">
+                  {/* No offset shadow: --shadow-color is --foreground, which
+                      flips, so the shadow would be dark green in light and cream
+                      in dark — one of those reads as a mistake on sand. The
+                      pinned dark border is what separates photo from surface. */}
+                  <div className="relative aspect-[2/3] md:h-full md:aspect-auto md:min-h-[26rem] border-[3px] border-primary-foreground overflow-hidden bg-primary-foreground/10">
                     <Image
                       src={portrait}
                       alt={subjectName}
@@ -200,17 +209,17 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                   tall portrait rather than floating at its top edge. */}
               <div className="flex-1 min-w-0 flex flex-col justify-center">
                 <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-accent">
+                  <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-primary-foreground">
                     Spotlight
                   </span>
                   {subjectRole && (
-                    <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-on-media/40 text-on-media">
+                    <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-primary-foreground/45 text-primary-foreground">
                       {subjectRole}
                     </span>
                   )}
                 </div>
 
-                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-on-media leading-[0.95]">
+                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-primary-foreground leading-[0.95]">
                   {subjectName}
                 </h1>
 
@@ -221,7 +230,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                     it in the body panel, where there is no portrait competing
                     for the same space. */}
                 {article.excerpt && (
-                  <p className="mt-5 text-base sm:text-lg font-medium text-on-media/75 leading-relaxed max-w-2xl">
+                  <p className="mt-5 text-base sm:text-lg font-medium text-primary-foreground/80 leading-relaxed max-w-2xl">
                     {article.excerpt}
                   </p>
                 )}
@@ -231,24 +240,24 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                     built from whatever is present and disappears entirely when
                     nothing is — which is the common case, not the edge case. */}
                 {facts.length > 0 && (
-                  <dl className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-on-media/20 pt-5">
+                  <dl className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-primary-foreground/25 pt-5">
                     {facts.map(fact => (
                       <div key={fact.label} className="flex items-baseline gap-2">
-                        <dt className="text-label font-black uppercase tracking-widest text-on-media/55 shrink-0">
+                        <dt className="text-label font-black uppercase tracking-widest text-primary-foreground/65 shrink-0">
                           {fact.label}
                         </dt>
-                        <dd className="text-meta font-bold text-on-media min-w-0">{fact.value}</dd>
+                        <dd className="text-meta font-bold text-primary-foreground min-w-0">{fact.value}</dd>
                       </div>
                     ))}
                   </dl>
                 )}
 
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-6 pt-4 border-t-[2px] border-on-media/20">
-                  <span className="font-black uppercase tracking-widest text-label text-on-media/70">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-6 pt-4 border-t-[2px] border-primary-foreground/25">
+                  <span className="font-black uppercase tracking-widest text-label text-primary-foreground/70">
                     {article.authors?.name || "Editorial Team"}
                   </span>
-                  <span className="text-on-media/40 text-label">·</span>
-                  <span className="text-label font-bold uppercase tracking-widest text-on-media/70">
+                  <span className="text-primary-foreground/40 text-label">·</span>
+                  <span className="text-label font-bold uppercase tracking-widest text-primary-foreground/70">
                     {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
                   </span>
                 </div>
@@ -301,7 +310,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
               )}
             </div>
 
-            <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-on-media leading-[0.95] max-w-4xl">
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-primary-foreground leading-[0.95] max-w-4xl">
               {article.title}
             </h1>
 
