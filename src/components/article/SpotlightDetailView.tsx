@@ -73,6 +73,8 @@ export default async function SpotlightDetailView({ article }: { article: Articl
   // Topic spotlights fall back to the movie backdrop the way reviews do — there
   // is no person to be wrong about, so a film still is the right image.
   const coverImage = article.cover_image_url || (article as any).movies?.backdrop_url;
+  // Preferred background for person spotlight: use the subject's primary movie poster if available
+  const posterImage = (article as any).movies?.poster_url || works[0]?.movies?.poster_url || null;
 
   const birthday = (article as any).subject_birthday as string | null;
   const birthplace = (article as any).subject_birthplace as string | null;
@@ -176,93 +178,26 @@ export default async function SpotlightDetailView({ article }: { article: Articl
           step off the cream page, so the 4px bottom border is doing real work
           as the separator rather than being decoration. */}
       {isPersonSpotlight ? (
-        <div className="bg-[#E5DCCA] border-b-[4px] border-primary-foreground">
-          <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 md:py-16">
-            <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-primary-foreground/60 hover:text-primary-foreground text-label font-black uppercase tracking-widest transition-colors mb-8">
-              <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
-            </Link>
-
-            <div className="flex flex-col md:flex-row md:items-stretch gap-8 md:gap-12">
-              {/* Portrait is omitted rather than substituted when absent — a
-                  hand-written person spotlight may have no subject_photo_url and
-                  must not get a broken or misleading card. */}
-              {portrait && (
-                <div className="w-52 sm:w-64 md:w-72 lg:w-80 shrink-0 mx-auto md:mx-0">
-                  {/* No offset shadow: --shadow-color is --foreground, which
-                      flips, so the shadow would be dark green in light and cream
-                      in dark — one of those reads as a mistake on sand. The
-                      pinned dark border is what separates photo from surface. */}
-                  <div className="relative aspect-[2/3] md:h-full md:aspect-auto md:min-h-[26rem] border-[3px] border-primary-foreground overflow-hidden bg-primary-foreground/10">
-                    <Image
-                      src={portrait}
-                      alt={subjectName}
-                      fill
-                      priority
-                      sizes="(max-width: 768px) 16rem, 20rem"
-                      className="object-cover object-top"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* justify-center so name and facts sit against the middle of a
-                  tall portrait rather than floating at its top edge. */}
-              <div className="flex-1 min-w-0 flex flex-col justify-center">
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-primary-foreground">
-                    Spotlight
-                  </span>
-                  {subjectRole && (
-                    <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-primary-foreground/45 text-primary-foreground">
-                      {subjectRole}
-                    </span>
-                  )}
-                </div>
-
-                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-primary-foreground leading-[0.95]">
-                  {subjectName}
-                </h1>
-
-                {/* The dek moves INTO the hero for people. It is the one line
-                    that answers "why this person, why now", so leaving it in a
-                    panel below the fold meant the hero showed a face and a
-                    birthday and no reason to keep reading. Topic spotlights keep
-                    it in the body panel, where there is no portrait competing
-                    for the same space. */}
-                {article.excerpt && (
-                  <p className="mt-5 text-base sm:text-lg font-medium text-primary-foreground/80 leading-relaxed max-w-2xl">
-                    {article.excerpt}
-                  </p>
-                )}
-
-                {/* Structured data, never generated prose. TMDB leaves birthday and
-                    place_of_birth null for many working directors, so this list is
-                    built from whatever is present and disappears entirely when
-                    nothing is — which is the common case, not the edge case. */}
-                {facts.length > 0 && (
-                  <dl className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-primary-foreground/25 pt-5">
-                    {facts.map(fact => (
-                      <div key={fact.label} className="flex items-baseline gap-2">
-                        <dt className="text-label font-black uppercase tracking-widest text-primary-foreground/65 shrink-0">
-                          {fact.label}
-                        </dt>
-                        <dd className="text-meta font-bold text-primary-foreground min-w-0">{fact.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-6 pt-4 border-t-[2px] border-primary-foreground/25">
-                  <span className="font-black uppercase tracking-widest text-label text-primary-foreground/70">
-                    {article.authors?.name || "Editorial Team"}
-                  </span>
-                  <span className="text-primary-foreground/40 text-label">·</span>
-                  <span className="text-label font-bold uppercase tracking-widest text-primary-foreground/70">
-                    {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
-                  </span>
-                </div>
-              </div>
-            </div>
+        <div className="relative w-full h-[55vh] md:h-[70vh] min-h-[380px] md:min-h-[460px] overflow-hidden border-b-[4px] border-primary-foreground">
+          {/* Background image: portrait or fallback cover */}
+          <Image
+            src={posterImage || portrait || coverImage || ""}
+            alt={subjectName}
+            fill
+            priority
+            className="object-cover object-top"
+          />
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-black/40" />
+          {/* Back link */}
+          <Link href="/spotlight" prefetch={false} className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-white/70 hover:text-white text-label font-black uppercase tracking-widest transition-colors">
+            <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
+          </Link>
+          {/* Centered name */}
+          <div className="absolute inset-0 flex items-center justify-center px-4">
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-white leading-[0.95] text-center">
+              {subjectName}
+            </h1>
           </div>
         </div>
       ) : (
