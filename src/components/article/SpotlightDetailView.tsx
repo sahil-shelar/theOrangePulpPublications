@@ -74,7 +74,6 @@ export default async function SpotlightDetailView({ article }: { article: Articl
   // is no person to be wrong about, so a film still is the right image.
   const coverImage = article.cover_image_url || (article as any).movies?.backdrop_url;
   // Preferred background for person spotlight: use the subject's primary movie poster if available
-  const posterImage = (article as any).movies?.poster_url || works[0]?.movies?.poster_url || null;
 
   const birthday = (article as any).subject_birthday as string | null;
   const birthplace = (article as any).subject_birthplace as string | null;
@@ -137,69 +136,141 @@ export default async function SpotlightDetailView({ article }: { article: Articl
       <ReaderControls />
 
       {/* ══ PERSON sub-template ══════════════════════════════════════════════
-          Portrait sized to the block rather than to a fixed width, with the
-          detail column beside it.
+          Same shape as the movie detail page: a full-bleed backdrop band, then
+          a portrait straddling its bottom edge with the name and facts beside
+          it on the ordinary page background.
 
-          Still NOT full-bleed. A subject photo is 2:3 (500x750 from TMDB); the
-          old full-width treatment made this box ~2.7:1, so object-cover threw
-          away most of the frame and rendered a director's face as an
-          unrecognisable blur. Here the portrait column is a fixed 2:3 aspect
-          that grows with the breakpoint, so the crop never gets worse than the
-          source — it simply gets bigger, which is what "portrait the height of
-          the hero" wants without reintroducing the crop bug.
+          Reusing that structure rather than inventing one solves the problem
+          four different hero fills could not. Every previous attempt tried to
+          find a colour for a band BEHIND the details — bg-muted vanished into
+          the page, bg-card was a white slab, on-media-surface read near-black,
+          warm sand sat a step off the page in light mode. The movie page shows
+          the answer is not a better colour: the details belong on the page
+          background, and the visual weight comes from the image above them plus
+          the portrait breaking the border. Nothing behind the text needs to be
+          tinted at all.
 
-          md:items-stretch + h-full lets the image match whatever height the
-          detail column ends up being, so the two sides finish level instead of
-          one leaving a slab of dead space under it. object-top because when the
-          detail column IS taller, the extra height is taken off the bottom of
-          the frame — a headshot survives losing its chest, not its head.
+          The parallel is exact — film backdrop + film poster there, the
+          triggering film's backdrop + the director's portrait here — which is
+          also why the two pages feel like the same publication.
 
-          SURFACE: warm sand #E5DCCA, PINNED in both themes. Three earlier
-          attempts each failed for a different reason — bg-muted is one step off
-          the page in light and IDENTICAL to it in dark (both #0E2419), so the
-          band vanished; bg-card is pure #FFFFFF, a stark slab in a palette with
-          no white anywhere else; on-media-surface (#12301F) read as heavy and
-          near-black against an otherwise airy page.
-
-          Written as a literal rather than bg-muted even though light-mode
-          --muted is the same value, because --muted FLIPS to #1F4A34 in dark
-          and this band must not. Pinning it is the whole point: one set of
-          markup, no dark: variants, and the band cannot disappear into the page
-          in either theme.
-
-          Consequence that drives every class below: the band is pinned LIGHT,
-          so everything on it must be pinned DARK. That means primary-foreground
-          (#173D2A in both themes), NOT foreground or card-foreground — those
-          flip to cream in dark mode and would be invisible on sand. This is the
-          exact trap globals.css documents, just in the opposite direction from
-          the usual one.
-
-          Known trade-off, accepted deliberately: in LIGHT mode sand sits one
-          step off the cream page, so the 4px bottom border is doing real work
-          as the separator rather than being decoration. */}
+          The portrait keeps its own 2:3 aspect and is never stretched into the
+          band, so the crop bug that once rendered a director's face as an
+          unrecognisable blur cannot come back: the backdrop is landscape source
+          in a landscape box, and the portrait is 2:3 source in a 2:3 box. */}
       {isPersonSpotlight ? (
-        <div className="relative w-full h-[55vh] md:h-[70vh] min-h-[380px] md:min-h-[460px] overflow-hidden border-b-[4px] border-primary-foreground">
-          {/* Background image: portrait or fallback cover */}
-          <Image
-            src={posterImage || portrait || coverImage || ""}
-            alt={subjectName}
-            fill
-            priority
-            className="object-cover object-top"
-          />
-          {/* Dark overlay for readability */}
-          <div className="absolute inset-0 bg-black/40" />
-          {/* Back link */}
-          <Link href="/spotlight" prefetch={false} className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-white/70 hover:text-white text-label font-black uppercase tracking-widest transition-colors">
-            <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
-          </Link>
-          {/* Centered name */}
-          <div className="absolute inset-0 flex items-center justify-center px-4">
-            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-white leading-[0.95] text-center">
-              {subjectName}
-            </h1>
+        <>
+          {/* Hard bottom edge, matching every other hero on the site — the
+              poster straddling a crisp border reads as deliberate, where a fade
+              would lay a wash over the lower third of the artwork. */}
+          <div className="relative w-full h-[42vh] md:h-[55vh] min-h-[260px] bg-on-media-surface overflow-hidden border-b-[4px] border-foreground">
+            {coverImage && (
+              <Image
+                src={coverImage}
+                alt={`${subjectName} — ${article.title}`}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-center"
+              />
+            )}
+            {/* A top strip only, NOT the full img-scrim. That utility carries
+                two gradients — a top band for chrome and a bottom ramp for a
+                title and meta sitting on the image. Here the only thing on the
+                backdrop is this back link; the headline lives below on the page
+                background, so the bottom ramp had nothing to make legible and
+                just laid a dark wash across the lower third of the artwork.
+                The movie detail page, which this layout follows, uses no scrim
+                at all for exactly that reason. */}
+            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
+            <Link
+              href="/spotlight"
+              prefetch={false}
+              className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-on-media/70 hover:text-on-media text-label font-black uppercase tracking-widest transition-colors"
+            >
+              <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
+            </Link>
           </div>
-        </div>
+
+          {/* Portrait + details. z-10 so the overlapping portrait sits above the
+              backdrop rather than being clipped by it. */}
+          <div className="max-w-6xl mx-auto px-6 md:px-10 relative z-10">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
+              {/* Portrait omitted rather than substituted when absent — a
+                  hand-written person spotlight may have no subject_photo_url and
+                  must not get a broken or misleading card. When it is missing the
+                  details simply start below the backdrop, which still reads. */}
+              {portrait && (
+                <div className="w-32 sm:w-40 md:w-52 shrink-0 aspect-[2/3] border-[4px] border-foreground bg-muted overflow-hidden -mt-20 sm:-mt-24 md:-mt-32">
+                  <Image
+                    src={portrait}
+                    alt={subjectName}
+                    width={208}
+                    height={312}
+                    priority
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+              )}
+
+              {/* Text sits on the page background, so these use the normal
+                  flipping tokens — no pinning needed, unlike every tinted-band
+                  version of this header. */}
+              <div className="flex-1 min-w-0 pt-6">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-foreground">
+                    Spotlight
+                  </span>
+                  {subjectRole && (
+                    <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground text-foreground">
+                      {subjectRole}
+                    </span>
+                  )}
+                </div>
+
+                <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-black uppercase text-foreground leading-[0.9] tracking-tight">
+                  {subjectName}
+                </h1>
+
+                {/* The dek answers "why this person, why now" and is the only
+                    place the new release is announced — see rule 4 in
+                    spotlights.ts, which stops the body restating it. */}
+                {article.excerpt && (
+                  <p className="mt-4 text-base sm:text-lg font-medium text-foreground/80 leading-relaxed max-w-2xl">
+                    {article.excerpt}
+                  </p>
+                )}
+
+                {/* Structured data, never generated prose. TMDB leaves birthday
+                    and place_of_birth null for many working directors, so this
+                    list is built from whatever is present and disappears
+                    entirely when nothing is — the common case, not the edge. */}
+                {facts.length > 0 && (
+                  <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-foreground/15 pt-5 max-w-3xl">
+                    {facts.map(fact => (
+                      <div key={fact.label} className="flex items-baseline gap-2">
+                        <dt className="text-label font-black uppercase tracking-widest text-muted-foreground shrink-0">
+                          {fact.label}
+                        </dt>
+                        <dd className="text-meta font-bold text-foreground min-w-0">{fact.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-5 pt-4 border-t-[2px] border-foreground/15 max-w-3xl">
+                  <span className="font-black uppercase tracking-widest text-label text-muted-foreground">
+                    {article.authors?.name || "Editorial Team"}
+                  </span>
+                  <span className="text-muted-foreground text-label">·</span>
+                  <span className="text-label font-bold uppercase tracking-widest text-muted-foreground">
+                    {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
         /* ══ TOPIC sub-template ═════════════════════════════════════════════
            An essay with no subject gets the cinematic hero, matching
