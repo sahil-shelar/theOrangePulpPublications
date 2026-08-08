@@ -150,11 +150,26 @@ export default async function SpotlightDetailView({ article }: { article: Articl
           detail column ends up being, so the two sides finish level instead of
           one leaving a slab of dead space under it. object-top because when the
           detail column IS taller, the extra height is taken off the bottom of
-          the frame — a headshot survives losing its chest, not its head. */}
+          the frame — a headshot survives losing its chest, not its head.
+
+          SURFACE: on-media-surface, and the choice is load-bearing rather than
+          decorative. Two previous attempts failed for opposite reasons —
+          bg-muted is one step off the page in light and IDENTICAL to it in dark
+          (both #0E2419), so the band read as accidental empty space; bg-card is
+          pure #FFFFFF, a stark white slab against a cream page in a palette
+          that has no white in it anywhere else. --on-media-surface (#12301F) is
+          the token globals.css already defines for exactly this: a panel that
+          must stay dark in BOTH themes, which is why it does not flip and why
+          the same markup works in light and dark with no dark: variants. The
+          portrait then reads as a print photo mounted on a dark board.
+
+          Everything inside therefore uses on-media/*, NOT foreground or
+          card-foreground — those flip to dark green in light mode and would be
+          invisible here. That is the trap this codebase has hit before. */}
       {isPersonSpotlight ? (
-        <div className="bg-card border-b-[4px] border-foreground">
-          <div className="max-w-6xl mx-auto px-6 md:px-10 py-8 md:py-12">
-            <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-label font-black uppercase tracking-widest transition-colors mb-6">
+        <div className="bg-on-media-surface border-b-[4px] border-foreground">
+          <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 md:py-16">
+            <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-on-media/60 hover:text-on-media text-label font-black uppercase tracking-widest transition-colors mb-8">
               <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
             </Link>
 
@@ -164,7 +179,11 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                   must not get a broken or misleading card. */}
               {portrait && (
                 <div className="w-52 sm:w-64 md:w-72 lg:w-80 shrink-0 mx-auto md:mx-0">
-                  <div className="relative aspect-[2/3] md:h-full md:aspect-auto md:min-h-[26rem] border-[3px] border-foreground shadow-hard-lg overflow-hidden bg-muted">
+                  {/* Cream border, and no offset shadow: --shadow-color is
+                      --foreground, which is dark green in light mode and would
+                      cast an invisible shadow onto this dark board. The border
+                      is what separates the photo from the surface here. */}
+                  <div className="relative aspect-[2/3] md:h-full md:aspect-auto md:min-h-[26rem] border-[3px] border-on-media/85 overflow-hidden bg-on-media/10">
                     <Image
                       src={portrait}
                       alt={subjectName}
@@ -180,18 +199,18 @@ export default async function SpotlightDetailView({ article }: { article: Articl
               {/* justify-center so name and facts sit against the middle of a
                   tall portrait rather than floating at its top edge. */}
               <div className="flex-1 min-w-0 flex flex-col justify-center">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-foreground">
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-accent">
                     Spotlight
                   </span>
                   {subjectRole && (
-                    <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-foreground text-foreground">
+                    <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] border-on-media/40 text-on-media">
                       {subjectRole}
                     </span>
                   )}
                 </div>
 
-                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-card-foreground leading-[0.95]">
+                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-on-media leading-[0.95]">
                   {subjectName}
                 </h1>
 
@@ -202,7 +221,7 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                     it in the body panel, where there is no portrait competing
                     for the same space. */}
                 {article.excerpt && (
-                  <p className="mt-4 text-base sm:text-lg font-medium text-card-foreground/80 leading-relaxed max-w-2xl">
+                  <p className="mt-5 text-base sm:text-lg font-medium text-on-media/75 leading-relaxed max-w-2xl">
                     {article.excerpt}
                   </p>
                 )}
@@ -212,24 +231,24 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                     built from whatever is present and disappears entirely when
                     nothing is — which is the common case, not the edge case. */}
                 {facts.length > 0 && (
-                  <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-foreground/15 pt-5">
+                  <dl className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-on-media/20 pt-5">
                     {facts.map(fact => (
                       <div key={fact.label} className="flex items-baseline gap-2">
-                        <dt className="text-label font-black uppercase tracking-widest text-muted-foreground shrink-0">
+                        <dt className="text-label font-black uppercase tracking-widest text-on-media/55 shrink-0">
                           {fact.label}
                         </dt>
-                        <dd className="text-meta font-bold text-card-foreground min-w-0">{fact.value}</dd>
+                        <dd className="text-meta font-bold text-on-media min-w-0">{fact.value}</dd>
                       </div>
                     ))}
                   </dl>
                 )}
 
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-6 pt-4 border-t-[2px] border-foreground/15">
-                  <span className="font-black uppercase tracking-widest text-label text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-6 pt-4 border-t-[2px] border-on-media/20">
+                  <span className="font-black uppercase tracking-widest text-label text-on-media/70">
                     {article.authors?.name || "Editorial Team"}
                   </span>
-                  <span className="text-muted-foreground text-label">·</span>
-                  <span className="text-label font-bold uppercase tracking-widest text-muted-foreground">
+                  <span className="text-on-media/40 text-label">·</span>
+                  <span className="text-label font-bold uppercase tracking-widest text-on-media/70">
                     {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
                   </span>
                 </div>
@@ -318,8 +337,12 @@ export default async function SpotlightDetailView({ article }: { article: Articl
         </div>
       )}
 
-      {/* ── Body + sidebar ── */}
-      <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 pb-12 md:pb-16">
+      {/* ── Body + sidebar ──
+          pt matters as much as pb here. This grid had bottom padding and none
+          at the top, so the first line of body copy and the sidebar block both
+          started hard against the hero's 4px border — the section read as
+          something cut off mid-flow rather than as a new one beginning. */}
+      <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 pt-10 md:pt-14 pb-12 md:pb-16">
         <div className="lg:col-span-8">
           {/* The dek was generated on every spotlight and rendered nowhere — the
               generator writes it to `excerpt`, which this view never read, so the

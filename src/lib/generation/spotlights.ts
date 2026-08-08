@@ -105,8 +105,30 @@ Rules, in priority order:
    what recurs across it, what the new release looks like against what came
    before.
 
-4. THE NEW RELEASE IS THE OCCASION. The piece exists because it just came out.
-   Lead from there. Do not pretend to survey a career from nowhere.
+4. THE NEW RELEASE IS THE OCCASION, AND THE DEK IS WHERE IT IS ANNOUNCED. The
+   piece exists because that film just came out, so the dek names it and says
+   why this person is worth reading about now.
+
+   THE BODY MUST NOT RE-ANNOUNCE IT. By the time the body starts, the reader
+   has just read the dek directly above it — restating the release, or opening
+   with the same claim in different words, prints the same paragraph twice on
+   one screen. Assume the occasion is established and write about the work
+   itself: what recurs across the filmography, what it is aimed at, how the new
+   film sits against it. You may refer to the new film; you may not re-introduce
+   it as news.
+
+   Wrong (dek then body restating it):
+     dek:  "With Super Troopers 3 arriving in cinemas, Jay Chandrasekhar
+            revisits the institutional anarchy that defined his early work."
+     body: "Jay Chandrasekhar's output relies on anarchic ensembles. The
+            arrival of Super Troopers 3 marks a return to that chaotic style."
+
+   Right (body starts from the work, not the announcement):
+     body: "The comedies work by treating petty authority as the only real
+            antagonist, which is why the ensembles never split into leads and
+            support."
+
+   Both examples are about an unnamed hypothetical. Never reuse their wording.
 
 5. Reproduce \`rank\` and \`title\` exactly as supplied. Never reorder, renumber,
    rename, add or drop a film.
@@ -122,11 +144,17 @@ const SPOTLIGHT_SCHEMA = {
   type: Type.OBJECT,
   properties: {
     headline: { type: Type.STRING, description: 'Polished headline naming the subject. No colon-subtitle cliches.' },
-    dek: { type: Type.STRING, description: 'One or two sentences framing why this person, now. 25-40 words.' },
+    dek: {
+      type: Type.STRING,
+      description:
+        'One or two sentences naming the new release and framing why this person, now. 25-40 words. This is the ONLY place the release is announced.',
+    },
     body: {
       type: Type.STRING,
       description:
-        'Two or three short paragraphs, markdown, separated by blank lines. 70-140 words total. No headings.',
+        'Two or three short paragraphs, markdown, separated by blank lines. 70-140 words total. No headings. ' +
+        'Renders directly beneath the dek, so it must NOT restate the dek or re-announce the new release — ' +
+        'start from the work itself and what recurs across the filmography.',
     },
     works: {
       type: Type.ARRAY,
