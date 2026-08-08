@@ -23,6 +23,7 @@ import {
   getTmdbPersonDetails,
   getTmdbPersonDirectedMovies,
   parseTmdbToInternalMovie,
+  searchTmdbPerson,
   type TmdbDiscoverResult,
 } from '@/lib/services/tmdb'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -70,6 +71,19 @@ export function spotlightSignature(personTmdbId: number) {
  *  as "nothing to write" rather than as a failure, the same way an unsupported
  *  topic is distinguished from a broken run. */
 export class NoSpotlightSubjectError extends Error {}
+
+/**
+ * The editor asked for a specific person and the request cannot be honoured.
+ *
+ * Distinct from NoSpotlightSubjectError on purpose: that one means "nothing in
+ * this week's releases qualifies, and that is a normal outcome, try again
+ * later" — the cron route logs it at info and the dashboard shows it as
+ * information, not a failure (see route.ts and generate.ts). Naming a person is
+ * a direct request, so "Nolan already has a spotlight" or "no directed release
+ * found" needs to read as a targeted error the editor can act on, not as a
+ * quiet week.
+ */
+export class SpotlightSubjectUnavailableError extends Error {}
 
 const SYSTEM_INSTRUCTION = `You write Spotlight profiles for The Orange Pulp, a film publication with a dry, confident house voice.
 
@@ -303,6 +317,113 @@ async function pickSubject(
   )
 }
 
+/**
+ * Build a Subject for a director an editor named directly, rather than one the
+ * release window picked.
+ *
+ * The module header's argument for auto-selection still holds — "why this
+ * person, why now" cannot be invented — but an editor choosing to write about
+ * someone IS an editorial answer to that question. It just means the piece
+ * cannot lean on "just came out": WINDOW_DAYS is not applied here, so the
+ * trigger is whichever of their directed films released most recently, full
+ * stop, not "most recently within 10 days". SYSTEM_INSTRUCTION rule 4 (`THE
+ * NEW RELEASE IS THE OCCASION`) still gets a real, if not brand-new, film to
+ * lead from — never a synthetic "career overview" with nothing to hang the
+ * opening paragraph on.
+ *
+ * Only directors are supported. An actor's spotlight would need a differently
+ * shaped subject (cast credits instead of directed ones, no meaningful
+ * "directed since" framing, and SYSTEM_INSTRUCTION rule 2 — "NO BIOGRAPHY...
+ * write about the work" — was written assuming the work is a filmography of
+ * films the person made, not appeared in). Building that properly is a
+ * separate feature, not a parameter on this one.
+ */
+async function pickNamedSubject(
+  supabase: ReturnType<typeof createAdminClient>,
+  personName: string
+): Promise<Subject> {
+  // Ranked scoring, not results[0] — see searchTmdbPerson. Directing is
+  // preferred so a same-named actor does not win a request meant for a
+  // director.
+  const person = await searchTmdbPerson(personName, { preferDepartment: 'Directing' })
+  if (!person) {
+    throw new SpotlightSubjectUnavailableError(`No TMDB person found for "${personName}".`)
+  }
+  // Deliberately NOT gated on knownForDepartment here. That field is TMDB's
+  // "where do they have the most credits" heuristic, not "have they directed
+  // anything" — it categorises plenty of working directors (Greta Gerwig,
+  // Ben Affleck, Bradley Cooper) as Acting because that side of their career is
+  // larger, which would have wrongly refused every one of them. The real check
+  // is factual: does getTmdbPersonDirectedMovies below find any directed,
+  // released film. searchTmdbPerson still WEIGHTS Directing when disambiguating
+  // between several people sharing a name — that scoring bias just is not
+  // treated as a hard requirement once a single person has been resolved.
+
+  const signature = spotlightSignature(person.id)
+  const { data: existing } = await supabase
+    .from('articles')
+    .select('id, slug')
+    .eq('query_signature', signature)
+    .limit(1)
+    .maybeSingle()
+  if (existing) {
+    throw new SpotlightSubjectUnavailableError(
+      `${person.name} already has a spotlight (${existing.slug}).`
+    )
+  }
+
+  // minVotes 0: a genuinely new release may not have accumulated any votes yet,
+  // and the trigger is chosen by recency here, not by audience signal — unlike
+  // priorWorks below, which still needs the vote floor to keep the Notable
+  // Works grid from filling with untracked entries.
+  const allDirected = await getTmdbPersonDirectedMovies(person.id, 0)
+  const dated = allDirected
+    .filter(m => m.release_date && m.release_date <= ymd(new Date()))
+    .sort((a, b) => (b.release_date ?? '').localeCompare(a.release_date ?? ''))
+
+  const trigger = dated[0]
+  if (!trigger) {
+    throw new SpotlightSubjectUnavailableError(
+      `No released, directed film found for ${person.name} on TMDB.`
+    )
+  }
+
+  const directed = await getTmdbPersonDirectedMovies(person.id, PRIOR_VOTE_FLOOR)
+  const priorWorks = directed.filter(m => m.tmdb_id !== trigger.tmdb_id)
+  if (priorWorks.length < MIN_PRIOR_WORKS) {
+    throw new SpotlightSubjectUnavailableError(
+      `${person.name} has only ${priorWorks.length} prior directed film(s) with enough votes ` +
+      `(need ${MIN_PRIOR_WORKS}) — too few to fill the Notable Works grid.`
+    )
+  }
+
+  // Same reasoning as pickSubject: profile_path drives the hero portrait, and a
+  // director with no photo degrades the piece to being about a film instead of
+  // a person. Read off the trigger film's credits rather than a second search,
+  // matching pickSubject's approach.
+  const details = await getTmdbMovieDetails(trigger.tmdb_id)
+  const director = (details?.credits?.crew ?? []).find(
+    (c: any) => c.job === 'Director' && c.id === person.id
+  )
+  if (!director?.profile_path) {
+    throw new SpotlightSubjectUnavailableError(
+      `${person.name} has no portrait on TMDB — cannot build the subject header.`
+    )
+  }
+
+  const info = await getTmdbPersonDetails(person.id).catch(() => null)
+
+  return {
+    personId: person.id,
+    name: person.name,
+    profilePath: director.profile_path,
+    birthday: info?.birthday ?? null,
+    placeOfBirth: info?.place_of_birth ?? null,
+    trigger,
+    priorWorks,
+  }
+}
+
 export type GenerateSpotlightResult = {
   articleId: string
   slug: string
@@ -316,10 +437,20 @@ export type GenerateSpotlightResult = {
 }
 
 export async function generateSpotlightDraft(
-  opts: { windowDays?: number } = {}
+  opts: { windowDays?: number; personName?: string } = {}
 ): Promise<GenerateSpotlightResult> {
   const supabase = createAdminClient()
-  const subject = await pickSubject(supabase, opts.windowDays ?? WINDOW_DAYS)
+  const personName = opts.personName?.trim()
+
+  // Two ways to reach a Subject, same shape either way: the automatic path
+  // decides who AND why ("this director, because their film just came out");
+  // the named path takes who as given and finds a why in their own filmography
+  // (their most recent directed release, regardless of window). Everything
+  // from here down — upsert, prompt, validate, insert, rollback — is identical
+  // for both, same as rankings' fixed-template vs free-text convergence.
+  const subject = personName
+    ? await pickNamedSubject(supabase, personName)
+    : await pickSubject(supabase, opts.windowDays ?? WINDOW_DAYS)
 
   // Trigger film first: it is the occasion, and it would otherwise be filtered
   // out of the works list entirely — a film released days ago has not

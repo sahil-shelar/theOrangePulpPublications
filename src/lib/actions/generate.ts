@@ -6,7 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { JOB_PRIORITY } from '@/lib/jobs/types'
 import { generateRankingFromResolved } from '@/lib/generation/rankings'
 import { resolveTopic, UnsupportedTopicError } from '@/lib/generation/intent'
-import { generateSpotlightDraft, NoSpotlightSubjectError } from '@/lib/generation/spotlights'
+import { generateSpotlightDraft, NoSpotlightSubjectError, SpotlightSubjectUnavailableError } from '@/lib/generation/spotlights'
 
 const MAX_TOPIC_LENGTH = 200
 
@@ -108,18 +108,31 @@ export type GenerateSpotlightState =
    *  the same distinction the cron route draws. Surfaced separately so the UI
    *  can say "nothing to write this week" rather than showing a red error. */
   | { status: 'no-subject'; reason: string }
+  /** A NAMED person was requested and cannot be used — already covered, not a
+   *  director, no recent release, too few prior films, no portrait. Distinct
+   *  from 'no-subject': this is a direct request, so it reads as a targeted
+   *  problem the editor can fix, not a quiet week. */
+  | { status: 'unavailable'; reason: string }
   | { status: 'error'; message: string }
 
 /**
  * Generate a Spotlight draft on demand.
  *
  * Until now this only ran from the Thursday cron, so an editor could not produce
- * one at all. Unlike a ranking there is no topic to type: the subject is chosen
- * by the pipeline from directors whose film came out in the last `windowDays`,
- * because "why this person, why now" is exactly what a spotlight cannot invent.
- * The only knob is how far back to look.
+ * one at all. Two ways to choose the subject:
+ *
+ *  - Leave `personName` empty: the pipeline picks a director from films released
+ *    in the last `windowDays`, because "why this person, why now" is exactly
+ *    what a spotlight cannot invent on its own.
+ *  - Name a director: the editor IS the answer to "why now" by choosing to
+ *    write about them; the trigger becomes their most recent directed release,
+ *    regardless of window. See pickNamedSubject's header for why this only
+ *    covers directors, not actors.
  */
-export async function generateSpotlightNow(windowDays?: number): Promise<GenerateSpotlightState> {
+export async function generateSpotlightNow(
+  opts: { windowDays?: number; personName?: string } = {}
+): Promise<GenerateSpotlightState> {
+  const { windowDays, personName } = opts
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { status: 'error', message: 'You must be signed in.' }
@@ -127,13 +140,16 @@ export async function generateSpotlightNow(windowDays?: number): Promise<Generat
   if (windowDays !== undefined && (!Number.isInteger(windowDays) || windowDays < 1 || windowDays > 60)) {
     return { status: 'error', message: 'Window must be a whole number of days between 1 and 60.' }
   }
+  if (personName !== undefined && personName.trim().length > 200) {
+    return { status: 'error', message: 'Director name is too long.' }
+  }
 
   const admin = createAdminClient()
   const { data: job } = await admin
     .from('jobs')
     .insert({
       job_type: 'generate_spotlight',
-      payload: { windowDays: windowDays ?? null, source: 'dashboard' },
+      payload: { windowDays: windowDays ?? null, personName: personName?.trim() || null, source: 'dashboard' },
       status: 'running',
       priority: JOB_PRIORITY.high,
       started_at: new Date().toISOString(),
@@ -159,7 +175,10 @@ export async function generateSpotlightNow(windowDays?: number): Promise<Generat
   }
 
   try {
-    const result = await generateSpotlightDraft(windowDays ? { windowDays } : {})
+    const result = await generateSpotlightDraft({
+      windowDays,
+      personName: personName?.trim() || undefined,
+    })
 
     await finish('info', `Generated spotlight "${result.title}" on ${result.subjectName} (${result.workCount} works) with ${result.model}`, { ...result })
 
@@ -186,6 +205,14 @@ export async function generateSpotlightNow(windowDays?: number): Promise<Generat
       await finish('info', `No spotlight subject: ${message}`, { noSubject: true })
       revalidatePath('/dashboard/jobs')
       return { status: 'no-subject', reason: message }
+    }
+
+    if (err instanceof SpotlightSubjectUnavailableError) {
+      // A direct request that cannot be honoured is still not an infrastructure
+      // fault — logged at info, same as an unsupported ranking topic.
+      await finish('info', `Requested subject unavailable: ${message}`, { unavailable: true })
+      revalidatePath('/dashboard/jobs')
+      return { status: 'unavailable', reason: message }
     }
 
     await finish('error', message, {})

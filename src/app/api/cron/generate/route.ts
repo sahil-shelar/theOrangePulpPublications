@@ -12,7 +12,7 @@ import { JOB_PRIORITY } from '@/lib/jobs/types'
 import { generateRankingFromResolved } from '@/lib/generation/rankings'
 import { isTemplateId, TEMPLATES, type TemplateId, type TemplateParams } from '@/lib/generation/templates'
 import { resolveTopic, UnsupportedTopicError } from '@/lib/generation/intent'
-import { generateSpotlightDraft, NoSpotlightSubjectError } from '@/lib/generation/spotlights'
+import { generateSpotlightDraft, NoSpotlightSubjectError, SpotlightSubjectUnavailableError } from '@/lib/generation/spotlights'
 
 // A run does ~10 TMDB detail fetches plus one Gemini call.
 export const maxDuration = 60
@@ -69,12 +69,16 @@ export async function GET(request: NextRequest) {
     if (windowRaw && !Number.isInteger(windowDays)) {
       return NextResponse.json({ error: `"windowDays" must be an integer, got "${windowRaw}".` }, { status: 400 })
     }
+    // Manual override for testing a specific director, same idea as the
+    // ranking path's ?template=/?person= overrides below. The weekly cron
+    // never sends this — the scheduled run always auto-picks.
+    const personName = url.searchParams.get('person') ?? undefined
 
     const { data: job, error: jobError } = await supabase
       .from('jobs')
       .insert({
         job_type: 'generate_spotlight',
-        payload: { windowDays: windowDays ?? null },
+        payload: { windowDays: windowDays ?? null, personName: personName ?? null },
         status: 'running',
         priority: JOB_PRIORITY.normal,
         started_at: new Date().toISOString(),
@@ -87,7 +91,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      const result = await generateSpotlightDraft(windowDays ? { windowDays } : {})
+      const result = await generateSpotlightDraft({ windowDays, personName })
 
       await supabase.from('job_logs').insert({
         job_id: job.id,
@@ -100,27 +104,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: true, jobId: job.id, ...result })
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
-      // "Nobody qualified this week" is a normal outcome, not a fault, so it is
-      // logged at info and reported 422 — the same split the topic parser uses.
-      // Marking it failed would make a quiet week look like a broken cron.
+      // "Nobody qualified this week" / "that named person isn't available" are
+      // both normal outcomes, not faults — logged at info and reported 422,
+      // the same split the topic parser uses. Marking either failed would make
+      // a quiet week or a bad request look like a broken cron.
       const noSubject = err instanceof NoSpotlightSubjectError
+      const unavailable = err instanceof SpotlightSubjectUnavailableError
+      const expected = noSubject || unavailable
 
       await supabase.from('job_logs').insert({
         job_id: job.id,
-        level: noSubject ? 'info' : 'error',
-        message: noSubject ? `No spotlight subject: ${message}` : message,
-        metadata: { noSubject },
+        level: expected ? 'info' : 'error',
+        message: noSubject ? `No spotlight subject: ${message}` : unavailable ? `Requested subject unavailable: ${message}` : message,
+        metadata: { noSubject, unavailable },
       })
       await supabase
         .from('jobs')
         .update(
-          noSubject
+          expected
             ? { status: 'completed', completed_at: new Date().toISOString() }
             : { status: 'failed', failed_reason: message, completed_at: new Date().toISOString() }
         )
         .eq('id', job.id)
 
-      return NextResponse.json({ ok: false, noSubject, jobId: job.id, error: message }, { status: noSubject ? 422 : 500 })
+      return NextResponse.json({ ok: false, noSubject, unavailable, jobId: job.id, error: message }, { status: expected ? 422 : 500 })
     }
   }
 
