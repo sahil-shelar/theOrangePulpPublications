@@ -73,32 +73,13 @@ export default async function SpotlightDetailView({ article }: { article: Articl
   // Topic spotlights fall back to the movie backdrop the way reviews do — there
   // is no person to be wrong about, so a film still is the right image.
   const coverImage = article.cover_image_url || (article as any).movies?.backdrop_url;
-  // Preferred background for person spotlight: use the subject's primary movie poster if available
 
-  const birthday = (article as any).subject_birthday as string | null;
-  const birthplace = (article as any).subject_birthplace as string | null;
-
-  // Career span comes from the works already on the page rather than another
-  // field, so it is always consistent with what is rendered below.
-  const workYears = works
-    .map((w: any) => w.movies?.release_year)
-    .filter((y: any): y is number => typeof y === "number");
-  const activeFrom = workYears.length ? Math.min(...workYears) : null;
-
-  const facts: { label: string; value: string }[] = [
-    subjectRole ? { label: "Role", value: subjectRole } : null,
-    birthday
-      ? {
-          label: "Born",
-          value: new Date(birthday).toLocaleDateString("en-US", {
-            month: "long", day: "numeric", year: "numeric", timeZone: "UTC",
-          }),
-        }
-      : null,
-    birthplace ? { label: "From", value: birthplace } : null,
-    activeFrom ? { label: "On record since", value: String(activeFrom) } : null,
-    works.length ? { label: "Works listed", value: String(works.length) } : null,
-  ].filter(Boolean) as { label: string; value: string }[];
+  // subject_birthday / subject_birthplace and the derived "on record since" and
+  // "works listed" counts are no longer rendered — the hero is backdrop,
+  // portrait and name only. The columns and the generator that fills them are
+  // left alone: they are cheap, they are structured (never paraphrased into
+  // prose), and putting a facts panel back is a markup change rather than a
+  // data migration. spotlight_works still renders in full further down.
 
   // ProfilePage only when there is genuinely a person being profiled. A topic
   // essay declaring a schema.org Person named after its own headline was
@@ -137,8 +118,8 @@ export default async function SpotlightDetailView({ article }: { article: Articl
 
       {/* ══ PERSON sub-template ══════════════════════════════════════════════
           Same shape as the movie detail page: a full-bleed backdrop band, then
-          a portrait straddling its bottom edge with the name and facts beside
-          it on the ordinary page background.
+          a portrait straddling its bottom edge and the name beside it on the
+          ordinary page background.
 
           Reusing that structure rather than inventing one solves the problem
           four different hero fills could not. Every previous attempt tried to
@@ -232,41 +213,17 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                   {subjectName}
                 </h1>
 
-                {/* The dek answers "why this person, why now" and is the only
-                    place the new release is announced — see rule 4 in
-                    spotlights.ts, which stops the body restating it. */}
-                {article.excerpt && (
-                  <p className="mt-4 text-base sm:text-lg font-medium text-foreground/80 leading-relaxed max-w-2xl">
-                    {article.excerpt}
-                  </p>
-                )}
+                {/* Dek, subject facts and byline deliberately do NOT render here.
+                    The hero is the backdrop, the portrait and the name; the
+                    piece then starts straight into its own prose.
 
-                {/* Structured data, never generated prose. TMDB leaves birthday
-                    and place_of_birth null for many working directors, so this
-                    list is built from whatever is present and disappears
-                    entirely when nothing is — the common case, not the edge. */}
-                {facts.length > 0 && (
-                  <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-foreground/15 pt-5 max-w-3xl">
-                    {facts.map(fact => (
-                      <div key={fact.label} className="flex items-baseline gap-2">
-                        <dt className="text-label font-black uppercase tracking-widest text-muted-foreground shrink-0">
-                          {fact.label}
-                        </dt>
-                        <dd className="text-meta font-bold text-foreground min-w-0">{fact.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-5 pt-4 border-t-[2px] border-foreground/15 max-w-3xl">
-                  <span className="font-black uppercase tracking-widest text-label text-muted-foreground">
-                    {article.authors?.name || "Editorial Team"}
-                  </span>
-                  <span className="text-muted-foreground text-label">·</span>
-                  <span className="text-label font-bold uppercase tracking-widest text-muted-foreground">
-                    {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
-                  </span>
-                </div>
+                    Consequence handled in spotlights.ts, not here: the dek used
+                    to be the only place the new release was announced, and rule
+                    4 told the body NOT to restate it. With the dek off the page
+                    that would have left the occasion unstated anywhere, so the
+                    rule now puts it back in the body's opening. The excerpt
+                    itself is still written and still earns its keep — listing
+                    cards and the SEO description both read it. */}
               </div>
             </div>
           </div>

@@ -105,30 +105,24 @@ Rules, in priority order:
    what recurs across it, what the new release looks like against what came
    before.
 
-4. THE NEW RELEASE IS THE OCCASION, AND THE DEK IS WHERE IT IS ANNOUNCED. The
-   piece exists because that film just came out, so the dek names it and says
-   why this person is worth reading about now.
+4. THE NEW RELEASE IS THE OCCASION, AND THE BODY IS WHERE IT IS ANNOUNCED.
+   The piece exists because that film just came out, so the body's opening
+   establishes it and moves on: what recurs across the filmography, what it is
+   aimed at, how the new film sits against it.
 
-   THE BODY MUST NOT RE-ANNOUNCE IT. By the time the body starts, the reader
-   has just read the dek directly above it — restating the release, or opening
-   with the same claim in different words, prints the same paragraph twice on
-   one screen. Assume the occasion is established and write about the work
-   itself: what recurs across the filmography, what it is aimed at, how the new
-   film sits against it. You may refer to the new film; you may not re-introduce
-   it as news.
+   The dek does NOT appear on the article page — it is the listing-card summary
+   and the SEO description, read somewhere else entirely. So it must stand on
+   its own for a reader who never sees the body, and the body must stand on its
+   own for a reader who never saw the dek. Write both as if the other is
+   missing; do not write the body as a continuation of the dek.
 
-   Wrong (dek then body restating it):
-     dek:  "With Super Troopers 3 arriving in cinemas, Jay Chandrasekhar
-            revisits the institutional anarchy that defined his early work."
-     body: "Jay Chandrasekhar's output relies on anarchic ensembles. The
-            arrival of Super Troopers 3 marks a return to that chaotic style."
+   (An earlier version of this rule told the body NOT to name the release,
+   because the dek was rendered directly above it and the two read as the same
+   paragraph twice. The dek was later removed from the page, which left the
+   occasion unstated anywhere — hence this reversal.)
 
-   Right (body starts from the work, not the announcement):
-     body: "The comedies work by treating petty authority as the only real
-            antagonist, which is why the ensembles never split into leads and
-            support."
-
-   Both examples are about an unnamed hypothetical. Never reuse their wording.
+   Announce it once, in the body, then write about the work. Do not restate it
+   in every paragraph.
 
 5. Reproduce \`rank\` and \`title\` exactly as supplied. Never reorder, renumber,
    rename, add or drop a film.
@@ -147,14 +141,15 @@ const SPOTLIGHT_SCHEMA = {
     dek: {
       type: Type.STRING,
       description:
-        'One or two sentences naming the new release and framing why this person, now. 25-40 words. This is the ONLY place the release is announced.',
+        'One or two sentences naming the new release and framing why this person, now. 25-40 words. ' +
+        'Does NOT render on the article page — it is the listing-card summary and SEO description, so it must stand alone.',
     },
     body: {
       type: Type.STRING,
       description:
         'Two or three short paragraphs, markdown, separated by blank lines. 70-140 words total. No headings. ' +
-        'Renders directly beneath the dek, so it must NOT restate the dek or re-announce the new release — ' +
-        'start from the work itself and what recurs across the filmography.',
+        'This is the first prose a reader sees, so the opening establishes the new release as the occasion, ' +
+        'then moves to what recurs across the filmography. Name the release once, not in every paragraph.',
     },
     works: {
       type: Type.ARRAY,
