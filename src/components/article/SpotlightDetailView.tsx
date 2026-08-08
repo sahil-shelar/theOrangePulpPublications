@@ -40,7 +40,27 @@ export default async function SpotlightDetailView({ article }: { article: Articl
     getCachedRelated(article.id, article.category_id, article.type, article.movie_id),
   ]);
 
-  const subjectName = (article as any).subject_name || article.title;
+  // ── Which sub-template ──────────────────────────────────────────────────
+  // Spotlights are two different articles wearing one type. A PERSON spotlight
+  // profiles a director or actor and is carried by their face and filmography.
+  // A TOPIC spotlight ("The Evolution of Modern Cinema") has no subject at all
+  // — it is an essay, and it wants the same cinematic treatment a review gets.
+  //
+  // `subject_name` is the discriminator rather than a new column, because it is
+  // already exactly that in practice: the generator always writes it for a
+  // person, nothing writes it for a topic, and this component already used its
+  // presence to decide whether to render a portrait. A dedicated enum would
+  // need a migration, a backfill of 48 rows, and an editor field that can
+  // contradict the data underneath it — all to answer a question the data
+  // already answers unambiguously.
+  //
+  // Actor vs director is NOT a third template: both are people with a
+  // filmography, so they share the person layout and differ only in
+  // `subject_role`, which is rendered as a badge and a fact.
+  const rawSubjectName = (article as any).subject_name as string | null;
+  const isPersonSpotlight = Boolean(rawSubjectName?.trim());
+
+  const subjectName = rawSubjectName || article.title;
   const subjectRole = (article as any).subject_role;
   const pullQuote = (article as any).pull_quote;
   const works = article.spotlight_works ?? [];
@@ -49,6 +69,10 @@ export default async function SpotlightDetailView({ article }: { article: Articl
   // an acceptable fallback here: it is a film backdrop, and a landscape still
   // stretched into a 2:3 card is not a portrait of anyone.
   const portrait = (article as any).subject_photo_url as string | null;
+
+  // Topic spotlights fall back to the movie backdrop the way reviews do — there
+  // is no person to be wrong about, so a film still is the right image.
+  const coverImage = article.cover_image_url || (article as any).movies?.backdrop_url;
 
   const birthday = (article as any).subject_birthday as string | null;
   const birthplace = (article as any).subject_birthplace as string | null;
@@ -75,18 +99,32 @@ export default async function SpotlightDetailView({ article }: { article: Articl
     works.length ? { label: "Works listed", value: String(works.length) } : null,
   ].filter(Boolean) as { label: string; value: string }[];
 
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    "mainEntity": {
-      "@type": "Person",
-      "name": subjectName,
-      ...(subjectRole && { "jobTitle": subjectRole }),
-      ...(portrait && { "image": portrait }),
-    },
-    "datePublished": article.published_at || article.created_at,
-    "author": [{ "@type": "Person", "name": article.authors?.name || "Editorial Team" }],
-  };
+  // ProfilePage only when there is genuinely a person being profiled. A topic
+  // essay declaring a schema.org Person named after its own headline was
+  // asserting an entity that does not exist, so those now emit a plain Article.
+  const schema = isPersonSpotlight
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "mainEntity": {
+          "@type": "Person",
+          "name": subjectName,
+          ...(subjectRole && { "jobTitle": subjectRole }),
+          ...(portrait && { "image": portrait }),
+        },
+        "datePublished": article.published_at || article.created_at,
+        "author": [{ "@type": "Person", "name": article.authors?.name || "Editorial Team" }],
+      }
+    : {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": article.seo_title || article.title,
+        "description": article.seo_description || article.excerpt,
+        ...(coverImage && { "image": [coverImage] }),
+        "datePublished": article.published_at || article.created_at,
+        "dateModified": article.updated_at || article.created_at,
+        "author": [{ "@type": "Person", "name": article.authors?.name || "Editorial Team" }],
+      };
 
   return (
     <div className="w-full bg-background min-h-screen">
@@ -96,57 +134,52 @@ export default async function SpotlightDetailView({ article }: { article: Articl
       <ViewCounter articleId={article.id} />
       <ReaderControls />
 
-      {/* ── Subject header: a bordered card holding portrait + facts ──
-          NOT a full-bleed portrait. A subject photo is 2:3 (500x750 from TMDB)
-          and this block was ~2.7:1 at a normal window, so object-cover showed
-          about a quarter of the image height magnified 3x — the reason a
-          director's face rendered as an unrecognisable dark blur. A contained
-          card lets the portrait keep its own aspect.
+      {/* ══ PERSON sub-template ══════════════════════════════════════════════
+          Portrait sized to the block rather than to a fixed width, with the
+          detail column beside it.
 
-          Also not the MovieDetail backdrop treatment: putting the new release's
-          backdrop full-bleed behind the subject makes the film the subject, and
-          this piece is about the person. cover_image_url still earns its keep on
-          listing cards; it just does not belong here.
+          Still NOT full-bleed. A subject photo is 2:3 (500x750 from TMDB); the
+          old full-width treatment made this box ~2.7:1, so object-cover threw
+          away most of the frame and rendered a director's face as an
+          unrecognisable blur. Here the portrait column is a fixed 2:3 aspect
+          that grows with the breakpoint, so the crop never gets worse than the
+          source — it simply gets bigger, which is what "portrait the height of
+          the hero" wants without reintroducing the crop bug.
 
-          Previously the full section width was filled with bg-muted, a colour
-          only one step off the page background (#E5DCCA vs #F5EFE4 in light,
-          and identical to it in dark — --muted and --background render the same
-          there). Close enough to invisible that the band read as stray empty
-          space rather than a deliberate panel, especially below the text
-          column: with items-start (the flex default) the row's height is set
-          by the taller portrait, so all of the leftover space collects under
-          the shorter text block instead of being shared. A bordered
-          brutal-panel gives the section a real edge in both themes, and
-          sm:items-center centers portrait and text against each other so that
-          leftover height splits top and bottom instead of pooling on one
-          side. */}
-      <div className="bg-background border-b-[4px] border-foreground">
-        <div className="max-w-6xl mx-auto px-6 md:px-10 py-8 md:py-12">
-          <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-label font-black uppercase tracking-widest transition-colors mb-6">
-            <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
-          </Link>
+          md:items-stretch + h-full lets the image match whatever height the
+          detail column ends up being, so the two sides finish level instead of
+          one leaving a slab of dead space under it. object-top because when the
+          detail column IS taller, the extra height is taken off the bottom of
+          the frame — a headshot survives losing its chest, not its head. */}
+      {isPersonSpotlight ? (
+        <div className="bg-card border-b-[4px] border-foreground">
+          <div className="max-w-6xl mx-auto px-6 md:px-10 py-8 md:py-12">
+            <Link href="/spotlight" prefetch={false} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-label font-black uppercase tracking-widest transition-colors mb-6">
+              <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
+            </Link>
 
-          <div className="brutal-panel shadow-hard-lg p-6 sm:p-8 md:p-10">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-6 md:gap-10">
-              {/* Portrait is omitted rather than substituted when absent — the one
-                  hand-written spotlight has no subject_photo_url and must not get a
-                  broken or misleading card. Centered on mobile (mx-auto) since a
-                  fixed-width block in a stacked column otherwise pins to the left
-                  edge under a headline that wraps full-width. */}
+            <div className="flex flex-col md:flex-row md:items-stretch gap-8 md:gap-12">
+              {/* Portrait is omitted rather than substituted when absent — a
+                  hand-written person spotlight may have no subject_photo_url and
+                  must not get a broken or misleading card. */}
               {portrait && (
-                <div className="w-40 sm:w-48 md:w-56 shrink-0 mx-auto sm:mx-0">
-                  {/* shadow-hard-sm, not -lg: the portrait now sits inside an
-                      already-shadowed panel, and stacking two large offset
-                      shadows reads as visual noise rather than depth. bg-muted
-                      as the loading/fallback fill so it doesn't blend into the
-                      bg-card panel behind it before the image paints. */}
-                  <div className="relative aspect-[2/3] border-[3px] border-foreground shadow-hard-sm overflow-hidden bg-muted">
-                    <Image src={portrait} alt={subjectName} fill priority sizes="224px" className="object-cover" />
+                <div className="w-52 sm:w-64 md:w-72 lg:w-80 shrink-0 mx-auto md:mx-0">
+                  <div className="relative aspect-[2/3] md:h-full md:aspect-auto md:min-h-[26rem] border-[3px] border-foreground shadow-hard-lg overflow-hidden bg-muted">
+                    <Image
+                      src={portrait}
+                      alt={subjectName}
+                      fill
+                      priority
+                      sizes="(max-width: 768px) 16rem, 20rem"
+                      className="object-cover object-top"
+                    />
                   </div>
                 </div>
               )}
 
-              <div className="flex-1 min-w-0">
+              {/* justify-center so name and facts sit against the middle of a
+                  tall portrait rather than floating at its top edge. */}
+              <div className="flex-1 min-w-0 flex flex-col justify-center">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-foreground">
                     Spotlight
@@ -158,28 +191,40 @@ export default async function SpotlightDetailView({ article }: { article: Articl
                   )}
                 </div>
 
-                <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl font-black uppercase text-foreground leading-[0.95]">
+                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-card-foreground leading-[0.95]">
                   {subjectName}
                 </h1>
+
+                {/* The dek moves INTO the hero for people. It is the one line
+                    that answers "why this person, why now", so leaving it in a
+                    panel below the fold meant the hero showed a face and a
+                    birthday and no reason to keep reading. Topic spotlights keep
+                    it in the body panel, where there is no portrait competing
+                    for the same space. */}
+                {article.excerpt && (
+                  <p className="mt-4 text-base sm:text-lg font-medium text-card-foreground/80 leading-relaxed max-w-2xl">
+                    {article.excerpt}
+                  </p>
+                )}
 
                 {/* Structured data, never generated prose. TMDB leaves birthday and
                     place_of_birth null for many working directors, so this list is
                     built from whatever is present and disappears entirely when
                     nothing is — which is the common case, not the edge case. */}
                 {facts.length > 0 && (
-                  <dl className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 border-t-[2px] border-foreground/15 pt-4 max-w-xl">
+                  <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 border-t-[2px] border-foreground/15 pt-5">
                     {facts.map(fact => (
                       <div key={fact.label} className="flex items-baseline gap-2">
                         <dt className="text-label font-black uppercase tracking-widest text-muted-foreground shrink-0">
                           {fact.label}
                         </dt>
-                        <dd className="text-meta font-bold text-foreground min-w-0">{fact.value}</dd>
+                        <dd className="text-meta font-bold text-card-foreground min-w-0">{fact.value}</dd>
                       </div>
                     ))}
                   </dl>
                 )}
 
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-5 pt-4 border-t-[2px] border-foreground/15">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-6 pt-4 border-t-[2px] border-foreground/15">
                   <span className="font-black uppercase tracking-widest text-label text-muted-foreground">
                     {article.authors?.name || "Editorial Team"}
                   </span>
@@ -192,7 +237,77 @@ export default async function SpotlightDetailView({ article }: { article: Articl
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* ══ TOPIC sub-template ═════════════════════════════════════════════
+           An essay with no subject gets the cinematic hero, matching
+           ReviewDetailView: same heights, same object-top crop reasoning, same
+           img-scrim, same on-media tokens. Deliberately a copy of that
+           structure rather than a shared component — the two differ in badge,
+           back-link target and meta row, and factoring out a hero that takes
+           eight props to express those differences would be harder to read than
+           the markup itself.
+
+           on-media / on-media-surface, NOT foreground/background: those flip
+           with the theme, and this text sits on a photo that is dark in both.
+           Using a flipping token here is what once made hero titles invisible
+           in dark mode. */
+        <div className="relative w-full h-[55vh] md:h-[70vh] min-h-[380px] md:min-h-[460px] overflow-hidden border-b-[4px] border-foreground">
+          {coverImage ? (
+            <Image src={coverImage} alt={article.title} fill priority sizes="100vw" className="object-cover object-top" />
+          ) : (
+            /* bg-accent, not a neutral: a topic spotlight with no cover is the
+               common case for older pieces, and a flat grey box reads as a
+               broken image rather than a deliberate colour field. */
+            <div className="absolute inset-0 bg-accent" />
+          )}
+          <div className="absolute inset-0 img-scrim" />
+
+          <Link
+            href="/spotlight"
+            prefetch={false}
+            className="absolute top-6 left-4 sm:left-8 flex items-center gap-2 text-on-media/70 hover:text-on-media text-label font-black uppercase tracking-widest transition-colors"
+          >
+            <ArrowLeft size={14} strokeWidth={2.5} /> Spotlight
+          </Link>
+
+          <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 md:pb-12 max-w-6xl mx-auto">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="text-label font-black uppercase tracking-widest px-3 py-1.5 border-[2px] bg-accent text-accent-foreground border-foreground">
+                Spotlight
+              </span>
+              {article.categories && (
+                <span className="text-label font-black uppercase tracking-widest text-on-media/80 px-3 py-1.5 border-[2px] border-on-media/20">
+                  {article.categories.name}
+                </span>
+              )}
+            </div>
+
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase text-on-media leading-[0.95] max-w-4xl">
+              {article.title}
+            </h1>
+
+            {article.excerpt && (
+              <p className="mt-3 text-sm sm:text-base font-medium text-on-media/80 leading-snug max-w-2xl italic">
+                {article.excerpt}
+              </p>
+            )}
+
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-4 pt-4 border-t-[1px] border-on-media/20">
+              <span className="font-black uppercase tracking-widest text-label text-on-media/80">
+                {article.authors?.name || "Editorial Team"}
+              </span>
+              <span className="text-on-media/30 text-label">·</span>
+              <span className="text-label font-bold uppercase tracking-widest text-on-media/80">
+                {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+              </span>
+              <span className="text-on-media/30 text-label">·</span>
+              <span className="text-label font-bold uppercase tracking-widest text-on-media/80">
+                {article.reading_time || 5} min read
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Pull quote ── */}
       {pullQuote && (
@@ -216,16 +331,13 @@ export default async function SpotlightDetailView({ article }: { article: Articl
               would put dark text on a dark panel. Border set explicitly rather
               than via brutal-panel, which applies bg-card from @layer utilities
               and would beat the fill on source order. */}
-          {article.excerpt && (
-            <div className="border-[3px] border-foreground bg-secondary shadow-hard-lg px-6 py-6 sm:px-8 sm:py-7 mb-10">
-              <span className="inline-block bg-on-media-surface text-on-media text-label font-black uppercase tracking-widest px-2.5 py-1 mb-4">
-                The Occasion
-              </span>
-              <p className="font-heading uppercase font-black text-base sm:text-lg leading-[1.35] text-primary-foreground">
-                {article.excerpt}
-              </p>
-            </div>
-          )}
+          {/* The "The Occasion" standfirst panel that used to sit here is gone.
+              It existed because the generated dek was written to `excerpt` and
+              rendered nowhere, so the sentence explaining why this subject now
+              was invisible. Both sub-templates now surface it in the hero —
+              beside the portrait for a person, under the headline for a topic —
+              so keeping the panel printed the same sentence twice on one
+              screen. The dek is still shown, just once and higher up. */}
 
           {article.content && (
             <article className="prose prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:uppercase prose-p:font-medium prose-img:border-[3px] prose-img:border-foreground prose-blockquote:border-l-[6px] prose-blockquote:border-primary prose-blockquote:not-italic prose-strong:font-black max-w-none text-foreground">
